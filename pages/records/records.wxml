@@ -1,0 +1,64 @@
+<view class="page">
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <icon-cmp type="search" size="18" color="#999999"></icon-cmp>
+      <input class="search-input" placeholder="搜索盘点单号" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearch" />
+      <view class="clear-btn" wx:if="{{searchKeyword}}" bindtap="onClearSearch">
+        <text>✕</text>
+      </view>
+    </view>
+    <view class="search-btn" bindtap="onSearch">
+      <text>搜索</text>
+    </view>
+  </view>
+
+  <view class="loading-container" wx:if="{{pageLoading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view class="empty-container" wx:elif="{{records.length === 0}}">
+    <icon-cmp type="document" size="64" color="#CCCCCC"></icon-cmp>
+    <text class="empty-text">暂无盘点记录</text>
+  </view>
+
+  <block wx:else>
+    <view class="record-list">
+      <view class="record-card" wx:for="{{records}}" wx:key="id" bindtap="onRecordTap" data-id="{{item.id}}">
+        <view class="record-header">
+          <view class="record-title-row">
+            <text class="record-title">{{item.checkNo}}</text>
+            <text class="record-status status-{{item.status}}">{{item.status === 'completed' ? '已完成' : item.status === 'pending' ? '进行中' : item.status}}</text>
+          </view>
+          <text class="record-date">{{item.createdAt}}</text>
+        </view>
+        <view class="record-body">
+          <view class="record-info-item">
+            <text class="info-label">盘点人</text>
+            <text class="info-value">{{item.operatorName}}</text>
+          </view>
+          <view class="record-info-item">
+            <text class="info-label">品种数</text>
+            <text class="info-value highlight">{{item.totalProducts}}</text>
+          </view>
+          <view class="record-info-item">
+            <text class="info-label">已盘</text>
+            <text class="info-value">{{item.checkedProducts}}</text>
+          </view>
+          <view class="record-info-item">
+            <text class="info-label">差异</text>
+            <text class="info-value {{item.diffProducts > 0 ? 'diff' : ''}}">{{item.diffProducts}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="load-more" wx:if="{{loadingMore}}">
+      <view class="loading-spinner small"></view>
+      <text class="loading-text">加载更多...</text>
+    </view>
+    <view class="load-more" wx:elif="{{!hasMore && records.length > 0}}">
+      <text class="no-more">— 已加载全部记录 —</text>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,446 @@
+/* ============================================================
+   UI-UX PRO MAX — 商品详情（与商品信息页统一设计语言）
+   ============================================================ */
+
+/* ---------- 基础 ---------- */
+page {
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+.page {
+  padding-bottom: 200rpx;
+  min-height: 100vh;
+}
+
+/* ---------- Loading ---------- */
+.loading-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+}
+.loading-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: #cccccc;
+  animation: pulse 1s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* ---------- 页面头部（琥珀渐变，与商品信息页一致） ---------- */
+.page-header {
+  background: linear-gradient(135deg, #F59E0B 0%, #F97316 100%);
+  padding: 32rpx 32rpx 56rpx;
+  border-radius: 0 0 40rpx 40rpx;
+}
+
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.header-info {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.product-name {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.3;
+  margin-bottom: 12rpx;
+  letter-spacing: 0.5rpx;
+}
+
+.product-meta {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.product-code {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: monospace;
+  letter-spacing: 1rpx;
+}
+
+.meta-sep {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.product-category {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* 状态标签 — 琥珀背景上用半透明白底 */
+.status-tag {
+  flex-shrink: 0;
+  padding: 8rpx 20rpx;
+  border-radius: 8rpx;
+  margin-top: 6rpx;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.status-tag-text {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: 0.5rpx;
+}
+
+/* ---------- 卡片通用（与 form.wxss 完全一致） ---------- */
+.section-card {
+  margin: -24rpx 20rpx 28rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  padding: 24rpx 24rpx;
+  position: relative;
+  z-index: 2;
+}
+
+.section-card:first-of-type {
+  margin-top: -24rpx;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.section-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.section-icon {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 8rpx;
+  flex-shrink: 0;
+}
+
+/* 与 form.wxss 保持一致的色系 */
+.section-icon-stock {
+  background: linear-gradient(135deg, #F59E0B, #F97316);
+}
+
+.section-icon-info {
+  background: linear-gradient(135deg, #F59E0B, #F97316);
+}
+
+.section-icon-warehouse {
+  background: linear-gradient(135deg, #10B981, #34D399);
+}
+
+.section-icon-logs {
+  background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #333333;
+}
+
+/* ---------- 库存指标（主角） ---------- */
+.stock-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #FFFBEB;
+  margin: 0 -24rpx;
+  padding: 32rpx 24rpx 28rpx;
+  border-radius: 12rpx;
+}
+
+.stock-num {
+  font-size: 64rpx;
+  font-weight: 800;
+  color: #333333;
+  line-height: 1;
+  letter-spacing: -1rpx;
+}
+
+.stock-num.num-danger {
+  color: #DC2626;
+}
+
+.stock-unit {
+  font-size: 24rpx;
+  color: #5c5c5c;
+  margin-top: 4rpx;
+}
+
+.stock-desc {
+  font-size: 22rpx;
+  color: #5c5c5c;
+  margin-top: 8rpx;
+}
+
+/* 库存次要指标行 */
+.stock-sub {
+  display: flex;
+  align-items: center;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f5f5f5;
+}
+
+.stock-sub-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.stock-sub-num {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #333333;
+  line-height: 1;
+}
+
+.stock-sub-label {
+  font-size: 22rpx;
+  color: #5c5c5c;
+}
+
+.stock-sub-divider {
+  width: 1rpx;
+  height: 56rpx;
+  background: #cccccc;
+  flex-shrink: 0;
+}
+
+/* ---------- 属性列表（与 form-item 对齐） ---------- */
+.attr-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #f5f5f5;
+}
+
+.attr-item:last-child {
+  border-bottom: none;
+}
+
+.attr-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333333;
+  flex-shrink: 0;
+}
+
+.attr-val {
+  font-size: 26rpx;
+  color: #5c5c5c;
+  text-align: right;
+  margin-left: 24rpx;
+  word-break: break-all;
+}
+
+.attr-price {
+  color: #DC2626;
+  font-weight: 700;
+  font-size: 28rpx;
+}
+
+/* ---------- 仓库分布 ---------- */
+.wh-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 0;
+  border-bottom: 2rpx solid #f5f5f5;
+}
+
+.wh-item:last-child {
+  border-bottom: none;
+}
+
+.wh-left {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.wh-name {
+  font-size: 26rpx;
+  color: #333333;
+  font-weight: 500;
+}
+
+.wh-loc {
+  font-size: 22rpx;
+  color: #5c5c5c;
+  background: #f5f5f5;
+  padding: 4rpx 14rpx;
+  border-radius: 6rpx;
+}
+
+.wh-right {
+  display: flex;
+  align-items: baseline;
+  gap: 6rpx;
+}
+
+.wh-num {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #333333;
+}
+
+.wh-unit {
+  font-size: 22rpx;
+  color: #5c5c5c;
+}
+
+/* 仓位数量 badge */
+.count-badge {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+  background: #f5f5f5;
+  padding: 4rpx 14rpx;
+  border-radius: 20rpx;
+}
+
+.count-badge-num {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #10B981;
+}
+
+.count-badge-label {
+  font-size: 20rpx;
+  color: #5c5c5c;
+}
+
+/* ---------- 出入库记录 ---------- */
+.log-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 2rpx solid #f5f5f5;
+}
+
+.log-item:last-child {
+  border-bottom: none;
+}
+
+.log-left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.log-tag {
+  font-size: 20rpx;
+  font-weight: 600;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  flex-shrink: 0;
+  letter-spacing: 0.5rpx;
+}
+
+.log-tag-in {
+  background: #D1FAE5;
+  color: #047857;
+}
+
+.log-tag-out {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+.log-tag-adj {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.log-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  min-width: 0;
+}
+
+.log-title {
+  font-size: 26rpx;
+  color: #333333;
+  font-weight: 500;
+}
+
+.log-time {
+  font-size: 22rpx;
+  color: #cccccc;
+}
+
+.log-qty {
+  font-size: 28rpx;
+  font-weight: 700;
+  flex-shrink: 0;
+  font-family: monospace;
+}
+
+.log-qty.qty-plus {
+  color: #059669;
+}
+
+.log-qty.qty-minus {
+  color: #DC2626;
+}
+
+.empty-hint {
+  display: block;
+  font-size: 24rpx;
+  color: #cccccc;
+  text-align: center;
+  padding: 24rpx 0 8rpx;
+}
+
+/* ---------- 底部操作栏（与 form.wxss 完全一致） ---------- */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  padding: 20rpx 32rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  border-top: 1rpx solid #cccccc;
+  z-index: 100;
+}
+
+.btn-edit {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: #333333;
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: 12rpx;
+  border: none;
+  text-align: center;
+  letter-spacing: 1rpx;
+}

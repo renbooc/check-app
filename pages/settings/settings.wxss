@@ -1,0 +1,44 @@
+.page {
+  padding: 36rpx;
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.menu-group {
+  margin-bottom: 28rpx;
+}
+
+.menu-title {
+  font-size: 24rpx;
+  color: #5c5c5c;
+  padding: 12rpx 0;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 28rpx 24rpx;
+  border-radius: 20rpx;
+  margin-bottom: 4rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s;
+}
+
+.menu-item:active {
+  transform: scale(0.98);
+}
+
+.menu-label {
+  font-size: 28rpx;
+  color: #333333;
+}
+
+.menu-value {
+  font-size: 26rpx;
+  color: #5c5c5c;
+}

@@ -1,0 +1,164 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Like } from 'typeorm';
+import { SalesOrder } from '../../entities/sales-order.entity';
+import { SalesOrderItem } from '../../entities/sales-order-item.entity';
+import { Inventory } from '../../entities/inventory.entity';
+import { InventoryLog } from '../../entities/inventory-log.entity';
+
+@Injectable()
+export class SalesService {
+  constructor(
+    @InjectRepository(SalesOrder) private orderRepo: Repository<SalesOrder>,
+    @InjectRepository(SalesOrderItem) private itemRepo: Repository<SalesOrderItem>,
+    @InjectRepository(Inventory) private inventoryRepo: Repository<Inventory>,
+    @InjectRepository(InventoryLog) private logRepo: Repository<InventoryLog>,
+  ) {}
+
+  async findAll(params: { page?: number; pageSize?: number; keyword?: string; status?: string }) {
+    const { page = 1, pageSize = 20, keyword, status } = params;
+    const where: any = {};
+    if (keyword) where.orderNo = Like(`%${keyword}%`);
+    if (status) where.status = status;
+    const [list, total] = await this.orderRepo.findAndCount({
+      where,
+      relations: ['customer'],
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      order: { createdAt: 'DESC' },
+    });
+    return { list, total, page, pageSize };
+  }
+
+  async findOne(id: string) {
+    return this.orderRepo.findOne({
+      where: { id },
+      relations: ['customer', 'items'],
+    });
+  }
+
+  async create(dto: {
+    customerId: string;
+    items: Array<{
+      productId: string;
+      productName: string;
+      productSpec?: string;
+      productUnit?: string;
+      quantity: number;
+      price: number;
+    }>;
+    operatorId: string;
+    operatorName: string;
+    remark?: string;
+  }) {
+    const orderNo = `SO${Date.now()}`;
+    let totalAmount = 0;
+    let totalQuantity = 0;
+
+    const order = this.orderRepo.create({
+      orderNo,
+      customerId: dto.customerId,
+      status: 'draft',
+      totalAmount: 0,
+      totalQuantity: 0,
+      operatorId: dto.operatorId,
+      operatorName: dto.operatorName,
+      remark: dto.remark,
+      expectedDate: (dto as any).expectedDate || null,
+    });
+    const savedOrder = await this.orderRepo.save(order);
+
+    const items = dto.items.map((item) => {
+      const amount = item.quantity * item.price;
+      totalAmount += amount;
+      totalQuantity += item.quantity;
+      return this.itemRepo.create({
+        orderId: savedOrder.id,
+        ...item,
+        amount,
+      });
+    });
+    await this.itemRepo.save(items);
+
+    await this.orderRepo.update(savedOrder.id, { totalAmount, totalQuantity });
+    return this.findOne(savedOrder.id);
+  }
+
+  async update(id: string, dto: {
+    customerId?: string;
+    items?: Array<{
+      productId: string;
+      productName: string;
+      productSpec?: string;
+      productUnit?: string;
+      quantity: number;
+      price: number;
+    }>;
+    remark?: string;
+    expectedDate?: string;
+  }) {
+    const order = await this.orderRepo.findOne({ where: { id } });
+    if (!order) throw new NotFoundException('销售订单不存在');
+
+    if (dto.customerId !== undefined) order.customerId = dto.customerId;
+    if (dto.remark !== undefined) order.remark = dto.remark;
+    if (dto.expectedDate !== undefined) order.expectedDate = dto.expectedDate;
+
+    if (dto.items) {
+      await this.itemRepo.delete({ orderId: id });
+
+      let totalAmount = 0;
+      let totalQuantity = 0;
+      const items = dto.items.map((item) => {
+        const amount = item.quantity * item.price;
+        totalAmount += amount;
+        totalQuantity += item.quantity;
+        return this.itemRepo.create({
+          orderId: id,
+          ...item,
+          amount,
+        });
+      });
+      await this.itemRepo.save(items);
+      order.totalAmount = totalAmount;
+      order.totalQuantity = totalQuantity;
+    }
+
+    await this.orderRepo.save(order);
+    return this.findOne(id);
+  }
+
+  async updateStatus(id: string, status: string, operatorId?: string, operatorName?: string) {
+    await this.orderRepo.update(id, { status });
+
+    // 确认出库时扣减库存
+    if (status === 'delivered') {
+      const order = await this.findOne(id);
+      if (order && order.items) {
+        for (const item of order.items) {
+          const existing = await this.inventoryRepo.findOne({
+            where: { productId: item.productId },
+          });
+          if (existing) {
+            const beforeQty = existing.quantity;
+            const changeQty = -Math.abs(item.quantity);
+            existing.quantity = Math.max(0, existing.quantity - item.quantity);
+            await this.inventoryRepo.save(existing);
+            await this.logRepo.save({
+              productId: item.productId,
+              productName: item.productName,
+              type: 'sales_out',
+              changeQuantity: changeQty,
+              beforeQuantity: beforeQty,
+              afterQuantity: existing.quantity,
+              relatedOrderId: id,
+              operatorId,
+              operatorName,
+            });
+          }
+        }
+      }
+    }
+    return this.findOne(id);
+  }
+}

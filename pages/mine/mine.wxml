@@ -1,0 +1,136 @@
+<view class="page">
+
+  <!-- ====== 用户信息 Hero（深蓝渐变卡片） ====== -->
+  <view class="hero">
+    <view class="hero-deco"></view>
+    <view class="hero-content">
+      <view class="hero-avatar-wrap">
+        <image class="hero-avatar" src="{{avatarUrl}}" mode="aspectFill"></image>
+      </view>
+      <view class="hero-info">
+        <text class="hero-name">{{displayName}}</text>
+        <view class="hero-role">
+          <view class="hero-role-dot"></view>
+          <text class="hero-role-text">{{roleText}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ====== 统计卡（白卡片，与首页 KPI 卡一致） ====== -->
+  <view class="stats-card">
+    <view class="stats-row">
+      <view class="stats-cell" bindtap="onNavigate" data-url="/pages/product/list">
+        <text class="stats-num">{{stats.productCount}}</text>
+        <view class="stats-label-row">
+          <view class="stats-dot stats-dot-blue"></view>
+          <text class="stats-label">商品</text>
+        </view>
+      </view>
+      <view class="stats-cell" bindtap="onNavigate" data-url="/pages/customer/list">
+        <text class="stats-num">{{stats.customerCount}}</text>
+        <view class="stats-label-row">
+          <view class="stats-dot stats-dot-green"></view>
+          <text class="stats-label">客户</text>
+        </view>
+      </view>
+      <view class="stats-cell" bindtap="onNavigate" data-url="/pages/check/check">
+        <text class="{{pendingChecksWarnCls}}">{{stats.pendingChecks}}</text>
+        <view class="stats-label-row">
+          <view class="stats-dot stats-dot-amber"></view>
+          <text class="stats-label">待盘点</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ====== 业务管理 ====== -->
+  <view class="menu-card-wrap">
+    <text class="menu-card-title">业务管理</text>
+    <view class="menu-card">
+      <view class="menu-item" bindtap="onNavigate" data-url="/pages/product/list">
+        <view class="menu-icon icon-bg-blue">
+          <image class="menu-icon-img" src="/images/icon-document.png" mode="aspectFit"></image>
+        </view>
+        <text class="menu-label">商品管理</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="onNavigate" data-url="/pages/supplier/list">
+        <view class="menu-icon icon-bg-green">
+          <image class="menu-icon-img" src="/images/icon-clipboard.png" mode="aspectFit"></image>
+        </view>
+        <text class="menu-label">供应商管理</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="onNavigate" data-url="/pages/customer/list">
+        <view class="menu-icon icon-bg-amber">
+          <image class="menu-icon-img" src="/images/icon-user.png" mode="aspectFit"></image>
+        </view>
+        <text class="menu-label">客户管理</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="onNavigate" data-url="/pages/check/check">
+        <view class="menu-icon icon-bg-rose">
+          <image class="menu-icon-img" src="/images/icon-quick-check.png" mode="aspectFit"></image>
+        </view>
+        <text class="menu-label">库存盘点</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ====== 数据与报表 ====== -->
+  <view class="menu-card-wrap">
+    <text class="menu-card-title">数据与报表</text>
+    <view class="menu-card">
+      <view class="menu-item" bindtap="onNavigate" data-url="/pages/report/report">
+        <view class="menu-icon icon-bg-purple">
+          <image class="menu-icon-img" src="/images/icon-record.png" mode="aspectFit"></image>
+        </view>
+        <text class="menu-label">经营报表</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="onNavigate" data-url="/pages/erp/erp">
+        <view class="menu-icon icon-bg-cyan">
+          <image class="menu-icon-img" src="/images/icon-stock.png" mode="aspectFit"></image>
+        </view>
+        <text class="menu-label">进销存管理</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ====== 系统 ====== -->
+  <view class="menu-card-wrap">
+    <text class="menu-card-title">系统</text>
+    <view class="menu-card">
+      <view class="menu-item" bindtap="onNavigate" data-url="/pages/settings/settings">
+        <view class="menu-icon icon-bg-gray">
+          <image class="menu-icon-img" src="/images/icon-settings.png" mode="aspectFit"></image>
+        </view>
+        <text class="menu-label">系统设置</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="onNavigate" data-url="/pages/about/about">
+        <view class="menu-icon icon-bg-gray">
+          <image class="menu-icon-img" src="/images/icon-about.png" mode="aspectFit"></image>
+        </view>
+        <text class="menu-label">关于我们</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ====== 退出登录 ====== -->
+  <view class="logout-section">
+    <view class="logout-btn" bindtap="onLogout">
+      <image class="logout-icon-img" src="/images/icon-logout.png" mode="aspectFit"></image>
+      <text class="logout-text">退出登录</text>
+    </view>
+  </view>
+
+  <view class="version-footer">
+    <text class="version-text">v2.0.0</text>
+  </view>
+
+</view>

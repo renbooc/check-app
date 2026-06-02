@@ -1,0 +1,219 @@
+/* ============================================================
+   UI-UX PRO MAX — 商品信息（新增/编辑）
+   ============================================================ */
+
+/* ---------- 基础 ---------- */
+.page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 0 0 200rpx;
+}
+
+.placeholder {
+  color: #cccccc;
+  font-size: 26rpx;
+}
+
+/* ---------- 页面头部 ---------- */
+.page-header {
+  background: linear-gradient(135deg, #F59E0B 0%, #F97316 100%);
+  padding: 40rpx 32rpx 56rpx;
+  border-radius: 0 0 40rpx 40rpx;
+}
+
+.page-header-title {
+  display: block;
+  font-size: 38rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 1rpx;
+}
+
+.page-header-sub {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ---------- 卡片通用 ---------- */
+.section-card {
+  margin: -24rpx 20rpx 28rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  padding: 24rpx 24rpx;
+  position: relative;
+  z-index: 2;
+}
+
+.section-card:first-of-type {
+  margin-top: -24rpx;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.section-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.section-icon {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 8rpx;
+  flex-shrink: 0;
+}
+
+.section-icon-info {
+  background: linear-gradient(135deg, #F59E0B, #F97316);
+}
+
+.section-icon-price {
+  background: linear-gradient(135deg, #10B981, #34D399);
+}
+
+.section-icon-other {
+  background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #333333;
+}
+
+/* ---------- 表单项 ---------- */
+.form-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #f5f5f5;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+/* 主角字段：商品名称 */
+.form-item-highlight {
+  background: #FFFBEB;
+  margin: 0 -24rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 12rpx;
+  border-bottom: 2rpx solid #f5f5f5;
+}
+
+.form-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333333;
+  flex-shrink: 0;
+  margin-right: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.required {
+  color: #EF4444;
+  font-size: 28rpx;
+  font-weight: 400;
+}
+
+.form-input {
+  flex: 1;
+  text-align: right;
+  font-size: 26rpx;
+  color: #333333;
+  height: 60rpx;
+  line-height: 60rpx;
+}
+
+/* ---------- 带前缀的输入框（¥） ---------- */
+.input-with-prefix {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.input-prefix {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #5c5c5c;
+  margin-right: 6rpx;
+}
+
+.input-with-prefix .form-input {
+  flex: none;
+  width: 200rpx;
+}
+
+/* ---------- Picker 选择器 ---------- */
+.form-picker {
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  height: 60rpx;
+  min-width: 180rpx;
+  font-size: 26rpx;
+  color: #5c5c5c;
+}
+
+.form-picker.has-value {
+  color: #D97706;
+  background: #FFFBEB;
+}
+
+.picker-arrow {
+  width: 10rpx;
+  height: 10rpx;
+  border-right: 3rpx solid #cccccc;
+  border-bottom: 3rpx solid #cccccc;
+  transform: rotate(45deg);
+  margin-left: 12rpx;
+  margin-top: -4rpx;
+  flex-shrink: 0;
+}
+
+/* ---------- 底部操作栏 ---------- */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  padding: 20rpx 32rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  border-top: 1rpx solid #cccccc;
+  z-index: 100;
+}
+
+.btn-save {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: #333333;
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: 12rpx;
+  border: none;
+  text-align: center;
+  letter-spacing: 1rpx;
+}
+
+.btn-save[disabled] {
+  background: #cccccc;
+  color: rgba(255, 255, 255, 0.7);
+}

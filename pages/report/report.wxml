@@ -1,0 +1,131 @@
+<view class="page">
+
+  <!-- ====== 日期选择栏 ====== -->
+  <view class="period-bar">
+    <view class="period-tabs">
+      <view class="period-tab {{activePeriod === 'today' ? 'active' : ''}}" bindtap="onSwitchPeriod" data-period="today">今日</view>
+      <view class="period-tab {{activePeriod === 'week' ? 'active' : ''}}" bindtap="onSwitchPeriod" data-period="week">本周</view>
+      <view class="period-tab {{activePeriod === 'month' ? 'active' : ''}}" bindtap="onSwitchPeriod" data-period="month">本月</view>
+      <view class="period-tab {{activePeriod === 'custom' ? 'active' : ''}}" bindtap="onSwitchPeriod" data-period="custom">自定义</view>
+    </view>
+    <text class="period-range">{{dateRangeText}}</text>
+  </view>
+
+  <!-- 自定义日期选择器 -->
+  <view class="custom-date" wx:if="{{showCustom}}">
+    <view class="custom-date-row">
+      <picker mode="date" value="{{customStart}}" bindchange="onCustomStartChange">
+        <view class="date-picker-btn">{{customStart || '开始日期'}}</view>
+      </picker>
+      <text class="date-sep">至</text>
+      <picker mode="date" value="{{customEnd}}" bindchange="onCustomEndChange">
+        <view class="date-picker-btn">{{customEnd || '结束日期'}}</view>
+      </picker>
+    </view>
+    <view class="custom-date-actions">
+      <button class="date-btn cancel" bindtap="onCancelCustom">取消</button>
+      <button class="date-btn apply" bindtap="onApplyCustomDate">应用</button>
+    </view>
+  </view>
+
+  <!-- ====== Loading ====== -->
+  <view class="loading-wrap" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载报表...</text>
+  </view>
+
+  <block wx:else>
+
+    <!-- ====== KPI 卡片 ====== -->
+    <view class="kpi-grid">
+      <view class="kpi-card">
+        <view class="kpi-icon icon-bg-blue">
+          <image class="kpi-icon-img" src="/images/icon-document.png" mode="aspectFit"></image>
+        </view>
+        <view class="kpi-body">
+          <text class="kpi-label">销售收入</text>
+          <text class="kpi-value">¥{{report.totalSales}}</text>
+          <text class="kpi-sub">{{report.salesCount}} 笔</text>
+        </view>
+      </view>
+      <view class="kpi-card">
+        <view class="kpi-icon icon-bg-green">
+          <image class="kpi-icon-img" src="/images/icon-clipboard.png" mode="aspectFit"></image>
+        </view>
+        <view class="kpi-body">
+          <text class="kpi-label">采购支出</text>
+          <text class="kpi-value">¥{{report.totalPurchase}}</text>
+          <text class="kpi-sub">{{report.purchaseCount}} 笔</text>
+        </view>
+      </view>
+      <view class="kpi-card">
+        <view class="kpi-icon icon-bg-amber">
+          <image class="kpi-icon-img" src="/images/icon-record.png" mode="aspectFit"></image>
+        </view>
+        <view class="kpi-body">
+          <text class="kpi-label">毛利润</text>
+          <text class="kpi-value">¥{{report.grossProfit}}</text>
+          <text class="kpi-sub">利润率 {{report.profitRate}}%</text>
+        </view>
+      </view>
+      <view class="kpi-card">
+        <view class="kpi-icon icon-bg-purple">
+          <image class="kpi-icon-img" src="/images/icon-stock.png" mode="aspectFit"></image>
+        </view>
+        <view class="kpi-body">
+          <text class="kpi-label">库存周转</text>
+          <text class="kpi-value">{{report.turnoverRate}}</text>
+          <text class="kpi-sub">次/月</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ====== 销售排行 ====== -->
+    <view class="section-card">
+      <view class="section-head">
+        <text class="section-title">销售排行 TOP5</text>
+      </view>
+      <view class="empty-wrap" wx:if="{{report.topProducts.length === 0}}">
+        <text class="empty-text">暂无销售数据</text>
+      </view>
+      <view class="rank-list" wx:else>
+        <view class="rank-item" wx:for="{{report.topProducts}}" wx:key="productId">
+          <view class="rank-badge rank-{{index + 1}}">{{index + 1}}</view>
+          <view class="rank-info">
+            <text class="rank-name">{{item.productName || '-'}}</text>
+            <text class="rank-code">{{item.productCode || ''}}</text>
+          </view>
+          <view class="rank-stats">
+            <text class="rank-qty">{{item.totalQuantity || 0}} 件</text>
+            <text class="rank-amount">¥{{item.totalAmount || '0.00'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ====== 库存预警 ====== -->
+    <view class="section-card">
+      <view class="section-head">
+        <text class="section-title">库存预警</text>
+      </view>
+      <view class="empty-wrap" wx:if="{{report.lowStockProducts.length === 0}}">
+        <text class="empty-text">库存状态良好，暂无预警</text>
+      </view>
+      <view class="alert-list" wx:else>
+        <view class="alert-item" wx:for="{{report.lowStockProducts}}" wx:key="productId">
+          <view class="alert-dot"></view>
+          <view class="alert-info">
+            <text class="alert-name">{{item.productName || '-'}}</text>
+            <text class="alert-code">{{item.productCode || ''}}</text>
+          </view>
+          <view class="alert-stock">
+            <text class="alert-qty">{{item.quantity || 0}}</text>
+            <text class="alert-min">/ {{item.minQuantity || 0}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+  </block>
+
+</view>

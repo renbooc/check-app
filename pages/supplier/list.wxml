@@ -1,0 +1,68 @@
+<view class="page">
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <icon-cmp type="search" size="18" color="#999999"></icon-cmp>
+      <input class="search-input" placeholder="搜索供应商名称/联系人" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearch" />
+    </view>
+  </view>
+
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+  </view>
+
+  <view class="empty-container" wx:elif="{{list.length === 0}}">
+    <text class="empty-text">暂无供应商</text>
+  </view>
+
+  <view class="supplier-list" wx:else>
+    <view class="supplier-card" wx:for="{{list}}" wx:key="id" bindtap="onEdit" data-id="{{item.id}}">
+      <view class="supplier-main">
+        <view class="supplier-avatar">{{item.name[0]}}</view>
+        <view class="supplier-info">
+          <text class="supplier-name">{{item.name}}</text>
+          <text class="supplier-contact">{{item.contactPerson || '--'}} {{item.contactPhone || ''}}</text>
+        </view>
+        <icon-cmp type="arrow-right" size="14" color="#CCCCCC"></icon-cmp>
+      </view>
+    </view>
+  </view>
+
+  <view class="fab" bindtap="onAdd">
+    <icon-cmp type="plus" size="24" color="#FFFFFF"></icon-cmp>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showModal}}" bindtap="onCloseModal"></view>
+  <view class="modal-panel {{showModal ? 'show' : ''}}">
+    <view class="modal-header">
+      <text class="modal-title">{{editingId ? '编辑供应商' : '新增供应商'}}</text>
+      <view class="modal-close" bindtap="onCloseModal"><icon-cmp type="close" size="18" color="#999999"></icon-cmp></view>
+    </view>
+    <view class="modal-body">
+      <view class="form-row">
+        <text class="form-label">名称</text>
+        <input class="form-input" placeholder="供应商名称" value="{{form.name}}" bindinput="onFormFieldInput" data-field="name" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">联系人</text>
+        <input class="form-input" placeholder="联系人姓名" value="{{form.contactPerson}}" bindinput="onFormFieldInput" data-field="contactPerson" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">联系电话</text>
+        <input class="form-input" type="number" placeholder="手机号码" value="{{form.contactPhone}}" bindinput="onFormFieldInput" data-field="contactPhone" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">地址</text>
+        <input class="form-input" placeholder="公司地址" value="{{form.address}}" bindinput="onFormFieldInput" data-field="address" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">备注</text>
+        <input class="form-input" placeholder="备注信息" value="{{form.remark}}" bindinput="onFormFieldInput" data-field="remark" />
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-delete" wx:if="{{editingId}}" bindtap="onDelete">删除</button>
+      <button class="btn-cancel" bindtap="onCloseModal">取消</button>
+      <button class="btn-confirm" bindtap="onSave">保存</button>
+    </view>
+  </view>
+</view>

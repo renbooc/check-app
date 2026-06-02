@@ -1,0 +1,41 @@
+<view class="login-page">
+  <!-- 装饰背景元素 -->
+  <view class="deco-circles">
+    <view class="deco-ring deco-ring-1"></view>
+    <view class="deco-ring deco-ring-2"></view>
+    <view class="deco-ring deco-ring-3"></view>
+  </view>
+
+  <view class="login-header">
+    <view class="brand-icon">
+      <text class="brand-icon-text">P</text>
+    </view>
+    <text class="brand-title">药品进销存ERP</text>
+    <view class="brand-bar"></view>
+  </view>
+
+  <view class="login-card">
+    <view class="form-group">
+      <text class="form-label">手机号</text>
+      <input class="form-input" type="number" maxlength="11" value="{{phone}}" bindinput="onPhoneInput" placeholder="13800138000" />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">密码</text>
+      <view class="input-wrapper">
+        <input class="form-input" placeholder="请输入密码" password="{{!showPassword}}" value="{{password}}" bindinput="onPasswordInput" />
+        <view class="toggle-pwd" bindtap="togglePassword">
+          <text class="toggle-text">{{showPassword ? '隐藏' : '显示'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <button class="login-btn" bindtap="onLogin" loading="{{loading}}" disabled="{{loading}}">
+      登录
+    </button>
+
+    <view class="login-hint">
+      <text class="hint-text">演示账号：13800138000 / 123456</text>
+    </view>
+  </view>
+</view>

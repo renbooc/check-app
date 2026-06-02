@@ -1,0 +1,400 @@
+/* ============================================================
+   经营报表页 — 企业级数据分析
+   背景 #f5f5f5 / 卡片 #FFFFFF / 主色 #0077C2
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+}
+
+/* ============================================================
+   日期选择栏
+   ============================================================ */
+.period-bar {
+  background: #FFFFFF;
+  padding: 20rpx 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+}
+
+.period-tabs {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.period-tab {
+  flex: 1;
+  text-align: center;
+  padding: 14rpx 0;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #5c5c5c;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+}
+
+.period-tab.active {
+  color: #FFFFFF;
+  background: #0077C2;
+  font-weight: 600;
+}
+
+.period-tab:active {
+  opacity: 0.8;
+}
+
+.period-range {
+  display: block;
+  font-size: 22rpx;
+  color: #5c5c5c;
+  text-align: center;
+}
+
+/* ============================================================
+   自定义日期选择器
+   ============================================================ */
+.custom-date {
+  background: #FFFFFF;
+  margin-top: 20rpx;
+  padding: 24rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.custom-date-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.date-picker-btn {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  color: #333333;
+}
+
+.date-sep {
+  font-size: 26rpx;
+  color: #5c5c5c;
+  flex-shrink: 0;
+}
+
+.custom-date-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.date-btn {
+  flex: 1;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  font-weight: 500;
+  border-radius: 8rpx;
+  border: none;
+}
+
+.date-btn.cancel {
+  background: #f5f5f5;
+  color: #5c5c5c;
+}
+
+.date-btn.apply {
+  background: #0077C2;
+  color: #FFFFFF;
+}
+
+/* ============================================================
+   Loading
+   ============================================================ */
+.loading-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+  gap: 20rpx;
+}
+
+.loading-spinner {
+  width: 48rpx;
+  height: 48rpx;
+  border: 4rpx solid #f5f5f5;
+  border-top-color: #0077C2;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 24rpx;
+  color: #5c5c5c;
+}
+
+/* ============================================================
+   KPI 卡片网格（2x2）
+   ============================================================ */
+.kpi-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20rpx 24rpx;
+  gap: 16rpx;
+}
+
+.kpi-card {
+  width: calc(50% - 8rpx);
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  display: flex;
+  gap: 16rpx;
+  box-sizing: border-box;
+}
+
+.kpi-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpi-icon-img {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+.icon-bg-blue   { background: #EEF4FF; }
+.icon-bg-green  { background: #ECFDF5; }
+.icon-bg-amber  { background: #FFF8E6; }
+.icon-bg-purple { background: #F3EEFF; }
+
+.kpi-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.kpi-label {
+  display: block;
+  font-size: 22rpx;
+  color: #5c5c5c;
+  margin-bottom: 8rpx;
+}
+
+.kpi-value {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #333333;
+  line-height: 1;
+  margin-bottom: 6rpx;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kpi-sub {
+  display: block;
+  font-size: 20rpx;
+  color: #cccccc;
+}
+
+/* ============================================================
+   通用 Section 卡片
+   ============================================================ */
+.section-card {
+  background: #FFFFFF;
+  margin: 20rpx 24rpx 0;
+  border-radius: 16rpx;
+  padding: 28rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.section-head {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #333333;
+}
+
+.empty-wrap {
+  padding: 40rpx 0;
+  text-align: center;
+}
+
+.empty-text {
+  font-size: 26rpx;
+  color: #5c5c5c;
+}
+
+/* ============================================================
+   销售排行
+   ============================================================ */
+.rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.rank-item:last-child {
+  border-bottom: none;
+}
+
+.rank-badge {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.rank-1 { background: #0077C2; }
+.rank-2 { background: #59a5f5; }
+.rank-3 { background: #00BFFF; }
+.rank-4, .rank-5 { background: #cccccc; }
+
+.rank-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.rank-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #333333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rank-code {
+  font-size: 20rpx;
+  color: #cccccc;
+}
+
+.rank-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  gap: 4rpx;
+}
+
+.rank-qty {
+  font-size: 22rpx;
+  color: #5c5c5c;
+}
+
+.rank-amount {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #0077C2;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+/* ============================================================
+   库存预警
+   ============================================================ */
+.alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.alert-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.alert-item:last-child {
+  border-bottom: none;
+}
+
+.alert-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #e74c3c;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.alert-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.alert-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #333333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alert-code {
+  font-size: 20rpx;
+  color: #cccccc;
+}
+
+.alert-stock {
+  display: flex;
+  align-items: baseline;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+.alert-qty {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #e74c3c;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+.alert-min {
+  font-size: 20rpx;
+  color: #5c5c5c;
+  margin-left: 4rpx;
+}

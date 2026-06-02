@@ -1,0 +1,303 @@
+/* ============================================================
+   我的页面 — 企业级 Profile（与首页统一设计语言）
+   背景 #f5f5f5 / Hero 渐变 / 卡片 #FFFFFF / 主色 #0077C2
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+}
+
+/* ============================================================
+   用户信息 Hero 卡片（深蓝渐变 — 与首页 Hero 一致风格）
+   ============================================================ */
+.hero {
+  background: linear-gradient(135deg, #0077C2 0%, #59a5f5 100%);
+  margin: 24rpx 24rpx 0;
+  padding: 40rpx 32rpx;
+  border-radius: 20rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 119, 194, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 装饰光晕（右上角，与首页 hero::after 一致） */
+.hero-deco {
+  position: absolute;
+  width: 280rpx;
+  height: 280rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  top: -80rpx;
+  right: -60rpx;
+  pointer-events: none;
+}
+
+.hero-content {
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-avatar-wrap {
+  flex-shrink: 0;
+  margin-right: 28rpx;
+}
+
+.hero-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  border: 4rpx solid rgba(255, 255, 255, 0.25);
+  display: block;
+}
+
+.hero-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-name {
+  display: block;
+  font-size: 38rpx;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 14rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hero-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 8rpx 20rpx;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 100rpx;
+}
+
+.hero-role-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #00BFFF;
+  flex-shrink: 0;
+}
+
+.hero-role-text {
+  font-size: 24rpx;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ============================================================
+   统计卡（白卡片 — 与首页 KPI 卡片完全一致）
+   ============================================================ */
+.stats-card {
+  background: #FFFFFF;
+  margin: 24rpx 24rpx 0;
+  padding: 28rpx 0 24rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.stats-row {
+  display: flex;
+  align-items: stretch;
+}
+
+.stats-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+  border-right: 1rpx solid #f5f5f5;
+}
+
+.stats-cell:last-child {
+  border-right: none;
+}
+
+.stats-cell:active {
+  background: #f5f5f5;
+}
+
+.stats-num {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #333333;
+  line-height: 1;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+.stats-num-warn {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #00BFFF;
+  line-height: 1;
+}
+
+/* 统计标签行（色点 + 文字）— 与首页 kpi-label-row 一致 */
+.stats-label-row {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.stats-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stats-dot-blue   { background: #0077C2; }
+.stats-dot-green  { background: #00B42A; }
+.stats-dot-amber  { background: #FF7D00; }
+
+.stats-label {
+  font-size: 22rpx;
+  color: #5c5c5c;
+  font-weight: 500;
+}
+
+/* ============================================================
+   菜单分组卡片（与首页 entry-card 统一语言）
+   ============================================================ */
+.menu-card-wrap {
+  margin-top: 24rpx;
+}
+
+.menu-card-title {
+  display: block;
+  font-size: 24rpx;
+  color: #5c5c5c;
+  font-weight: 500;
+  padding: 0 32rpx 12rpx;
+}
+
+.menu-card {
+  background: #FFFFFF;
+  margin: 0 24rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+/* ---------- 菜单项 ---------- */
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 28rpx;
+  position: relative;
+}
+
+.menu-item:active {
+  background: #f5f5f5;
+}
+
+/* 分隔线 */
+.menu-item + .menu-item::before {
+  content: '';
+  position: absolute;
+  left: 100rpx;
+  right: 28rpx;
+  top: 0;
+  height: 1rpx;
+  background: #f5f5f5;
+}
+
+/* ---------- 图标容器（与首页 entry-icon 完全一致） ---------- */
+.menu-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 14rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 柔和色底（与首页 icon-bg-* 一致） */
+.icon-bg-blue   { background: #EEF4FF; }
+.icon-bg-green  { background: #ECFDF5; }
+.icon-bg-amber  { background: #FFF8E6; }
+.icon-bg-rose   { background: #FFF1F2; }
+.icon-bg-purple { background: #F3EEFF; }
+.icon-bg-cyan   { background: #E6FFFB; }
+.icon-bg-gray   { background: #F2F3F5; }
+
+.menu-icon-img {
+  width: 32rpx;
+  height: 32rpx;
+  display: block;
+}
+
+/* ---------- 标签 & 箭头 ---------- */
+.menu-label {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333333;
+}
+
+.menu-arrow {
+  font-size: 32rpx;
+  color: #cccccc;
+  font-weight: 300;
+  line-height: 1;
+  margin-left: 8rpx;
+}
+
+/* ============================================================
+   退出按钮
+   ============================================================ */
+.logout-section {
+  margin-top: 48rpx;
+  padding: 0 24rpx;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  height: 84rpx;
+  border-radius: 16rpx;
+  background: #FFFFFF;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.logout-btn:active {
+  background: #fff5f5;
+}
+
+.logout-icon-img {
+  width: 28rpx;
+  height: 28rpx;
+  display: block;
+}
+
+.logout-text {
+  font-size: 28rpx;
+  color: #e74c3c;
+  font-weight: 500;
+}
+
+/* ---------- 版本号 ---------- */
+.version-footer {
+  text-align: center;
+  padding: 28rpx 0 20rpx;
+}
+
+.version-text {
+  font-size: 20rpx;
+  color: #cccccc;
+  font-weight: 400;
+}

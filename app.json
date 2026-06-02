@@ -1,0 +1,77 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/erp/erp",
+    "pages/report/report",
+    "pages/mine/mine",
+    "pages/login/login",
+    "pages/check/check",
+    "pages/records/records",
+    "pages/stock/stock",
+    "pages/purchase/list",
+    "pages/purchase/form",
+    "pages/sales/list",
+    "pages/sales/form",
+    "pages/supplier/list",
+    "pages/customer/list",
+    "pages/product/list",
+    "pages/product/form",
+    "pages/product/detail",
+    "pages/settings/settings",
+    "pages/about/about",
+    "pages/message/message"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "药品进销存ERP",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f5f5f5",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": false
+  },
+  "usingComponents": {
+    "icon-cmp": "/components/icon/icon"
+  },
+  "tabBar": {
+    "color": "#5c5c5c",
+    "selectedColor": "#0077C2",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "工作台",
+        "iconPath": "images/tab-home.png",
+        "selectedIconPath": "images/tab-home-active.png"
+      },
+      {
+        "pagePath": "pages/erp/erp",
+        "text": "进销存",
+        "iconPath": "images/tab-erp.png",
+        "selectedIconPath": "images/tab-erp-active.png"
+      },
+      {
+        "pagePath": "pages/report/report",
+        "text": "报表",
+        "iconPath": "images/tab-chart.png",
+        "selectedIconPath": "images/tab-chart-active.png"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的",
+        "iconPath": "images/tab-mine.png",
+        "selectedIconPath": "images/tab-mine-active.png"
+      }
+    ]
+  },
+  "permission": {
+    "scope.camera": {
+      "desc": "需要使用相机进行条码扫描"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseLocation"
+  ],
+  "sitemapLocation": "sitemap.json"
+}

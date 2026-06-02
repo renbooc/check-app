@@ -1,0 +1,10 @@
+# 自动检测文本文件，并在提交时统一转为 LF 存储
+* text=auto eol=lf
+
+# 明确标记二进制文件，不做换行转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary

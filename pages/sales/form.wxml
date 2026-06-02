@@ -1,0 +1,225 @@
+<view class="page">
+
+  <!-- ===== 页面头部 ===== -->
+  <view class="page-header">
+    <text class="page-header-title">新增销售订单</text>
+    <text class="page-header-sub">填写以下信息创建销售订单</text>
+  </view>
+
+  <!-- ===== 订单信息（含客户） ===== -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-header-left">
+        <view class="section-icon section-icon-order"></view>
+        <text class="section-title">订单信息</text>
+      </view>
+      <view class="change-btn" wx:if="{{selectedCustomer}}" bindtap="onClearCustomer">
+        <text class="change-btn-text">更换客户</text>
+      </view>
+    </view>
+
+    <view class="order-form-item">
+      <text class="order-form-label">客户</text>
+      <view wx:if="{{!selectedCustomer}}" style="flex:1;">
+        <view class="search-field {{showCustomerResults && filteredCustomers.length > 0 ? 'search-field-active' : ''}}">
+          <view class="search-field-icon">
+            <icon-cmp type="search" size="18" color="#999"></icon-cmp>
+          </view>
+          <input
+            class="search-field-input"
+            placeholder="搜索客户名称"
+            placeholder-class="placeholder"
+            value="{{customerKeyword}}"
+            bindinput="onCustomerInput"
+            bindfocus="onCustomerFocus"
+            bindblur="onCustomerBlur"
+          />
+        </view>
+        <view class="search-results" wx:if="{{showCustomerResults && filteredCustomers.length > 0}}">
+          <view class="search-result-item" wx:for="{{filteredCustomers}}" wx:key="id" data-index="{{index}}" bindtap="onCustomerSelect">
+            <view class="result-item-info">
+              <text class="result-item-name">{{item.name}}</text>
+              <text class="result-item-contact" wx:if="{{item.contactPerson}}">{{item.contactPerson}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="search-empty" wx:elif="{{showCustomerResults && filteredCustomers.length === 0}}">
+          <text class="search-empty-text">未找到匹配的客户</text>
+        </view>
+      </view>
+      <view class="customer-selected-inline" wx:else>
+        <view class="customer-avatar-sm">{{selectedCustomer.name.charAt(0)}}</view>
+        <text class="customer-name-inline">{{selectedCustomer.name}}</text>
+        <text class="customer-contact-inline" wx:if="{{selectedCustomer.contactPerson}}">· {{selectedCustomer.contactPerson}}</text>
+      </view>
+    </view>
+
+    <view class="order-form-item">
+      <text class="order-form-label">发货日期</text>
+      <picker mode="date" value="{{expectedDate}}" bindchange="onDateChange">
+        <view class="order-form-picker {{expectedDate ? 'has-value' : ''}}">
+          <text wx:if="{{expectedDate}}">{{expectedDate}}</text>
+          <text wx:else class="placeholder">选择日期</text>
+          <view class="picker-arrow"></view>
+        </view>
+      </picker>
+    </view>
+
+    <view class="order-form-item">
+      <text class="order-form-label">备注说明</text>
+      <input
+        class="order-form-input"
+        placeholder="选填，添加备注信息"
+        placeholder-class="placeholder"
+        value="{{remark}}"
+        maxlength="200"
+        bindinput="onRemarkInput"
+      />
+    </view>
+  </view>
+
+  <!-- ===== 商品明细卡片 ===== -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-header-left">
+        <view class="section-icon section-icon-items"></view>
+        <text class="section-title">商品明细</text>
+      </view>
+      <view class="items-count">
+        <text class="items-count-num">{{items.length}}</text>
+        <text class="items-count-label">项</text>
+      </view>
+    </view>
+
+    <!-- 统一商品搜索框 -->
+    <view class="product-search-area">
+      <view class="ps-field {{showProductResults ? 'ps-field-active' : ''}}">
+        <icon-cmp type="search" size="18" color="#999"></icon-cmp>
+        <input
+          class="ps-input"
+          placeholder="搜索商品名称，点击添加"
+          placeholder-class="placeholder"
+          value="{{productKeyword}}"
+          bindinput="onItemProductSearchInput"
+          bindfocus="onItemProductSearchFocus"
+          bindblur="onItemProductSearchBlur"
+        />
+      </view>
+      <view class="ps-list" wx:if="{{showProductResults && productSearchResults.length > 0}}">
+        <view
+          class="ps-item"
+          wx:for="{{productSearchResults}}"
+          wx:for-item="prod"
+          wx:for-index="pIndex"
+          wx:key="id"
+          data-pindex="{{pIndex}}"
+          bindtap="onItemProductSearchSelect"
+        >
+          <view class="ps-item-info">
+            <text class="ps-item-name">{{prod.name}}</text>
+            <text class="ps-item-spec">{{prod.spec || '-'}} · {{prod.unit ? prod.unit.name : '-'}}</text>
+          </view>
+          <view class="ps-item-add">+</view>
+        </view>
+      </view>
+      <text class="ps-empty-text" wx:elif="{{showProductResults && productSearchResults.length === 0}}">未找到匹配的商品</text>
+    </view>
+
+    <!-- 已添加商品列表 -->
+    <view class="items-list" wx:if="{{items.length > 0}}">
+      <view class="item-card" wx:for="{{items}}" wx:key="index">
+
+        <view class="item-card-body">
+          <!-- 行号徽章 -->
+          <view class="row-badge">
+            <text class="row-badge-text">{{index + 1}}</text>
+          </view>
+
+          <!-- 商品信息 -->
+          <view class="item-content">
+            <view class="item-content-top">
+              <view class="item-product-info">
+                <text class="item-name">{{item.productName}}</text>
+                <view class="item-meta">
+                  <text class="item-meta-text" wx:if="{{item.productSpec}}">{{item.productSpec}}</text>
+                  <text class="item-meta-divider" wx:if="{{item.productSpec && item.productUnit}}">·</text>
+                  <text class="item-meta-text" wx:if="{{item.productUnit}}">{{item.productUnit}}</text>
+                </view>
+              </view>
+              <view class="item-remove-btn" bindtap="onRemoveItem" data-index="{{index}}">
+                <text class="item-remove-icon">✕</text>
+              </view>
+            </view>
+
+            <!-- 数量/单价 -->
+            <view class="item-prices">
+              <view class="item-prices-row">
+                <view class="item-price-field">
+                  <text class="item-price-label">数量</text>
+                  <view class="qty-control">
+                    <view class="qty-btn" bindtap="onQtyDecrease" data-index="{{index}}">−</view>
+                    <input
+                      class="qty-input"
+                      type="digit"
+                      placeholder="0"
+                      placeholder-class="placeholder-center"
+                      value="{{item.quantity}}"
+                      data-index="{{index}}"
+                      bindinput="onItemQuantityInput"
+                    />
+                    <view class="qty-btn" bindtap="onQtyIncrease" data-index="{{index}}">+</view>
+                  </view>
+                </view>
+                <view class="item-price-field">
+                  <text class="item-price-label">单价</text>
+                  <view class="price-wrap">
+                    <text class="price-symbol">¥</text>
+                    <input
+                      class="price-input"
+                      type="digit"
+                      placeholder="0.00"
+                      placeholder-class="placeholder-center"
+                      value="{{item.price}}"
+                      data-index="{{index}}"
+                      bindinput="onItemPriceInput"
+                    />
+                  </view>
+                </view>
+              </view>
+              <view class="item-subtotal">
+                <text class="subtotal-label">小计</text>
+                <text class="subtotal-value">¥{{item.amount || '0.00'}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+      </view>
+    </view>
+
+    <!-- 无商品提示 -->
+    <view class="items-empty" wx:if="{{items.length === 0}}">
+      <text class="items-empty-text">暂无商品，请在上方搜索添加</text>
+    </view>
+  </view>
+
+  <!-- ===== 底部操作栏 ===== -->
+  <view class="bottom-bar">
+    <view class="bottom-inner">
+      <view class="bottom-summary">
+        <view class="bottom-summary-left">
+          <text class="summary-label">合计</text>
+          <text class="summary-qty">{{totalQuantity || 0}} 件</text>
+        </view>
+        <text class="summary-amount">¥ {{totalAmount || '0.00'}}</text>
+      </view>
+      <view class="bottom-actions">
+        <button class="action-btn action-draft" bindtap="onSaveDraft" disabled="{{submitting}}">保存草稿</button>
+        <button class="action-btn action-submit" bindtap="onSubmit" disabled="{{submitting}}">
+          {{submitting ? '提交中...' : '提交订单'}}
+        </button>
+      </view>
+    </view>
+  </view>
+
+</view>

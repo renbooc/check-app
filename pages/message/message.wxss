@@ -1,0 +1,271 @@
+/* ============================================================
+   消息通知页 — 简约大气现代风格
+   与工作台首页、我的页面统一设计语言
+   背景 #f5f5f5 / 渐变 #0077C2→#59a5f5 / 卡片 #FFFFFF
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 0 0 48rpx;
+}
+
+/* ---------- Loading ---------- */
+.loading-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+}
+
+.loading-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: #cccccc;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50%      { opacity: 1;   transform: scale(1.1); }
+}
+
+/* ============================================================
+   顶部渐变标题区
+   ============================================================ */
+.page-header {
+  background: linear-gradient(135deg, #0077C2 0%, #59a5f5 100%);
+  padding: 56rpx 32rpx 40rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-deco {
+  position: absolute;
+  width: 320rpx;
+  height: 320rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  top: -80rpx;
+  right: -60rpx;
+  pointer-events: none;
+}
+
+.header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.header-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.page-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.2;
+  margin-bottom: 8rpx;
+}
+
+.page-subtitle {
+  display: block;
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
+}
+
+/* 全部已读按钮 */
+.mark-all-btn {
+  font-size: 22rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+  padding: 8rpx 20rpx;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 100rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+.mark-all-btn:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ============================================================
+   消息列表（独立白卡）
+   ============================================================ */
+.msg-list {
+  padding: 24rpx 24rpx 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+/* 单条消息卡片 */
+.msg-item {
+  display: flex;
+  align-items: stretch;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.msg-item:active {
+  transform: scale(0.98);
+  box-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.08);
+}
+
+/* 已读状态 */
+.msg-read {
+  opacity: 0.6;
+}
+
+/* ---------- 左侧类型色带 ---------- */
+.msg-stripe {
+  width: 8rpx;
+  flex-shrink: 0;
+}
+
+.msg-type-info    { background: #0077C2; }
+.msg-type-warn    { background: #FF7D00; }
+.msg-type-error   { background: #00BFFF; }
+.msg-type-success { background: #00B42A; }
+
+/* ---------- 消息内容区 ---------- */
+.msg-body {
+  flex: 1;
+  min-width: 0;
+  padding: 24rpx 28rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.msg-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.msg-item-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.msg-read .msg-item-title {
+  color: #5c5c5c;
+  font-weight: 500;
+}
+
+.msg-item-content {
+  font-size: 24rpx;
+  color: #5c5c5c;
+  line-height: 1.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.msg-read .msg-item-content {
+  color: #cccccc;
+}
+
+.msg-item-time {
+  font-size: 20rpx;
+  color: #cccccc;
+}
+
+/* ---------- 未读红点 ---------- */
+.msg-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #00BFFF;
+  flex-shrink: 0;
+}
+
+.dot-hidden {
+  display: none;
+}
+
+/* ============================================================
+   空态
+   ============================================================ */
+.empty-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 48rpx 0;
+  gap: 16rpx;
+}
+
+.empty-icon {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12rpx;
+}
+
+/* 空态铃铛（CSS 绘制） */
+.empty-bell {
+  width: 44rpx;
+  height: 48rpx;
+  background: #cccccc;
+  border-radius: 14rpx 14rpx 22rpx 22rpx;
+  position: relative;
+}
+
+.empty-bell::before {
+  content: '';
+  position: absolute;
+  width: 10rpx;
+  height: 12rpx;
+  background: #cccccc;
+  border-radius: 50%;
+  top: -10rpx;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.empty-bell::after {
+  content: '';
+  position: absolute;
+  width: 18rpx;
+  height: 12rpx;
+  background: #cccccc;
+  border-radius: 0 0 9rpx 9rpx;
+  bottom: -12rpx;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.empty-title {
+  font-size: 28rpx;
+  color: #5c5c5c;
+  font-weight: 600;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: #cccccc;
+}

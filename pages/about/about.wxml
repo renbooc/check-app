@@ -1,0 +1,20 @@
+<view class="page">
+  <view class="about-card">
+    <view class="logo-wrap">
+      <text class="logo-text">ERP</text>
+    </view>
+    <text class="app-name">药品进销存管理系统</text>
+    <text class="app-version">v{{version}}</text>
+  </view>
+
+  <view class="info-card">
+    <view class="info-item">
+      <text class="info-label">系统简介</text>
+      <text class="info-value">企业级药品进销存管理微信小程序，支持采购管理、销售管理、库存管理、客户管理、供应商管理、报表分析等核心业务功能。</text>
+    </view>
+    <view class="info-item">
+      <text class="info-label">技术栈</text>
+      <text class="info-value">前端：微信小程序原生开发\n后端：NestJS + TypeORM\n数据库：PostgreSQL</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,156 @@
+<view class="page">
+
+  <!-- ===== Loading ===== -->
+  <view class="loading-wrap" wx:if="{{pageLoading}}">
+    <view class="loading-dot"></view>
+  </view>
+
+  <block wx:elif="{{loaded}}">
+
+    <!-- ===== 顶栏（开放布局，不加卡片） ===== -->
+    <view class="topbar">
+      <view class="topbar-left">
+        <text class="topbar-date">{{todayDate}} · {{weekdayText}}</text>
+        <text class="topbar-greeting">{{greeting}}</text>
+      </view>
+      <view class="topbar-msg" bindtap="onGoMessage">
+        <view class="msg-icon"></view>
+        <view class="{{unreadDotCls}}"></view>
+      </view>
+    </view>
+
+    <!-- ===== 今日销售 Hero（深蓝渐变卡片） ===== -->
+    <view class="hero">
+      <view class="hero-label-row">
+        <text class="hero-label">今日销售总额</text>
+        <view wx:if="{{showTrend}}" class="{{trendCls}}">
+          <text class="trend-arrow">{{trendArrow}}</text>
+          <text class="trend-num">{{trendNumText}}</text>
+          <text class="trend-vs">较昨日</text>
+        </view>
+      </view>
+      <view class="hero-amount">
+        <text class="hero-currency">¥</text>
+        <text class="hero-num">{{todaySalesDisplay}}</text>
+      </view>
+      <view class="hero-sub">
+        <text class="hero-sub-item">{{salesCountText}}</text>
+        <text class="hero-sub-dot">·</text>
+        <text class="hero-sub-item">{{purchaseText}}</text>
+        <text class="hero-sub-dot">·</text>
+        <text class="hero-sub-item">{{marginText}}</text>
+      </view>
+    </view>
+
+    <!-- ===== KPI 三列 ===== -->
+    <view class="kpi-card">
+      <view class="kpi-row">
+        <view class="kpi-cell" bindtap="onGoStock">
+          <text class="kpi-num">¥{{inventoryValueDisplay}}</text>
+          <view class="kpi-label-row">
+            <view class="kpi-dot kpi-dot-blue"></view>
+            <text class="kpi-label">库存总值</text>
+          </view>
+          <text class="kpi-foot">{{productCountText}}</text>
+        </view>
+        <view class="kpi-cell" bindtap="onGoCheck">
+          <text class="{{pendingWarnCls}}">{{pendingChecks}}</text>
+          <view class="kpi-label-row">
+            <view class="kpi-dot kpi-dot-amber"></view>
+            <text class="kpi-label">待盘点</text>
+          </view>
+          <text class="kpi-foot">需处理</text>
+        </view>
+        <view class="kpi-cell" bindtap="onGoCustomer">
+          <text class="kpi-num">{{customerCount}}</text>
+          <view class="kpi-label-row">
+            <view class="kpi-dot kpi-dot-green"></view>
+            <text class="kpi-label">客户数</text>
+          </view>
+          <text class="kpi-foot">活跃合作</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 快捷操作 ===== -->
+    <view class="entry-card">
+      <text class="entry-title">快捷操作</text>
+      <view class="entry-grid">
+        <view class="entry-item" bindtap="onQuickAction" data-type="purchase">
+          <view class="entry-icon icon-bg-green">
+            <image class="entry-icon-img" src="/images/icon-clipboard.png" mode="aspectFit"></image>
+          </view>
+          <text class="entry-text">采购入库</text>
+        </view>
+        <view class="entry-item" bindtap="onQuickAction" data-type="sales">
+          <view class="entry-icon icon-bg-blue">
+            <image class="entry-icon-img" src="/images/icon-document.png" mode="aspectFit"></image>
+          </view>
+          <text class="entry-text">销售出库</text>
+        </view>
+        <view class="entry-item" bindtap="onQuickAction" data-type="check">
+          <view class="entry-icon icon-bg-amber">
+            <image class="entry-icon-img" src="/images/icon-quick-check.png" mode="aspectFit"></image>
+          </view>
+          <text class="entry-text">库存盘点</text>
+        </view>
+        <view class="entry-item" bindtap="onQuickAction" data-type="scan">
+          <view class="entry-icon icon-bg-purple">
+            <image class="entry-icon-img" src="/images/icon-scan-code.png" mode="aspectFit"></image>
+          </view>
+          <text class="entry-text">扫码查询</text>
+        </view>
+        <view class="entry-item" bindtap="onGoStock">
+          <view class="entry-icon icon-bg-cyan">
+            <image class="entry-icon-img" src="/images/icon-stock.png" mode="aspectFit"></image>
+          </view>
+          <text class="entry-text">库存查询</text>
+        </view>
+        <view class="entry-item" bindtap="onGoReport">
+          <view class="entry-icon icon-bg-rose">
+            <image class="entry-icon-img" src="/images/icon-record.png" mode="aspectFit"></image>
+          </view>
+          <text class="entry-text">经营报表</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ===== 最近订单 ===== -->
+    <view class="orders-card">
+      <view class="orders-head">
+        <text class="orders-title">最近订单</text>
+        <view class="orders-tabs">
+          <text class="{{purchaseTabCls}}" bindtap="onSwitchTab" data-tab="purchase">采购</text>
+          <text class="{{salesTabCls}}" bindtap="onSwitchTab" data-tab="sales">销售</text>
+        </view>
+      </view>
+
+      <view class="orders-list" wx:if="{{showOrders}}">
+        <view wx:for="{{currentOrders}}" wx:key="id" class="orders-row" bindtap="onOrderTap" data-id="{{item.id}}" data-type="{{orderTab}}">
+          <view class="orders-row-main">
+            <view class="orders-row-head">
+              <text class="orders-row-no">{{item.orderNo}}</text>
+              <text class="orders-status orders-status-{{item.status}}">{{item.statusText}}</text>
+            </view>
+            <text class="orders-row-party">{{item.partyName}}</text>
+          </view>
+          <view class="orders-row-amount">
+            <text class="orders-amount-num">¥{{item.totalAmount}}</text>
+            <text class="orders-amount-time">{{item.timeText}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="orders-empty" wx:else>
+        <text>{{ordersEmptyText}}</text>
+      </view>
+
+      <view class="section-foot" wx:if="{{showOrders}}" bindtap="onViewAll">
+        <text class="section-foot-text">查看全部</text>
+        <text class="section-foot-arrow">›</text>
+      </view>
+    </view>
+
+  </block>
+
+</view>

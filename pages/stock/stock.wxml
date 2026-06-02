@@ -1,0 +1,126 @@
+<view class="page">
+
+  <!-- ====== 搜索栏 ====== -->
+  <view class="search-card">
+    <view class="search-input-wrap">
+      <image class="search-icon" src="/images/icon-search.png" mode="aspectFit"></image>
+      <input class="search-input" placeholder="搜索药品名称/条码" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearch" />
+      <view class="clear-btn" wx:if="{{searchKeyword}}" bindtap="onClearSearch">
+        <text>✕</text>
+      </view>
+    </view>
+    <view class="scan-btn" bindtap="onScanCode">
+      <image class="scan-icon" src="/images/icon-scan.png" mode="aspectFit"></image>
+    </view>
+  </view>
+
+  <!-- ====== Loading ====== -->
+  <view class="loading-wrap" wx:if="{{pageLoading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- ====== 空状态 ====== -->
+  <view class="empty-wrap" wx:elif="{{stockList.length === 0}}">
+    <image class="empty-img" src="/images/icon-stock.png" mode="aspectFit"></image>
+    <text class="empty-text">暂无库存数据</text>
+    <text class="empty-hint">请先添加商品或进行采购入库</text>
+  </view>
+
+  <!-- ====== 库存列表 ====== -->
+  <block wx:else>
+    <view class="list-header">
+      <text class="list-count">共 {{total}} 条记录</text>
+    </view>
+
+    <view class="stock-list">
+      <view class="stock-card" wx:for="{{stockList}}" wx:key="id" bindtap="onItemTap" data-id="{{item.id}}">
+        <!-- 顶部：名称 + 规格 -->
+        <view class="card-top">
+          <view class="card-info">
+            <text class="card-name">{{item.product.name}}</text>
+            <text class="card-spec">{{item.product.spec}} / {{item.product.unit ? item.product.unit.name : ''}}</text>
+          </view>
+          <view class="card-qty">
+            <text class="qty-num">{{item.quantity}}</text>
+            <text class="qty-unit">{{item.product.unit ? item.product.unit.name : ''}}</text>
+          </view>
+        </view>
+        <!-- 底部：条码 + 库位 + 批号 + 有效期 -->
+        <view class="card-meta">
+          <view class="meta-item">
+            <text class="meta-label">条码</text>
+            <text class="meta-value">{{item.product.code}}</text>
+          </view>
+          <view class="meta-item">
+            <text class="meta-label">库位</text>
+            <text class="meta-value">{{item.location ? item.location.name : '-'}}</text>
+          </view>
+          <view class="meta-item">
+            <text class="meta-label">批号</text>
+            <text class="meta-value">{{item.batchNo || '-'}}</text>
+          </view>
+          <view class="meta-item">
+            <text class="meta-label">有效期</text>
+            <text class="meta-value">{{item.expiryDate || '-'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- ====== 库存详情弹层 ====== -->
+  <view class="detail-mask" wx:if="{{showDetail}}" bindtap="onCloseDetail"></view>
+  <view class="detail-panel {{showDetail ? 'visible' : ''}}">
+    <view class="detail-header">
+      <text class="detail-title">库存详情</text>
+      <view class="detail-close" bindtap="onCloseDetail">
+        <text>✕</text>
+      </view>
+    </view>
+    <block wx:if="{{detailProduct}}">
+      <view class="detail-body">
+        <view class="detail-row">
+          <text class="detail-label">药品名称</text>
+          <text class="detail-value">{{detailProduct.product.name}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">规格</text>
+          <text class="detail-value">{{detailProduct.product.spec}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">单位</text>
+          <text class="detail-value">{{detailProduct.product.unit ? detailProduct.product.unit.name : ''}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">条码</text>
+          <text class="detail-value">{{detailProduct.product.code}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">库存数量</text>
+          <text class="detail-value highlight">{{detailProduct.quantity}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">仓库</text>
+          <text class="detail-value">{{detailProduct.warehouse ? detailProduct.warehouse.name : '-'}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">库位</text>
+          <text class="detail-value">{{detailProduct.location ? detailProduct.location.name : '-'}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">批号</text>
+          <text class="detail-value">{{detailProduct.batchNo || '-'}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">有效期</text>
+          <text class="detail-value">{{detailProduct.expiryDate || '-'}}</text>
+        </view>
+      </view>
+      <view class="detail-footer">
+        <button class="detail-btn" bindtap="onGoCheck" data-id="{{detailProduct.id}}">去盘点</button>
+      </view>
+    </block>
+  </view>
+
+</view>
