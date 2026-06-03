@@ -31,10 +31,22 @@ import { SalesOrder } from './entities/sales-order.entity';
 import { SalesOrderItem } from './entities/sales-order-item.entity';
 
 const entities = [
-  User, Product, Category, Unit, Warehouse, Location,
-  Supplier, Customer, Inventory, InventoryLog,
-  StockCheck, StockCheckItem, PurchaseOrder, PurchaseOrderItem,
-  SalesOrder, SalesOrderItem,
+  User,
+  Product,
+  Category,
+  Unit,
+  Warehouse,
+  Location,
+  Supplier,
+  Customer,
+  Inventory,
+  InventoryLog,
+  StockCheck,
+  StockCheckItem,
+  PurchaseOrder,
+  PurchaseOrderItem,
+  SalesOrder,
+  SalesOrderItem,
 ];
 
 @Module({
@@ -51,7 +63,11 @@ const entities = [
         password: config.get('DB_PASSWORD', 'postgres'),
         database: config.get('DB_DATABASE', 'erp_db'),
         entities,
-        synchronize: config.get('NODE_ENV') !== 'production',
+        synchronize:
+          config.get(
+            'DB_SYNCHRONIZE',
+            String(config.get('NODE_ENV') !== 'production'),
+          ) === 'true',
       }),
     }),
     ThrottlerModule.forRootAsync({

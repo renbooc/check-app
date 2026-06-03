@@ -467,8 +467,8 @@ Certbot 安装后会自动添加定时任务，证书到期前自动续期。
 ```bash
 cd /opt/erp
 
-# 在 app 容器内运行 seed 脚本
-sudo docker compose exec app node dist/seed.js
+# 在 app 容器内运行 seed 脚本（需要开启同步以创建表结构）
+sudo docker compose exec -e DB_SYNCHRONIZE=true app node dist/seed.js
 ```
 
 成功后将看到：
