@@ -10,7 +10,7 @@
     <view class="brand-icon">
       <text class="brand-icon-text">P</text>
     </view>
-    <text class="brand-title">药品进销存ERP</text>
+    <text class="brand-title">宸杰ERP</text>
     <view class="brand-bar"></view>
   </view>
 
@@ -30,6 +30,10 @@
       </view>
     </view>
 
+    <button class="login-btn" bindtap="onLogin" loading="{{loading}}" disabled="{{loading}}">
+      登录
+    </button>
+
     <!-- 隐私协议 -->
     <view class="agreement-row">
       <view class="agreement-checkbox {{agreed ? 'checked' : ''}}" bindtap="onToggleAgreement">
@@ -41,10 +45,6 @@
         <text class="agreement-link" bindtap="onViewTerms">《用户协议》</text>
       </text>
     </view>
-
-    <button class="login-btn" bindtap="onLogin" loading="{{loading}}" disabled="{{loading}}">
-      登录
-    </button>
 
     <view class="login-hint">
       <text class="hint-text">演示账号：13800138000 / 123456</text>
