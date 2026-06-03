@@ -57,16 +57,17 @@ async function seed() {
   );
 
   // 清空现有数据（注意顺序：先删子表，再删主表）
-  await salesItemRepo.delete({});
-  await salesRepo.delete({});
-  await purchaseItemRepo.delete({});
-  await purchaseRepo.delete({});
-  await inventoryRepo.delete({});
-  await productRepo.delete({});
-  await supplierRepo.delete({});
-  await customerRepo.delete({});
-  await locationRepo.delete({});
-  await warehouseRepo.delete({});
+  await salesItemRepo.clear();
+  await salesRepo.clear();
+  await purchaseItemRepo.clear();
+  await purchaseRepo.clear();
+  await inventoryRepo.clear();
+  await productRepo.clear();
+  await unitRepo.clear();
+  await supplierRepo.clear();
+  await customerRepo.clear();
+  await locationRepo.clear();
+  await warehouseRepo.clear();
 
   console.log('✅ 已清空现有数据');
 
