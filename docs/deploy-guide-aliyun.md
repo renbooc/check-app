@@ -235,16 +235,19 @@ openssl rand -hex 32
 cd /opt/erp
 
 cat > .env.production << 'EOF'
-# 数据库配置 — 务必修改为强密码
+# ── 运行环境 ──
+NODE_ENV=production
+
+# ── 数据库配置（务必修改为强密码）──
 DB_USERNAME=erp_user
 DB_PASSWORD=此处填写强密码（建议16位以上，含大小写数字符号）
 DB_DATABASE=erp_db
 
-# JWT 认证 — 填写上一步生成的随机字符串
+# ── JWT 认证（填写上一步生成的随机字符串）──
 JWT_SECRET=此处填写openssl生成的随机字符串
 JWT_EXPIRES_IN=7d
 
-# 跨域设置 — 暂时用 *，有域名后改为域名
+# ── 跨域设置（有域名后改为具体域名）──
 CORS_ORIGIN=*
 EOF
 ```
@@ -296,14 +299,16 @@ const ENV_MAP = {
 ```bash
 cd /opt/erp
 
-# 加载生产环境变量并启动
-export $(cat .env.production | xargs)
-
 # 使用 docker compose 构建并启动（后台运行）
+# docker-compose.yml 已配置 env_file: .env.production，无需手动加载环境变量
+git pull origin main
 sudo docker compose up -d --build
 ```
 
 首次构建大约需要 3~8 分钟（下载基础镜像 + 安装依赖 + 编译 TypeScript）。
+
+> **安全提示：** 后端端口 `3000` 只绑定到 `127.0.0.1`（本地回环），外部无法直接访问。
+> Nginx 在同一台服务器上可以通过反向代理转发请求，既安全又无需额外防火墙配置。
 
 ### 8.2 检查容器状态
 
@@ -311,13 +316,16 @@ sudo docker compose up -d --build
 sudo docker compose ps
 ```
 
-预期输出（两个容器均为 running）：
+预期输出（两个容器均为 healthy）：
 
 ```
-NAME        STATUS          PORTS
-erp-app     Up (healthy)    0.0.0.0:3000->3000/tcp
-erp-db      Up (healthy)    5432/tcp
+NAME      STATUS          PORTS
+erp-db    Up (healthy)    5432/tcp
+erp-app   Up (healthy)    127.0.0.1:3000->3000/tcp
 ```
+
+> 两个服务都带有健康检查，`STATUS` 列显示 `Up (healthy)` 才表示完全就绪。
+> `app` 首次启动时可能出现短暂的 `(starting)` 状态，这是正常的（`start_period: 30s`）。
 
 ### 8.3 查看启动日志
 
@@ -582,11 +590,12 @@ curl -X POST https://api.你的域名.com/auth/login \
 # 进入项目目录
 cd /opt/erp
 
-# 查看服务状态
+# 查看服务状态（含健康检查）
 sudo docker compose ps
 
 # 查看实时日志
 sudo docker compose logs -f app
+sudo docker compose logs -f db
 
 # 重启应用（不影响数据库）
 sudo docker compose restart app
@@ -605,18 +614,28 @@ git pull origin main
 
 # 重新构建并启动（会自动更新容器）
 sudo docker compose up -d --build
+
+# 等待健康检查通过
+sudo docker compose ps
+
+# 查看启动日志确认
+sudo docker compose logs -f app --tail 20
 ```
 
 ### 数据库备份
 
 ```bash
-# 备份数据库到文件
-sudo docker compose exec db pg_dump -U erp_user erp_db > /opt/backup/erp_$(date +%Y%m%d_%H%M%S).sql
+# 创建备份目录
+sudo mkdir -p /opt/backup && sudo chmod 755 /opt/backup
 
-# 创建定期备份的 cron 任务（每天凌晨3点自动备份）
+# 备份数据库到文件
+sudo docker compose exec db pg_dump -U ${DB_USERNAME:-erp_user} ${DB_DATABASE:-erp_db} \
+  > /opt/backup/erp_$(date +%Y%m%d_%H%M%S).sql
+
+# 创建定期备份的 cron 任务（每天凌晨3点自动备份，保留最近30天）
 sudo crontab -e
 # 添加以下行：
-# 0 3 * * * cd /opt/erp && docker compose exec -T db pg_dump -U erp_user erp_db > /opt/backup/erp_$(date +\%Y\%m\%d).sql
+# 0 3 * * * cd /opt/erp && docker compose exec -T db pg_dump -U erp_user erp_db > /opt/backup/erp_$(date +\%Y\%m\%d).sql && find /opt/backup -name 'erp_*.sql' -mtime +30 -delete
 ```
 
 ### 数据库恢复
@@ -685,13 +704,22 @@ sudo docker compose up -d
 
 ### Q5：数据库 synchronize 问题
 
-**说明：** 生产环境（`NODE_ENV=production`）下，TypeORM 的 `synchronize` 为 `false`，不会自动创建表。
+**说明：** 生产环境（`NODE_ENV=production`）下，TypeORM 的 `synchronize` 为 `false`，不会自动创建或修改表结构。
 
-**首次部署** 时 TypeORM 会在 `NODE_ENV` 不是 production 时自动建表。若需手动迁移：
+**首次部署创建表结构：**
 ```bash
-# 在容器内运行 TypeORM 迁移（如果有配置迁移文件）
+# 运行 seed 脚本时临时开启同步（自动建表 + 填充数据）
+sudo docker compose exec -e DB_SYNCHRONIZE=true app node dist/seed.js
+```
+
+**如需手动迁移（有配置迁移文件时）：**
+```bash
 sudo docker compose exec app npx typeorm migration:run
 ```
+
+> `synchronize` 行为由 `DB_SYNCHRONIZE` 环境变量控制，默认值根据 `NODE_ENV` 决定：
+> - `NODE_ENV=production` 且未设置 `DB_SYNCHRONIZE` → 关闭
+> - 其他环境或显式设置 `DB_SYNCHRONIZE=true` → 开启
 
 ### Q6：服务器内存不足，容器被 kill
 
@@ -746,25 +774,25 @@ git clone https://github.com/你的用户名/checkApp.git .
 
 # === 配置环境变量 ===
 openssl rand -hex 32
-vi .env.production    # 填入实际配置
+vi .env.production    # 填入实际配置（含 NODE_ENV=production）
 chmod 600 .env.production
 
 # === 启动服务 ===
 sudo docker compose up -d --build
-sudo docker compose ps
-sudo docker compose logs -f app
+sudo docker compose ps                      # 等待均为 healthy
+sudo docker compose logs -f app --tail 50   # 查看启动日志
 
-# === 配置 Nginx ===
-sudo vi /etc/nginx/conf.d/erp.conf    # 填入配置内容
+# === 配置 Nginx 反向代理 ===
+sudo vi /etc/nginx/conf.d/erp.conf    # 填入配置内容（proxy_pass http://127.0.0.1:3000）
 sudo nginx -t && sudo systemctl reload nginx
 
 # === SSL 证书（有域名后）===
 sudo dnf install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d api.你的域名.com
 
-# === 初始化数据 ===
-sudo docker compose exec app node dist/seed.js
+# === 初始化数据库（首次部署）===
+sudo docker compose exec -e DB_SYNCHRONIZE=true app node dist/seed.js
 
-# === 完成 ===
+# === 完成验证 ===
 curl https://api.你的域名.com/health
 ```
