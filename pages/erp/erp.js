@@ -4,6 +4,7 @@ const { showError, showSuccess } = require('../../utils/util')
 Page({
   data: {
     activeTab: 'purchase',
+    networkError: false,
     purchaseKeyword: '',
     purchaseList: [],
     purchasePage: 1,
@@ -19,6 +20,11 @@ Page({
   },
 
   onShow() {
+    this.loadCurrentTab()
+  },
+
+  onRetry() {
+    this.setData({ networkError: false })
     this.loadCurrentTab()
   },
 
@@ -70,6 +76,7 @@ Page({
       })
     } catch (err) {
       showError(err.message)
+      this.setData({ networkError: true })
     }
   },
 
@@ -84,6 +91,7 @@ Page({
       })
     } catch (err) {
       showError(err.message)
+      this.setData({ networkError: true })
     }
   },
 
@@ -98,6 +106,7 @@ Page({
       })
     } catch (err) {
       showError(err.message)
+      this.setData({ networkError: true })
     }
   },
 

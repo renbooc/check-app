@@ -1,4 +1,14 @@
 <view class="page">
+
+  <!-- ===== Network Error ===== -->
+  <view class="error-container" wx:if="{{networkError}}">
+    <image class="error-icon" src="/images/icon-document.png" mode="aspectFit"></image>
+    <text class="error-title">网络开小差了</text>
+    <text class="error-desc">请检查网络连接后重试</text>
+    <view class="error-retry-btn" bindtap="onRetry">重新加载</view>
+  </view>
+
+  <block wx:else>
   <view class="tab-bar">
     <view class="tab-item {{activeTab === 'purchase' ? 'active' : ''}}" bindtap="onTabChange" data-tab="purchase">
       <text>采购订单</text>
@@ -123,4 +133,5 @@
       </view>
     </view>
   </view>
+    </block>
 </view>

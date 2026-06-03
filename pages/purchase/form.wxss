@@ -731,7 +731,7 @@
 .action-submit {
   background: linear-gradient(135deg, #0077C2, #59a5f5);
   color: #FFFFFF;
-  box-shadow: 0 4rpx 16rpx rgba(0, 119, 194, 0.3);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
 }
 
 .action-submit:active {

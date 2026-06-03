@@ -14,10 +14,10 @@
    ============================================================ */
 .hero {
   background: linear-gradient(135deg, #0077C2 0%, #59a5f5 100%);
-  margin: 24rpx 24rpx 0;
+  margin: 20rpx 20rpx 0;
   padding: 40rpx 32rpx;
-  border-radius: 20rpx;
-  box-shadow: 0 8rpx 32rpx rgba(0, 119, 194, 0.35);
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
   position: relative;
   overflow: hidden;
 }
@@ -61,7 +61,7 @@
 
 .hero-name {
   display: block;
-  font-size: 38rpx;
+  font-size: 36rpx;
   font-weight: 800;
   color: #FFFFFF;
   margin-bottom: 14rpx;
@@ -98,9 +98,9 @@
    ============================================================ */
 .stats-card {
   background: #FFFFFF;
-  margin: 24rpx 24rpx 0;
+  margin: 20rpx 20rpx 0;
   padding: 28rpx 0 24rpx;
-  border-radius: 16rpx;
+  border-radius: 12rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
@@ -160,7 +160,7 @@
 .stats-dot-amber  { background: #FF7D00; }
 
 .stats-label {
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #5c5c5c;
   font-weight: 500;
 }
@@ -182,8 +182,8 @@
 
 .menu-card {
   background: #FFFFFF;
-  margin: 0 24rpx;
-  border-radius: 16rpx;
+  margin: 0 20rpx;
+  border-radius: 12rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
   overflow: hidden;
 }
@@ -268,8 +268,8 @@
   align-items: center;
   justify-content: center;
   gap: 10rpx;
-  height: 84rpx;
-  border-radius: 16rpx;
+  height: 88rpx;
+  border-radius: 8rpx;
   background: #FFFFFF;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
@@ -297,7 +297,7 @@
 }
 
 .version-text {
-  font-size: 20rpx;
+  font-size: 24rpx;
   color: #cccccc;
   font-weight: 400;
 }

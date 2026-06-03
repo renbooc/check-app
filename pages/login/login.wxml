@@ -30,6 +30,18 @@
       </view>
     </view>
 
+    <!-- 隐私协议 -->
+    <view class="agreement-row">
+      <view class="agreement-checkbox {{agreed ? 'checked' : ''}}" bindtap="onToggleAgreement">
+        <view class="checkbox-icon" wx:if="{{agreed}}">✓</view>
+      </view>
+      <text class="agreement-text">
+        已阅读并同意
+        <text class="agreement-link" bindtap="onViewPrivacy">《隐私政策》</text>
+        <text class="agreement-link" bindtap="onViewTerms">《用户协议》</text>
+      </text>
+    </view>
+
     <button class="login-btn" bindtap="onLogin" loading="{{loading}}" disabled="{{loading}}">
       登录
     </button>

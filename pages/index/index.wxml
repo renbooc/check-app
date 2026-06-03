@@ -1,8 +1,16 @@
 <view class="page">
 
   <!-- ===== Loading ===== -->
-  <view class="loading-wrap" wx:if="{{pageLoading}}">
+  <view class="loading-wrap" wx:if="{{pageLoading && !networkError}}">
     <view class="loading-dot"></view>
+  </view>
+
+  <!-- ===== Network Error ===== -->
+  <view class="error-container" wx:elif="{{networkError}}">
+    <image class="error-icon" src="/images/icon-document.png" mode="aspectFit"></image>
+    <text class="error-title">网络开小差了</text>
+    <text class="error-desc">请检查网络连接后重试</text>
+    <view class="error-retry-btn" bindtap="onRetry">重新加载</view>
   </view>
 
   <block wx:elif="{{loaded}}">

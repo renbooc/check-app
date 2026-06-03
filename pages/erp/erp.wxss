@@ -7,7 +7,7 @@
 .tab-bar {
   display: flex;
   background: #ffffff;
-  padding: 0 40rpx;
+  padding: 0 30rpx;
   gap: 8rpx;
 }
 
@@ -39,7 +39,7 @@
 }
 
 .tab-content {
-  padding: 24rpx 30rpx;
+  padding: 20rpx 20rpx;
 }
 
 .action-bar {
@@ -71,21 +71,21 @@
   display: flex;
   align-items: center;
   gap: 8rpx;
-  height: 80rpx;
+  height: 88rpx;
   padding: 0 28rpx;
   background: #0077C2;
   color: #ffffff;
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: 500;
-  border-radius: 16rpx;
+  border-radius: 8rpx;
   white-space: nowrap;
-  box-shadow: 0 4rpx 16rpx rgba(0, 119, 194, 0.3);
-  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: none;
+  transition: transform 0.2s;
 }
 
 .btn-add:active {
   transform: scale(0.97);
-  box-shadow: 0 2rpx 8rpx rgba(0, 119, 194, 0.2);
+  box-shadow: none;
 }
 
 .order-list {
@@ -96,9 +96,9 @@
 
 .order-card {
   background: #ffffff;
-  border-radius: 20rpx;
+  border-radius: 12rpx;
   padding: 28rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
   transition: transform 0.2s;
 }
 
@@ -120,7 +120,7 @@
 }
 
 .order-status {
-  font-size: 22rpx;
+  font-size: 24rpx;
   font-weight: 500;
   padding: 6rpx 16rpx;
   border-radius: 8rpx;
@@ -174,12 +174,12 @@
 }
 
 .order-date {
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #5c5c5c;
 }
 
 .order-qty {
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #5c5c5c;
 }
 
@@ -191,9 +191,9 @@
 
 .inventory-card {
   background: #ffffff;
-  border-radius: 20rpx;
+  border-radius: 12rpx;
   padding: 28rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
   transition: transform 0.2s;
 }
 
@@ -226,7 +226,7 @@
 }
 
 .inv-code {
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #5c5c5c;
 }
 
@@ -244,7 +244,7 @@
 }
 
 .inv-unit {
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #5c5c5c;
   margin-left: 6rpx;
 }
@@ -262,7 +262,7 @@
 }
 
 .inv-warehouse {
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #5c5c5c;
 }
 
@@ -287,7 +287,7 @@
 }
 
 .btn-action {
-  font-size: 22rpx;
+  font-size: 24rpx;
   font-weight: 500;
   padding: 8rpx 20rpx;
   border-radius: 10rpx;

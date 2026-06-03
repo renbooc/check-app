@@ -14,7 +14,7 @@
    ============================================================ */
 .period-bar {
   background: #FFFFFF;
-  padding: 20rpx 24rpx;
+  padding: 20rpx 20rpx;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
 }
 
@@ -59,7 +59,7 @@
   background: #FFFFFF;
   margin-top: 20rpx;
   padding: 24rpx;
-  border-radius: 16rpx;
+  border-radius: 12rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
@@ -149,14 +149,14 @@
 .kpi-grid {
   display: flex;
   flex-wrap: wrap;
-  padding: 20rpx 24rpx;
+  padding: 20rpx 20rpx;
   gap: 16rpx;
 }
 
 .kpi-card {
   width: calc(50% - 8rpx);
   background: #FFFFFF;
-  border-radius: 16rpx;
+  border-radius: 12rpx;
   padding: 24rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
   display: flex;
@@ -191,7 +191,7 @@
 
 .kpi-label {
   display: block;
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #5c5c5c;
   margin-bottom: 8rpx;
 }
@@ -211,7 +211,7 @@
 
 .kpi-sub {
   display: block;
-  font-size: 20rpx;
+  font-size: 24rpx;
   color: #cccccc;
 }
 
@@ -220,8 +220,8 @@
    ============================================================ */
 .section-card {
   background: #FFFFFF;
-  margin: 20rpx 24rpx 0;
-  border-radius: 16rpx;
+  margin: 20rpx 20rpx 0;
+  border-radius: 12rpx;
   padding: 28rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
@@ -273,7 +273,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22rpx;
+  font-size: 24rpx;
   font-weight: 700;
   color: #FFFFFF;
   margin-right: 16rpx;
@@ -303,7 +303,7 @@
 }
 
 .rank-code {
-  font-size: 20rpx;
+  font-size: 24rpx;
   color: #cccccc;
 }
 
@@ -375,7 +375,7 @@
 }
 
 .alert-code {
-  font-size: 20rpx;
+  font-size: 24rpx;
   color: #cccccc;
 }
 
@@ -394,7 +394,7 @@
 }
 
 .alert-min {
-  font-size: 20rpx;
+  font-size: 24rpx;
   color: #5c5c5c;
   margin-left: 4rpx;
 }

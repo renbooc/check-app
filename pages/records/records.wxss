@@ -47,7 +47,7 @@
   background: #0077C2;
   color: #ffffff;
   border-color: #0077C2;
-  box-shadow: 0 4rpx 16rpx rgba(0, 119, 194, 0.3);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
 }
 
 .record-list {

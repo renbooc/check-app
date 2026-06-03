@@ -48,6 +48,7 @@ Page({
   data: {
     pageLoading: true,
     loaded: false,
+    networkError: false,
     // 顶栏（预计算，避免 WXML || 链）
     todayDate: '',
     weekdayText: '',
@@ -82,6 +83,12 @@ Page({
 
   onShow() {
     this.setHeaderInfo()
+    this.loadDashboard()
+    this.loadUnreadCount()
+  },
+
+  onRetry() {
+    this.setData({ networkError: false })
     this.loadDashboard()
     this.loadUnreadCount()
   },
@@ -160,8 +167,7 @@ Page({
       })
     } catch (err) {
       console.error('[Dashboard] load error:', err)
-      showError(err.message)
-      this.setData({ pageLoading: false, loaded: false })
+      this.setData({ pageLoading: false, networkError: true })
     }
   },
 
