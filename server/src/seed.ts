@@ -56,18 +56,16 @@ async function seed() {
     getRepositoryToken(SalesOrderItem),
   );
 
-  // 清空现有数据（注意顺序：先删子表，再删主表）
-  await salesItemRepo.clear();
-  await salesRepo.clear();
-  await purchaseItemRepo.clear();
-  await purchaseRepo.clear();
-  await inventoryRepo.clear();
-  await productRepo.clear();
-  await unitRepo.clear();
-  await supplierRepo.clear();
-  await customerRepo.clear();
-  await locationRepo.clear();
-  await warehouseRepo.clear();
+  // 清空现有数据 — 使用 TRUNCATE ... CASCADE 一次性处理所有外键引用
+  await salesItemRepo.query(`
+    TRUNCATE TABLE
+      "sales_order_items", "sales_orders",
+      "purchase_order_items", "purchase_orders",
+      "inventory", "products",
+      "suppliers", "customers",
+      "units", "locations", "warehouses"
+    CASCADE
+  `);
 
   console.log('✅ 已清空现有数据');
 
