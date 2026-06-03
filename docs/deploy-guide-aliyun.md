@@ -1,8 +1,8 @@
 # 阿里云服务器部署指南 — 药品进销存 ERP
 
 > 适用于：微信小程序前端 + NestJS/PostgreSQL 后端 Docker 部署  
-> 操作系统：Alibaba Cloud Linux 3.2104（RHEL/CentOS 兼容）
-> 最后更新：2026-06-02
+> 操作系统：Ubuntu 24.04 LTS
+> 最后更新：2026-06-03
 
 ---
 
@@ -81,15 +81,17 @@ passwd
 ### 2.3 创建普通用户（可选，推荐）
 
 ```bash
-useradd deploy
-usermod -aG wheel deploy
+adduser deploy
+usermod -aG sudo deploy
 su - deploy
 ```
+
+> Ubuntu 的 `sudo` 用户组相当于 CentOS 的 `wheel` 组。
 
 ### 2.4 更新系统
 
 ```bash
-sudo dnf update -y
+sudo apt update && sudo apt upgrade -y
 ```
 
 ### 2.5 设置时区
@@ -105,15 +107,23 @@ sudo timedatectl set-timezone Asia/Shanghai
 ### 3.1 安装 Docker（使用阿里云镜像，国内速度更快）
 
 ```bash
-# 添加阿里云 Docker 仓库
-curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo | sudo tee /etc/yum.repos.d/docker-ce.repo
+# 安装依赖
+sudo apt install -y ca-certificates curl gnupg
 
-# 替换为阿里云镜像源
-sudo sed -i 's+download.docker.com+mirrors.aliyun.com/docker-ce+' /etc/yum.repos.d/docker-ce.repo
+# 添加 Docker 官方 GPG 密钥
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# 添加阿里云 Docker 仓库（适配 Ubuntu 24.04）
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.aliyun.com/docker-ce/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # 刷新缓存并安装
-sudo dnf makecache
-sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 ```
 
 ### 3.2 启动并设置开机自启
@@ -148,22 +158,19 @@ sudo usermod -aG docker $USER
 ## 4. 安装 Nginx
 
 ```bash
-# 安装 EPEL 扩展仓库（Nginx 在此仓库中）
-sudo dnf install -y epel-release
-
-# 安装 Nginx
-sudo dnf install -y nginx
+sudo apt install -y nginx
 sudo systemctl enable nginx
 sudo systemctl start nginx
 ```
 
 验证：在浏览器访问 `http://你的服务器公网IP`，看到 Nginx 欢迎页即成功。
 
-> **注意：** Alibaba Cloud Linux 默认启用防火墙，需开放 80/443 端口：
+> **说明：** Ubuntu 上 ufw 防火墙默认未启用。阿里云服务器实际由**安全组**控制流量，
+> 只要安全组已开放 80/443 端口，无需额外配置 ufw。
+> 如需启用 ufw：
 > ```bash
-> sudo firewall-cmd --permanent --add-service=http
-> sudo firewall-cmd --permanent --add-service=https
-> sudo firewall-cmd --reload
+> sudo ufw allow 'Nginx Full'
+> sudo ufw enable
 > ```
 
 ---
@@ -176,7 +183,7 @@ sudo systemctl start nginx
 
 ```bash
 # 服务器安装 Git
-sudo dnf install -y git
+sudo apt install -y git
 
 # 创建项目目录
 sudo mkdir -p /opt/erp
@@ -184,7 +191,7 @@ sudo chown $USER:$USER /opt/erp
 cd /opt/erp
 
 # 拉取代码
-git clone https://github.com/你的用户名/checkApp.git .
+git clone https://github.com/renbooc/check-app.git .
 ```
 
 ### 方式二：本地上传（scp）
@@ -232,7 +239,7 @@ openssl rand -hex 32
 ### 6.2 创建 .env.production 文件
 
 ```bash
-cd /opt/erp
+cd /opt/erp/check-app
 
 cat > .env.production << 'EOF'
 # ── 运行环境 ──
@@ -297,7 +304,7 @@ const ENV_MAP = {
 ### 8.1 执行部署
 
 ```bash
-cd /opt/erp
+cd /opt/erp/check-app
 
 # 使用 docker compose 构建并启动（后台运行）
 # docker-compose.yml 已配置 env_file: .env.production，无需手动加载环境变量
@@ -441,8 +448,8 @@ curl http://你的服务器IP/health
 ### 10.2 使用 Let's Encrypt 申请免费证书
 
 ```bash
-# 安装 certbot（通过 EPEL 仓库）
-sudo dnf install -y certbot python3-certbot-nginx
+# 安装 certbot
+sudo apt install -y certbot python3-certbot-nginx
 
 # 自动申请并配置 SSL
 sudo certbot --nginx -d api.你的域名.com
@@ -731,13 +738,15 @@ sudo dmesg | grep -i "oom\|kill"
 
 **解决：** 添加 Swap 空间
 ```bash
-sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+sudo fallocate -l 2G /swapfile
 sudo chmod 600 /swapfile
 sudo mkswap /swapfile
 sudo swapon /swapfile
 # 永久生效
-echo '/swapfile swap swap defaults 0 0' | sudo tee -a /etc/fstab
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ```
+
+> Ubuntu 24.04 建议优先使用 `fallocate` 而非 `dd` 创建 swap 文件，速度更快。
 
 ---
 
@@ -747,27 +756,25 @@ echo '/swapfile swap swap defaults 0 0' | sudo tee -a /etc/fstab
 # === 服务器初始化 ===
 ssh root@服务器公网IP
 passwd
-sudo dnf update -y
+sudo apt update && sudo apt upgrade -y
 sudo timedatectl set-timezone Asia/Shanghai
 
 # === 安装 Docker（阿里云镜像）===
-curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo | sudo tee /etc/yum.repos.d/docker-ce.repo
-sudo sed -i 's+download.docker.com+mirrors.aliyun.com/docker-ce+' /etc/yum.repos.d/docker-ce.repo
-sudo dnf makecache
-sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo apt install -y ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(. /etc/os-release && echo \"$VERSION_CODENAME\") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo systemctl enable docker && sudo systemctl start docker
 
 # === 安装 Nginx ===
-sudo dnf install -y epel-release
-sudo dnf install -y nginx
+sudo apt install -y nginx
 sudo systemctl enable nginx
-# 开放防火墙端口
-sudo firewall-cmd --permanent --add-service=http
-sudo firewall-cmd --permanent --add-service=https
-sudo firewall-cmd --reload
 
 # === 上传代码（Git 方式）===
-sudo dnf install -y git
+sudo apt install -y git
 sudo mkdir -p /opt/erp && sudo chown $USER:$USER /opt/erp
 cd /opt/erp
 git clone https://github.com/你的用户名/checkApp.git .
@@ -777,7 +784,7 @@ openssl rand -hex 32
 vi .env.production    # 填入实际配置（含 NODE_ENV=production）
 chmod 600 .env.production
 
-# === 启动服务 ===
+# === 构建并启动服务 ===
 sudo docker compose up -d --build
 sudo docker compose ps                      # 等待均为 healthy
 sudo docker compose logs -f app --tail 50   # 查看启动日志
@@ -787,7 +794,7 @@ sudo vi /etc/nginx/conf.d/erp.conf    # 填入配置内容（proxy_pass http://1
 sudo nginx -t && sudo systemctl reload nginx
 
 # === SSL 证书（有域名后）===
-sudo dnf install -y certbot python3-certbot-nginx
+sudo apt install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d api.你的域名.com
 
 # === 初始化数据库（首次部署）===
