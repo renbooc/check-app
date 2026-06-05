@@ -239,7 +239,7 @@ openssl rand -hex 32
 ### 6.2 创建 .env.production 文件
 
 ```bash
-cd /opt/erp/check-app
+cd /opt/erp
 
 cat > .env.production << 'EOF'
 # ── 运行环境 ──
@@ -304,7 +304,7 @@ const ENV_MAP = {
 ### 8.1 执行部署
 
 ```bash
-cd /opt/erp/check-app
+cd /opt/erp
 
 # 使用 docker compose 构建并启动（后台运行）
 # docker-compose.yml 已配置 env_file: .env.production，无需手动加载环境变量
