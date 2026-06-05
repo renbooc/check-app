@@ -8,8 +8,6 @@ services:
     restart: unless-stopped
     volumes:
       - pgdata:/var/lib/postgresql/data
-    env_file:
-      - .env.production
     environment:
       POSTGRES_DB: ${DB_DATABASE:-erp_db}
       POSTGRES_USER: ${DB_USERNAME:-postgres}

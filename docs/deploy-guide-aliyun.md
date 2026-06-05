@@ -307,9 +307,9 @@ const ENV_MAP = {
 cd /opt/erp
 
 # 使用 docker compose 构建并启动（后台运行）
-# docker-compose.yml 已配置 env_file: .env.production，无需手动加载环境变量
+# --env-file 指定环境变量来源，确保 db 和 app 使用相同的凭据
 git pull origin main
-sudo docker compose up -d --build
+sudo docker compose --env-file .env.production up -d --build
 ```
 
 首次构建大约需要 3~8 分钟（下载基础镜像 + 安装依赖 + 编译 TypeScript）。
@@ -619,8 +619,8 @@ cd /opt/erp
 # 拉取最新代码
 git pull origin main
 
-# 重新构建并启动（会自动更新容器）
-sudo docker compose up -d --build
+# 重新构建并启动（--env-file 确保变量替换正确）
+sudo docker compose --env-file .env.production up -d --build
 
 # 等待健康检查通过
 sudo docker compose ps
@@ -785,7 +785,7 @@ vi .env.production    # 填入实际配置（含 NODE_ENV=production）
 chmod 600 .env.production
 
 # === 构建并启动服务 ===
-sudo docker compose up -d --build
+sudo docker compose --env-file .env.production up -d --build
 sudo docker compose ps                      # 等待均为 healthy
 sudo docker compose logs -f app --tail 50   # 查看启动日志
 
