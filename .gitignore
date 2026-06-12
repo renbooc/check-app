@@ -35,6 +35,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+pnpm-lock.yaml
+pnpm-workspace.yaml
 
 # ==============================
 # 环境变量（敏感文件，绝不提交）
