@@ -1,31 +1,111 @@
 <view class="page">
+
+  <!-- ========== 搜索栏 ========== -->
   <view class="search-bar">
-    <view class="search-input-wrap">
-      <input class="search-input" placeholder="搜索商品名称/编码" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearch" />
-    </view>
-  </view>
-
-  <view class="empty-container" wx:if="{{list.length === 0}}">
-    <text class="empty-text">暂无商品</text>
-  </view>
-
-  <view class="product-list" wx:else>
-    <view class="product-card" wx:for="{{list}}" wx:key="id" bindtap="onEdit" data-id="{{item.id}}">
-      <view class="product-main">
-        <view class="product-info">
-          <text class="product-name">{{item.name}}</text>
-          <text class="product-code">{{item.code || '-'}}</text>
-        </view>
-        <view class="product-meta">
-          <text class="product-price">¥{{item.price || '0.00'}}</text>
-          <text class="product-unit">/ {{item.unit || '-'}}</text>
-        </view>
-        <icon-cmp type="arrow-right" size="14" color="#CCCCCC"></icon-cmp>
+    <view class="search-box">
+      <view class="search-icon"></view>
+      <input class="search-input" placeholder="搜索商品名称/编码/条码" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearch" confirm-type="search" />
+      <view class="search-clear" wx:if="{{keyword}}" bindtap="onClearSearch">
+        <view class="clear-icon"></view>
       </view>
     </view>
   </view>
 
-  <view class="fab" bindtap="onAdd">
-    <icon-cmp type="plus" size="24" color="#FFFFFF"></icon-cmp>
+  <!-- ========== 分类筛选 ========== -->
+  <scroll-view class="category-scroll" scroll-x enhanced show-scrollbar="{{false}}" wx:if="{{categories.length > 0}}">
+    <view class="category-list">
+      <view class="category-chip {{activeCategory === '' ? 'chip-active' : ''}}" bindtap="onFilterCategory" data-cid="">
+        <text>全部</text>
+      </view>
+      <view class="category-chip {{activeCategory === item.id ? 'chip-active' : ''}}" wx:for="{{categories}}" wx:key="id" bindtap="onFilterCategory" data-cid="{{item.id}}">
+        <text>{{item.name}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- ========== 内容区域 ========== -->
+  <view class="content-area">
+
+    <!-- Loading 骨架屏 -->
+    <view class="skeleton-wrap" wx:if="{{loading}}">
+      <view class="skeleton-card" wx:for="{{[1,2,3]}}" wx:key="*this">
+        <view class="skeleton-line skeleton-name"></view>
+        <view class="skeleton-line skeleton-code"></view>
+        <view class="skeleton-line skeleton-meta"></view>
+      </view>
+    </view>
+
+    <!-- 搜索为空 -->
+    <view class="empty-wrap" wx:elif="{{searched && list.length === 0}}">
+      <view class="empty-icon-wrap">
+        <view class="empty-icon-search"></view>
+      </view>
+      <text class="empty-title">未找到匹配商品</text>
+      <text class="empty-desc">试试其他关键词或分类</text>
+    </view>
+
+    <!-- 数据为空 -->
+    <view class="empty-wrap" wx:elif="{{!loading && !searched && list.length === 0 && loaded}}">
+      <view class="empty-icon-wrap">
+        <view class="empty-icon-box"></view>
+      </view>
+      <text class="empty-title">暂无商品</text>
+      <text class="empty-desc">点击下方按钮添加首个商品</text>
+    </view>
+
+    <!-- 商品列表 -->
+    <view class="product-list" wx:else>
+      <view class="product-card" wx:for="{{list}}" wx:key="id" bindtap="onEdit" data-id="{{item.id}}">
+        <view class="card-top">
+          <text class="product-name">{{item.name}}</text>
+          <view class="product-category-tag" wx:if="{{item.categoryName}}">{{item.categoryName}}</view>
+        </view>
+        <view class="card-body">
+          <view class="info-row">
+            <text class="info-label">编码</text>
+            <text class="info-val">{{item.code || '-'}}</text>
+          </view>
+          <view class="info-row" wx:if="{{item.spec}}">
+            <text class="info-label">规格</text>
+            <text class="info-val">{{item.spec}}</text>
+          </view>
+        </view>
+        <view class="card-footer">
+          <view class="price-area">
+            <text class="price-sign">¥</text>
+            <text class="price-num">{{item.price || '0.00'}}</text>
+            <text class="price-unit">/ {{item.unitName || '件'}}</text>
+          </view>
+          <view class="stock-badge {{item.stockStatus || 'unknown'}}">
+            <view class="stock-dot"></view>
+            <text>{{item.stockLabel || '-'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 加载更多 -->
+      <view class="load-more" wx:if="{{list.length > 0 && list.length < total}}">
+        <text class="load-more-text">上拉加载更多</text>
+      </view>
+      <view class="load-more" wx:elif="{{list.length > 0 && list.length >= total && total > 0}}">
+        <text class="load-more-text">— 已显示全部 {{total}} 件商品 —</text>
+      </view>
+    </view>
+
   </view>
+
+  <!-- ========== 底部操作栏（替代悬浮按钮） ========== -->
+  <view class="bottom-action">
+    <view class="action-inner">
+      <view class="action-count" wx:if="{{total > 0}}">
+        <text class="count-num">{{total}}</text>
+        <text class="count-label">件商品</text>
+      </view>
+      <view class="action-btn" bindtap="onAdd">
+        <view class="btn-plus"></view>
+        <text>添加商品</text>
+      </view>
+    </view>
+  </view>
+
 </view>
