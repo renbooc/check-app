@@ -3,86 +3,114 @@ const { showError, showSuccess } = require('../../utils/util')
 
 Page({
   data: {
-    loading: false,
     keyword: '',
+    searched: false,
     list: [],
     page: 1,
     pageSize: 20,
     total: 0,
+    loading: true,
+    loaded: false,
+
+    // 弹窗
     showModal: false,
     editingId: null,
     form: {
       name: '',
       contactPerson: '',
-      contactPhone: '',
+      phone: '',
       address: '',
       remark: ''
     }
   },
 
-  onLoad() {
-    this.loadList()
+  onShow() {
+    this.resetList()
   },
 
   onPullDownRefresh() {
-    this.setData({ page: 1 })
-    this.loadList().then(() => wx.stopPullDownRefresh())
+    this.resetList().then(() => wx.stopPullDownRefresh())
   },
 
   onReachBottom() {
-    if (this.data.list.length < this.data.total) {
+    if (this.data.list.length < this.data.total && !this.data.loading) {
       this.setData({ page: this.data.page + 1 })
       this.loadList(true)
     }
   },
+
+  // ==================== 搜索 ====================
 
   onSearchInput(e) {
     this.setData({ keyword: e.detail.value })
   },
 
   onSearch() {
-    this.setData({ page: 1 })
-    this.loadList()
+    this.setData({ searched: true })
+    this.resetList()
+  },
+
+  onClearSearch() {
+    this.setData({ keyword: '', searched: false })
+    this.resetList()
+  },
+
+  // ==================== 数据 ====================
+
+  async resetList() {
+    this.setData({ page: 1, list: [], loading: true })
+    await this.loadList(false)
   },
 
   async loadList(append) {
-    this.setData({ loading: true })
     try {
       const params = { page: this.data.page, pageSize: this.data.pageSize }
       if (this.data.keyword) params.keyword = this.data.keyword
       const res = await api.get('/suppliers', params)
+      const enriched = (res.list || []).map(this.enrichItem.bind(this))
       this.setData({
-        list: append ? [...this.data.list, ...(res.list || [])] : (res.list || []),
+        list: append ? [...this.data.list, ...enriched] : enriched,
         total: res.total || 0,
-        loading: false
+        loading: false,
+        loaded: true,
       })
     } catch (err) {
       showError(err.message)
-      this.setData({ loading: false })
+      this.setData({ loading: false, loaded: true })
     }
   },
+
+  enrichItem(item) {
+    return {
+      ...item,
+      initial: (item.name && item.name[0]) || '?',
+      phone: item.phone || '',
+    }
+  },
+
+  // ==================== 弹窗 ====================
 
   onAdd() {
     this.setData({
       showModal: true,
       editingId: null,
-      form: { name: '', contactPerson: '', contactPhone: '', address: '', remark: '' }
+      form: { name: '', contactPerson: '', phone: '', address: '', remark: '' }
     })
   },
 
   async onEdit(e) {
     const id = e.currentTarget.dataset.id
     try {
-      const supplier = await api.get(`/suppliers/${id}`)
+      const item = await api.get('/suppliers/' + id)
       this.setData({
         showModal: true,
         editingId: id,
         form: {
-          name: supplier.name || '',
-          contactPerson: supplier.contactPerson || '',
-          contactPhone: supplier.contactPhone || '',
-          address: supplier.address || '',
-          remark: supplier.remark || ''
+          name: item.name || '',
+          contactPerson: item.contactPerson || '',
+          phone: item.phone || '',
+          address: item.address || '',
+          remark: item.remark || ''
         }
       })
     } catch (err) {
@@ -96,8 +124,7 @@ Page({
 
   onFormFieldInput(e) {
     const field = e.currentTarget.dataset.field
-    const form = { ...this.data.form, [field]: e.detail.value }
-    this.setData({ form })
+    this.setData({ ['form.' + field]: e.detail.value })
   },
 
   async onSave() {
@@ -106,17 +133,15 @@ Page({
       wx.showToast({ title: '请输入供应商名称', icon: 'none' })
       return
     }
-
     try {
       if (editingId) {
-        await api.put(`/suppliers/${editingId}`, form)
+        await api.put('/suppliers/' + editingId, form)
       } else {
         await api.post('/suppliers', form)
       }
       showSuccess('保存成功')
       this.setData({ showModal: false })
-      this.setData({ page: 1 })
-      this.loadList()
+      this.resetList()
     } catch (err) {
       showError(err.message)
     }
@@ -131,15 +156,15 @@ Page({
       success: async (res) => {
         if (res.confirm) {
           try {
-            await api.del(`/suppliers/${editingId}`)
+            await api.del('/suppliers/' + editingId)
             showSuccess('删除成功')
             this.setData({ showModal: false })
-            this.loadList()
+            this.resetList()
           } catch (err) {
             showError(err.message)
           }
         }
       }
     })
-  }
+  },
 })
