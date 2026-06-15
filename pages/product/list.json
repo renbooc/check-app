@@ -3,5 +3,8 @@
   "navigationBarBackgroundColor": "#f5f7fa",
   "navigationBarTextStyle": "black",
   "backgroundColor": "#f5f7fa",
+  "backgroundTextStyle": "dark",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 100,
   "usingComponents": {}
 }
