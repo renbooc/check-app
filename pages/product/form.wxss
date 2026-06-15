@@ -157,6 +157,20 @@
   width: 200rpx;
 }
 
+/* ---------- 只读文本（自动编码） ---------- */
+.form-readonly {
+  flex: 1;
+  text-align: right;
+  font-size: 26rpx;
+  color: #5c5c5c;
+  line-height: 80rpx;
+}
+
+.form-auto-code {
+  color: #cccccc;
+  font-style: italic;
+}
+
 /* ---------- Picker 选择器 ---------- */
 .form-picker {
   display: flex;

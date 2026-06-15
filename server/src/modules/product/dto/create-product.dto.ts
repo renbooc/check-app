@@ -4,18 +4,21 @@ export class CreateProductDto {
   @IsString()
   name: string;
 
+  @IsOptional()
   @IsString()
-  code: string;
+  code?: string;
 
   @IsOptional()
   @IsString()
   approvalNo?: string;
 
+  @IsOptional()
   @IsString()
-  spec: string;
+  spec?: string;
 
+  @IsOptional()
   @IsString()
-  unitId: string;
+  unitId?: string;
 
   @IsOptional()
   @IsString()

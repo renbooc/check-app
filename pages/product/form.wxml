@@ -28,16 +28,14 @@
       />
     </view>
 
-    <view class="form-item">
-      <text class="form-label">商品编码 <text class="required">*</text></text>
-      <input
-        class="form-input"
-        placeholder="唯一编码"
-        placeholder-class="placeholder"
-        value="{{form.code}}"
-        bindinput="onFieldInput"
-        data-field="code"
-      />
+    <!-- 新增时编码自动生成，编辑时显示只读 -->
+    <view class="form-item" wx:if="{{editingId}}">
+      <text class="form-label">商品编码</text>
+      <view class="form-readonly">{{form.code}}</view>
+    </view>
+    <view class="form-item" wx:else>
+      <text class="form-label">商品编码</text>
+      <view class="form-readonly form-auto-code">保存后自动生成</view>
     </view>
 
     <view class="form-item">

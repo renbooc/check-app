@@ -27,7 +27,7 @@ export class Product {
   @Column({ length: 100 })
   spec: string;
 
-  @Column()
+  @Column({ nullable: true })
   unitId: string;
 
   @ManyToOne(() => Unit)

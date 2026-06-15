@@ -126,10 +126,6 @@ Page({
       wx.showToast({ title: '请输入商品名称', icon: 'none' })
       return
     }
-    if (!form.code.trim()) {
-      wx.showToast({ title: '请输入商品编码', icon: 'none' })
-      return
-    }
 
     this.setData({ submitting: true })
     try {
