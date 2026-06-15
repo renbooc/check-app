@@ -22,6 +22,8 @@ Page({
     filteredSuppliers: [],
     showSupplierResults: false,
     selectedSupplier: null,
+    supplierInitial: '',
+    supplierName: '',
     _allSuppliers: [],
 
     // 仓库
@@ -121,6 +123,8 @@ Page({
       this.setData({
         orderNo: order.orderNo || '',
         selectedSupplier: supplier || null,
+        supplierInitial: supplier ? supplier.name.charAt(0) : '',
+        supplierName: supplier ? supplier.name : '',
         supplierKeyword: supplier ? supplier.name : "",
         remark: order.remark || "",
         expectedDate: order.expectedDate || "",
@@ -177,6 +181,8 @@ Page({
     const supplier = this.data.filteredSuppliers[index];
     this.setData({
       selectedSupplier: supplier,
+      supplierInitial: supplier.name.charAt(0),
+      supplierName: supplier.name,
       supplierKeyword: supplier.name,
       showSupplierResults: false,
       filteredSuppliers: [],

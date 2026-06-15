@@ -53,7 +53,7 @@
         </view>
       </view>
       <view class="supplier-selected-inline" wx:else>
-        <view class="supplier-avatar supplier-avatar-sm">{{selectedSupplier.name.charAt(0)}}</view>
+        <view class="supplier-avatar supplier-avatar-sm">{{supplierInitial}}</view>
         <text class="supplier-name-inline">{{selectedSupplier.name}}</text>
         <text class="supplier-contact-inline" wx:if="{{selectedSupplier.contactPerson}}">· {{selectedSupplier.contactPerson}}</text>
       </view>

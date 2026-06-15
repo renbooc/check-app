@@ -22,6 +22,8 @@ Page({
     filteredCustomers: [],
     showCustomerResults: false,
     selectedCustomer: null,
+    customerInitial: '',
+    customerName: '',
     _allCustomers: [],
 
     // Warehouse
@@ -130,6 +132,8 @@ Page({
       this.setData({
         orderNo: order.orderNo || '',
         selectedCustomer: customer || null,
+        customerInitial: customer ? customer.name.charAt(0) : '',
+        customerName: customer ? customer.name : '',
         customerKeyword: customer ? customer.name : '',
         warehouseIndex: warehouseIdx,
         selectedWarehouse: selWarehouse,
@@ -181,6 +185,8 @@ Page({
     const customer = this.data.filteredCustomers[index]
     this.setData({
       selectedCustomer: customer,
+      customerInitial: customer.name.charAt(0),
+      customerName: customer.name,
       customerKeyword: customer.name,
       showCustomerResults: false,
       filteredCustomers: [],

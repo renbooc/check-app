@@ -53,8 +53,8 @@
         </view>
       </view>
       <view class="customer-selected-inline" wx:else>
-        <view class="customer-avatar-sm">{{(selectedCustomer || {}).name ? selectedCustomer.name.charAt(0) : ''}}</view>
-        <text class="customer-name-inline">{{(selectedCustomer || {}).name || ''}}</text>
+        <view class="customer-avatar-sm">{{customerInitial}}</view>
+        <text class="customer-name-inline">{{customerName}}</text>
         <text class="customer-contact-inline" wx:if="{{selectedCustomer && selectedCustomer.contactPerson}}">· {{selectedCustomer.contactPerson}}</text>
       </view>
     </view>
