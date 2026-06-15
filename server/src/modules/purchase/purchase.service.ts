@@ -37,6 +37,20 @@ export class PurchaseService {
     });
   }
 
+  private async generateOrderNo(): Promise<string> {
+    const prefix = 'CGDD';
+    const now = new Date();
+    const dateStr = `${now.getFullYear().toString().slice(2)}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+    const last = await this.orderRepo
+      .createQueryBuilder('o')
+      .select('o.orderNo')
+      .where("o.orderNo LIKE :pattern", { pattern: `${prefix}${dateStr}%` })
+      .orderBy('o.orderNo', 'DESC')
+      .getRawOne();
+    const seq = last ? parseInt(last.o_orderNo.slice(-4), 10) + 1 : 1;
+    return `${prefix}${dateStr}${String(seq).padStart(4, '0')}`;
+  }
+
   async create(dto: {
     supplierId: string;
     items: Array<{
@@ -51,7 +65,7 @@ export class PurchaseService {
     operatorName: string;
     remark?: string;
   }) {
-    const orderNo = `PO${Date.now()}`;
+    const orderNo = await this.generateOrderNo();
     let totalAmount = 0;
     let totalQuantity = 0;
 

@@ -152,19 +152,68 @@
   color: #5c5c5c;
 }
 
-.fab {
+.bottom-action {
   position: fixed;
-  right: 40rpx;
-  bottom: 60rpx;
-  width: 100rpx;
-  height: 100rpx;
-  background: #0077C2;
-  border-radius: 50%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0 24rpx calc(24rpx + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, #f5f5f5 60%, transparent);
+  z-index: 100;
+  pointer-events: none;
+}
+
+.action-inner {
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
-  z-index: 100;
+  justify-content: space-between;
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 16rpx 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  pointer-events: auto;
+}
+
+.action-count {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+}
+
+.count-num {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #333333;
+}
+
+.count-label {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  height: 80rpx;
+  padding: 0 36rpx;
+  background: #0077C2;
+  border-radius: 16rpx;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.action-btn:active {
+  opacity: 0.85;
+}
+
+.btn-plus {
+  width: 28rpx;
+  height: 28rpx;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .empty-container {

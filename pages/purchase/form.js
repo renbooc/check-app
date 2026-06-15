@@ -1,9 +1,21 @@
 const { api } = require("../../utils/request");
 const { showError, showSuccess } = require("../../utils/util");
 
+const STATUS_MAP = {
+  draft: '草稿',
+  pending: '待审核',
+  approved: '已审核',
+  received: '已入库',
+  cancelled: '已取消',
+};
+
+const EDITABLE_STATUSES = ['draft']; // 只有草稿可编辑
+
 Page({
   data: {
     id: null,
+    readonly: false,
+    orderNo: '',
 
     // 供应商
     supplierKeyword: "",
@@ -15,6 +27,8 @@ Page({
     // 订单信息
     expectedDate: "",
     remark: "",
+    statusCls: 'draft',
+    statusText: '草稿',
 
     // 统一商品搜索
     productKeyword: "",
@@ -65,23 +79,26 @@ Page({
   async loadOrder(id) {
     try {
       const order = await api.get(`/purchase/${id}`);
+      if (!order) { showError('订单不存在'); return; }
+
       const allSuppliers = this.data._allSuppliers || [];
       const supplier = allSuppliers.find((s) => s.id === order.supplierId);
-      const products = this.data.products;
-      const items = (order.items || []).map((item) => {
-        return {
-          productId: item.productId,
-          productName: item.productName,
-          productSpec: item.productSpec,
-          productUnit: item.productUnit,
-          productManufacturer:
-            item.productManufacturer || item.manufacturer || "",
-          quantity: item.quantity,
-          price: item.price,
-          amount: item.amount,
-        };
-      });
+      const status = order.status || 'draft';
+      const readonly = !EDITABLE_STATUSES.includes(status);
+
+      const items = (order.items || []).map((item) => ({
+        productId: item.productId,
+        productName: item.productName,
+        productSpec: item.productSpec,
+        productUnit: item.productUnit,
+        productManufacturer: item.productManufacturer || item.manufacturer || "",
+        quantity: item.quantity,
+        price: item.price,
+        amount: item.amount,
+      }));
+
       this.setData({
+        orderNo: order.orderNo || '',
         selectedSupplier: supplier || null,
         supplierKeyword: supplier ? supplier.name : "",
         remark: order.remark || "",
@@ -89,6 +106,9 @@ Page({
         items,
         totalQuantity: order.totalQuantity || 0,
         totalAmount: (parseFloat(order.totalAmount) || 0).toFixed(2),
+        readonly,
+        statusCls: status,
+        statusText: STATUS_MAP[status] || status,
       });
     } catch (err) {
       showError(err.message);
@@ -160,7 +180,7 @@ Page({
   },
 
   // ============================================================
-  //  统一商品搜索 — 搜索 + 自动添加
+  //  统一商品搜索
   // ============================================================
   onProductSearchInput(e) {
     const keyword = e.detail.value;
@@ -196,9 +216,15 @@ Page({
   },
 
   onProductSearchSelect(e) {
-    const pIndex = parseInt(e.currentTarget.dataset.pindex);
-    const product = this.data.products[pIndex];
+    const pid = e.currentTarget.dataset.pid;
+    const product = this.data.products.find(p => p.id === pid);
     if (!product) return;
+
+    // 检查是否已添加
+    if (this.data.items.some(item => item.productId === product.id)) {
+      wx.showToast({ title: '商品已存在', icon: 'none' });
+      return;
+    }
 
     const items = [
       ...this.data.items,
@@ -254,9 +280,7 @@ Page({
     let qty = parseFloat(items[index].quantity) || 0;
     qty = qty > 1 ? qty - 1 : 0;
     items[index].quantity = qty;
-    items[index].amount = (qty * parseFloat(items[index].price || 0)).toFixed(
-      2,
-    );
+    items[index].amount = (qty * parseFloat(items[index].price || 0)).toFixed(2);
     this.setData({ items });
     this.calcTotal();
   },
@@ -267,9 +291,7 @@ Page({
     let qty = parseFloat(items[index].quantity) || 0;
     qty = qty + 1;
     items[index].quantity = qty;
-    items[index].amount = (qty * parseFloat(items[index].price || 0)).toFixed(
-      2,
-    );
+    items[index].amount = (qty * parseFloat(items[index].price || 0)).toFixed(2);
     this.setData({ items });
     this.calcTotal();
   },
@@ -371,7 +393,10 @@ Page({
       } else {
         order = await api.post("/purchase", data);
       }
-      await api.put(`/purchase/${order.id}/status`, { status: "pending" });
+      // 只有草稿状态的订单才提交审核
+      if (!this.data.id || this.data.statusCls === 'draft') {
+        await api.put(`/purchase/${order.id}/status`, { status: "pending" });
+      }
       showSuccess("提交成功");
       setTimeout(() => wx.navigateBack(), 1000);
     } catch (err) {
@@ -379,5 +404,9 @@ Page({
     } finally {
       this.setData({ submitting: false });
     }
+  },
+
+  onBack() {
+    wx.navigateBack();
   },
 });

@@ -1,6 +1,14 @@
 const { api } = require('../../utils/request')
 const { showError } = require('../../utils/util')
 
+const STATUS_TEXT = {
+  draft: '草稿',
+  pending: '待审核',
+  approved: '已审核',
+  received: '已入库',
+  cancelled: '已取消',
+}
+
 Page({
   data: {
     loading: false,
@@ -11,7 +19,8 @@ Page({
     total: 0
   },
 
-  onLoad() {
+  onShow() {
+    this.setData({ page: 1 })
     this.loadList()
   },
 
@@ -42,8 +51,12 @@ Page({
       const params = { page: this.data.page, pageSize: this.data.pageSize }
       if (this.data.keyword) params.keyword = this.data.keyword
       const res = await api.get('/purchase', params)
+      const list = (res.list || []).map(item => ({
+        ...item,
+        statusText: STATUS_TEXT[item.status] || item.status,
+      }))
       this.setData({
-        list: append ? [...this.data.list, ...(res.list || [])] : (res.list || []),
+        list: append ? [...this.data.list, ...list] : list,
         total: res.total || 0,
         loading: false
       })

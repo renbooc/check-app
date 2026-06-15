@@ -2,8 +2,13 @@
 
   <!-- ===== 页面头部 ===== -->
   <view class="page-header">
-    <text class="page-header-title">新增采购订单</text>
-    <text class="page-header-sub">填写以下信息创建采购订单</text>
+    <text class="page-header-title">{{id ? '采购订单详情' : '新增采购订单'}}</text>
+    <text class="page-header-sub">{{id ? '查看订单信息' : '填写以下信息创建采购订单'}}</text>
+  </view>
+
+  <!-- 只读提示 -->
+  <view class="readonly-banner" wx:if="{{readonly}}">
+    <text class="readonly-banner-text">此订单「{{statusText}}」，不可编辑</text>
   </view>
 
   <!-- ===== 订单信息（含供应商） ===== -->
@@ -13,14 +18,14 @@
         <view class="section-icon section-icon-order"></view>
         <text class="section-title">订单信息</text>
       </view>
-      <view class="change-btn" wx:if="{{selectedSupplier}}" bindtap="onClearSupplier">
+      <view class="change-btn" wx:if="{{selectedSupplier && !readonly}}" bindtap="onClearSupplier">
         <text class="change-btn-text">更换供应商</text>
       </view>
     </view>
 
     <view class="order-form-item order-form-item-column">
       <text class="order-form-label">供应商</text>
-      <view wx:if="{{!selectedSupplier}}" class="supplier-search-wrap">
+      <view wx:if="{{!selectedSupplier && !readonly}}" class="supplier-search-wrap">
         <view class="search-field {{showSupplierResults && filteredSuppliers.length > 0 ? 'search-field-active' : ''}}">
           <view class="search-field-icon">
             <icon-cmp type="search" size="18" color="#999"></icon-cmp>
@@ -55,12 +60,23 @@
     </view>
 
     <view class="order-form-item">
+      <text class="order-form-label">订单编号</text>
+      <text class="order-form-value" wx:if="{{orderNo}}">{{orderNo}}</text>
+      <text class="order-form-value placeholder" wx:else>保存后自动生成</text>
+    </view>
+
+    <view class="order-form-item">
+      <text class="order-form-label">订单状态</text>
+      <text class="order-form-value status-tag-{{statusCls}}">{{statusText || '新建'}}</text>
+    </view>
+
+    <view class="order-form-item">
       <text class="order-form-label">预计到货</text>
-      <picker mode="date" value="{{expectedDate}}" bindchange="onDateChange">
+      <picker mode="date" value="{{expectedDate}}" bindchange="onDateChange" disabled="{{readonly}}">
         <view class="order-form-picker {{expectedDate ? 'has-value' : ''}}">
           <text wx:if="{{expectedDate}}">{{expectedDate}}</text>
           <text wx:else class="placeholder">选择日期</text>
-          <view class="picker-arrow"></view>
+          <view class="picker-arrow" wx:if="{{!readonly}}"></view>
         </view>
       </picker>
     </view>
@@ -74,6 +90,7 @@
         value="{{remark}}"
         maxlength="200"
         bindinput="onRemarkInput"
+        disabled="{{readonly}}"
       />
     </view>
   </view>
@@ -91,8 +108,8 @@
       </view>
     </view>
 
-    <!-- 统一商品搜索框 -->
-    <view class="product-search-area">
+    <!-- 统一商品搜索框（只编辑模式下显示） -->
+    <view class="product-search-area" wx:if="{{!readonly}}">
       <view class="ps-field {{showProductResults ? 'ps-field-active' : ''}}">
         <icon-cmp type="search" size="18" color="#999"></icon-cmp>
         <input
@@ -109,15 +126,13 @@
         <view
           class="ps-item"
           wx:for="{{productSearchResults}}"
-          wx:for-item="prod"
-          wx:for-index="pIndex"
           wx:key="id"
-          data-pindex="{{pIndex}}"
+          data-pid="{{item.id}}"
           bindtap="onProductSearchSelect"
         >
           <view class="ps-item-info">
-            <text class="ps-item-name">{{prod.name}}</text>
-            <text class="ps-item-spec">{{prod.spec || '-'}} · {{prod.unit ? prod.unit.name : '-'}}</text>
+            <text class="ps-item-name">{{item.name}}</text>
+            <text class="ps-item-spec">{{item.spec || '-'}} · {{item.unit ? item.unit.name : '-'}}</text>
           </view>
           <view class="ps-item-add">+</view>
         </view>
@@ -147,7 +162,7 @@
                 </view>
                 <text class="item-manufacturer" wx:if="{{item.productManufacturer}}">{{item.productManufacturer}}</text>
               </view>
-              <view class="item-remove-btn" bindtap="onRemoveItem" data-index="{{index}}">
+              <view class="item-remove-btn" wx:if="{{!readonly}}" bindtap="onRemoveItem" data-index="{{index}}">
                 <text class="item-remove-icon">✕</text>
               </view>
             </view>
@@ -156,7 +171,7 @@
               <view class="item-prices-row">
                 <view class="item-price-field">
                   <text class="item-price-label">数量</text>
-                  <view class="qty-control">
+                  <view class="qty-control" wx:if="{{!readonly}}">
                     <view class="qty-btn" bindtap="onQtyDecrease" data-index="{{index}}">−</view>
                     <input
                       class="qty-input"
@@ -169,10 +184,11 @@
                     />
                     <view class="qty-btn" bindtap="onQtyIncrease" data-index="{{index}}">+</view>
                   </view>
+                  <text class="item-readonly-value" wx:else>{{item.quantity}}</text>
                 </view>
                 <view class="item-price-field">
                   <text class="item-price-label">单价</text>
-                  <view class="price-wrap">
+                  <view class="price-wrap" wx:if="{{!readonly}}">
                     <text class="price-symbol">¥</text>
                     <input
                       class="price-input"
@@ -184,6 +200,7 @@
                       bindinput="onItemPriceInput"
                     />
                   </view>
+                  <text class="item-readonly-value" wx:else>¥{{item.price}}</text>
                 </view>
               </view>
               <view class="item-subtotal">
@@ -199,12 +216,12 @@
 
     <!-- 无商品提示 -->
     <view class="items-empty" wx:if="{{items.length === 0}}">
-      <text class="items-empty-text">暂无商品，请在上方搜索添加</text>
+      <text class="items-empty-text">{{readonly ? '暂无商品' : '暂无商品，请在上方搜索添加'}}</text>
     </view>
   </view>
 
   <!-- ===== 底部操作栏 ===== -->
-  <view class="bottom-bar">
+  <view class="bottom-bar" wx:if="{{!readonly}}">
     <view class="bottom-inner">
       <view class="bottom-summary">
         <view class="bottom-summary-left">
@@ -219,6 +236,13 @@
           {{submitting ? '提交中...' : '提交订单'}}
         </button>
       </view>
+    </view>
+  </view>
+
+  <!-- 只读模式底部按钮 -->
+  <view class="bottom-bar" wx:else>
+    <view class="bottom-inner bottom-inner-single">
+      <button class="action-btn action-back" bindtap="onBack">返回列表</button>
     </view>
   </view>
 

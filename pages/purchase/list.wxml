@@ -18,7 +18,7 @@
     <view class="order-card" wx:for="{{list}}" wx:key="id" bindtap="onDetail" data-id="{{item.id}}">
       <view class="order-header">
         <text class="order-no">{{item.orderNo}}</text>
-        <text class="order-status status-{{item.status}}">{{item.status === 'pending' ? '待审核' : item.status === 'approved' ? '已审核' : item.status === 'received' ? '已入库' : item.status}}</text>
+        <text class="order-status status-{{item.status}}">{{item.statusText || item.status}}</text>
       </view>
       <view class="order-body">
         <text class="order-party">{{item.supplier ? item.supplier.name : '-'}}</text>
@@ -31,7 +31,17 @@
     </view>
   </view>
 
-  <view class="fab" bindtap="onCreate">
-    <icon-cmp type="plus" size="24" color="#FFFFFF"></icon-cmp>
+  <!-- 底部操作栏 -->
+  <view class="bottom-action">
+    <view class="action-inner">
+      <view class="action-count" wx:if="{{total > 0}}">
+        <text class="count-num">{{total}}</text>
+        <text class="count-label">笔订单</text>
+      </view>
+      <view class="action-btn" bindtap="onCreate">
+        <view class="btn-plus"></view>
+        <text>新增采购</text>
+      </view>
+    </view>
   </view>
 </view>
