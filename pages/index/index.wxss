@@ -90,7 +90,7 @@
 /* ---------- 未读红点（红色徽标） ---------- */
 .unread-dot {
   position: absolute;
-  bottom: 4rpx;
+  top: 4rpx;
   right: 4rpx;
   width: 18rpx;
   height: 18rpx;
