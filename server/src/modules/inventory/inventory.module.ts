@@ -9,13 +9,14 @@ import { PurchaseOrderItem } from '../../entities/purchase-order-item.entity';
 import { SalesOrder } from '../../entities/sales-order.entity';
 import { SalesOrderItem } from '../../entities/sales-order-item.entity';
 import { Location } from '../../entities/location.entity';
+import { Customer } from '../../entities/customer.entity';
 import { InventoryService } from './inventory.service';
 import { InventoryController, StockController, CheckController } from './inventory.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([
     Inventory, InventoryLog, StockCheck, StockCheckItem,
-    PurchaseOrder, PurchaseOrderItem, SalesOrder, SalesOrderItem, Location,
+    PurchaseOrder, PurchaseOrderItem, SalesOrder, SalesOrderItem, Location, Customer,
   ])],
   controllers: [InventoryController, StockController, CheckController],
   providers: [InventoryService],

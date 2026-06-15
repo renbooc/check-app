@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { PurchaseService } from './purchase.service';
+import { CreatePurchaseDto, UpdatePurchaseDto, UpdatePurchaseStatusDto, QueryPurchaseDto } from './dto/purchase.dto';
 
 @Controller('purchase')
 @UseGuards(AuthGuard('jwt'))
@@ -8,7 +9,7 @@ export class PurchaseController {
   constructor(private purchaseService: PurchaseService) {}
 
   @Get()
-  async findAll(@Query() query: any) {
+  async findAll(@Query() query: QueryPurchaseDto) {
     const data = await this.purchaseService.findAll(query);
     return { code: 200, data };
   }
@@ -20,7 +21,7 @@ export class PurchaseController {
   }
 
   @Post()
-  async create(@Body() body: any, @Req() req: any) {
+  async create(@Body() body: CreatePurchaseDto, @Req() req: any) {
     const dto = {
       ...body,
       operatorId: req.user.id,
@@ -31,14 +32,14 @@ export class PurchaseController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() body: any) {
+  async update(@Param('id') id: string, @Body() body: UpdatePurchaseDto) {
     const data = await this.purchaseService.update(id, body);
     return { code: 200, data };
   }
 
   @Put(':id/status')
-  async updateStatus(@Param('id') id: string, @Body('status') status: string) {
-    const data = await this.purchaseService.updateStatus(id, status);
+  async updateStatus(@Param('id') id: string, @Body() body: UpdatePurchaseStatusDto) {
+    const data = await this.purchaseService.updateStatus(id, body.status);
     return { code: 200, data };
   }
 }

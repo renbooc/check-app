@@ -10,6 +10,7 @@ import { PurchaseOrderItem } from '../../entities/purchase-order-item.entity';
 import { SalesOrder, SalesOrderStatus } from '../../entities/sales-order.entity';
 import { SalesOrderItem } from '../../entities/sales-order-item.entity';
 import { Location } from '../../entities/location.entity';
+import { Customer } from '../../entities/customer.entity';
 
 @Injectable()
 export class InventoryService {
@@ -22,6 +23,7 @@ export class InventoryService {
     @InjectRepository(SalesOrder) private salesRepo: Repository<SalesOrder>,
     @InjectRepository(SalesOrderItem) private salesItemRepo: Repository<SalesOrderItem>,
     @InjectRepository(Location) private locationRepo: Repository<Location>,
+    @InjectRepository(Customer) private customerRepo: Repository<Customer>,
   ) {}
 
   async getOverview() {
@@ -39,13 +41,13 @@ export class InventoryService {
       .andWhere('so.createdAt >= :startDate', { startDate: startOfMonth })
       .getRawOne();
 
-    // 本月采购统计
+    // 本月采购统计（修复：RECEIVED 重复 -> APPROVED + RECEIVED）
     const monthlyPurchase = await this.purchaseRepo
       .createQueryBuilder('po')
       .select('COALESCE(SUM(po.totalAmount), 0)', 'total')
       .addSelect('COUNT(*)', 'count')
       .where('po.status IN (:...statuses)', {
-        statuses: [PurchaseOrderStatus.RECEIVED, PurchaseOrderStatus.RECEIVED],
+        statuses: [PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.RECEIVED],
       })
       .andWhere('po.createdAt >= :startDate', { startDate: startOfMonth })
       .getRawOne();
@@ -99,6 +101,13 @@ export class InventoryService {
       .where('sc.status = :status', { status: 'pending' })
       .getRawOne();
 
+    // 客户总数（修复：之前缺失该字段）
+    const customerCount = await this.customerRepo
+      .createQueryBuilder('c')
+      .select('COUNT(*)', 'count')
+      .where('c.isActive = true')
+      .getRawOne();
+
     // 周转率
     const avgInventory = (parseFloat(totalInventory?.total || '0')) / 2;
     const turnoverRate = avgInventory > 0
@@ -123,6 +132,7 @@ export class InventoryService {
       pendingChecks: parseInt(pendingCheckCount?.count || '0'),
       pendingTypes: parseInt(pendingCheckCount?.count || '0'),
       turnoverRate,
+      customerCount: parseInt(customerCount?.count || '0'), // 新增客户数
     };
   }
 

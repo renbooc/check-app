@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SalesService } from './sales.service';
+import { CreateSalesDto, UpdateSalesDto, UpdateSalesStatusDto, QuerySalesDto } from './dto/sales.dto';
 
 @Controller('sales')
 @UseGuards(AuthGuard('jwt'))
@@ -8,7 +9,7 @@ export class SalesController {
   constructor(private salesService: SalesService) {}
 
   @Get()
-  async findAll(@Query() query: any) {
+  async findAll(@Query() query: QuerySalesDto) {
     const data = await this.salesService.findAll(query);
     return { code: 200, data };
   }
@@ -20,7 +21,7 @@ export class SalesController {
   }
 
   @Post()
-  async create(@Body() body: any, @Req() req: any) {
+  async create(@Body() body: CreateSalesDto, @Req() req: any) {
     const dto = {
       ...body,
       operatorId: req.user.id,
@@ -31,14 +32,14 @@ export class SalesController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() body: any) {
+  async update(@Param('id') id: string, @Body() body: UpdateSalesDto) {
     const data = await this.salesService.update(id, body);
     return { code: 200, data };
   }
 
   @Put(':id/status')
-  async updateStatus(@Param('id') id: string, @Body('status') status: string) {
-    const data = await this.salesService.updateStatus(id, status);
+  async updateStatus(@Param('id') id: string, @Body() body: UpdateSalesStatusDto) {
+    const data = await this.salesService.updateStatus(id, body.status);
     return { code: 200, data };
   }
 }

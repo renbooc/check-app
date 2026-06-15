@@ -5,12 +5,12 @@ const ENV_MAP = {
     debug: true,
   },
   test: {
-    baseUrl: "https://test-api.example.com",
+    baseUrl: "https://api.rccjoy.com.cn",
     env: "testing",
     debug: true,
   },
   prod: {
-    baseUrl: "https://8.162.26.240",
+    baseUrl: "https://api.rccjoy.com.cn",
     env: "production",
     debug: false,
   },

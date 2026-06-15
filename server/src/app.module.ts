@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProductModule } from './modules/product/product.module';
 import { SupplierModule } from './modules/supplier/supplier.module';
@@ -29,6 +30,7 @@ import { PurchaseOrder } from './entities/purchase-order.entity';
 import { PurchaseOrderItem } from './entities/purchase-order-item.entity';
 import { SalesOrder } from './entities/sales-order.entity';
 import { SalesOrderItem } from './entities/sales-order-item.entity';
+import { Notification } from './entities/notification.entity';
 
 const entities = [
   User,
@@ -47,6 +49,7 @@ const entities = [
   PurchaseOrderItem,
   SalesOrder,
   SalesOrderItem,
+  Notification,
 ];
 
 @Module({
@@ -100,4 +103,8 @@ const entities = [
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

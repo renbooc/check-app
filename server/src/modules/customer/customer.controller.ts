@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CustomerService } from './customer.service';
+import { CreateCustomerDto, UpdateCustomerDto, QueryCustomerDto } from './dto/customer.dto';
 
 @Controller('customers')
 @UseGuards(AuthGuard('jwt'))
@@ -8,7 +9,7 @@ export class CustomerController {
   constructor(private customerService: CustomerService) {}
 
   @Get()
-  async findAll(@Query() query: any) {
+  async findAll(@Query() query: QueryCustomerDto) {
     const data = await this.customerService.findAll(query);
     return { code: 200, data };
   }
@@ -20,13 +21,13 @@ export class CustomerController {
   }
 
   @Post()
-  async create(@Body() body: any) {
+  async create(@Body() body: CreateCustomerDto) {
     const data = await this.customerService.create(body);
     return { code: 200, data };
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() body: any) {
+  async update(@Param('id') id: string, @Body() body: UpdateCustomerDto) {
     const data = await this.customerService.update(id, body);
     return { code: 200, data };
   }

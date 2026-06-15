@@ -2,6 +2,7 @@ const config = require('../config/index')
 const { storage } = require('./storage')
 const mockHandler = config.useMock ? require('../mock/data').handle : null
 
+// 请求去重 Map: key -> { promise, requestTask }
 const pendingRequests = new Map()
 
 function getRequestKey(url, method, data) {
@@ -22,8 +23,9 @@ function request(options) {
 
   const requestKey = getRequestKey(url, method, data)
 
+  // 去重：相同请求进行中的直接复用
   if (pendingRequests.has(requestKey)) {
-    return pendingRequests.get(requestKey)
+    return pendingRequests.get(requestKey).promise
   }
 
   const requestPromise = new Promise((resolve, reject) => {
@@ -42,7 +44,7 @@ function request(options) {
 
     function doRequest(attempt) {
       const token = storage.get('token')
-      wx.request({
+      const requestTask = wx.request({
         url: config.baseUrl + url,
         method,
         data,
@@ -76,6 +78,12 @@ function request(options) {
         },
         fail(err) {
           if (showLoading) wx.hideLoading()
+          // 请求被取消时静默处理
+          if (err.errMsg && err.errMsg.indexOf('abort') !== -1) {
+            pendingRequests.delete(requestKey)
+            reject(new Error('请求已取消'))
+            return
+          }
           if (attempt < maxRetries) {
             console.warn(`[API] network retry ${attempt + 1}/${maxRetries}:`, url)
             sleep(config.retryDelay * (attempt + 1)).then(() => {
@@ -87,12 +95,45 @@ function request(options) {
           }
         }
       })
+
+      // 保存 requestTask 以便取消
+      const entry = pendingRequests.get(requestKey)
+      if (entry) {
+        entry.requestTask = requestTask
+      }
     }
+
     doRequest(0)
   })
 
-  pendingRequests.set(requestKey, requestPromise)
+  pendingRequests.set(requestKey, { promise: requestPromise, requestTask: null })
   return requestPromise
+}
+
+/**
+ * 取消指定请求
+ */
+function cancelRequest(url, method = 'GET', data) {
+  const key = getRequestKey(url, method, data)
+  const entry = pendingRequests.get(key)
+  if (entry) {
+    if (entry.requestTask) {
+      entry.requestTask.abort()
+    }
+    pendingRequests.delete(key)
+  }
+}
+
+/**
+ * 取消所有进行中的请求
+ */
+function cancelAllRequests() {
+  pendingRequests.forEach((entry) => {
+    if (entry.requestTask) {
+      entry.requestTask.abort()
+    }
+  })
+  pendingRequests.clear()
 }
 
 const api = {
@@ -110,4 +151,4 @@ const api = {
   }
 }
 
-module.exports = { request, api }
+module.exports = { request, api, cancelRequest, cancelAllRequests }

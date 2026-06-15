@@ -8,6 +8,7 @@ import { PurchaseOrder } from '../../entities/purchase-order.entity';
 import { PurchaseOrderItem } from '../../entities/purchase-order-item.entity';
 import { SalesOrder } from '../../entities/sales-order.entity';
 import { SalesOrderItem } from '../../entities/sales-order-item.entity';
+import { Notification } from '../../entities/notification.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { SalesOrderItem } from '../../entities/sales-order-item.entity';
       PurchaseOrderItem,
       SalesOrder,
       SalesOrderItem,
+      Notification,
     ]),
   ],
   controllers: [ReportController],

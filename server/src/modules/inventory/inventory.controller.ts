@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { InventoryService } from './inventory.service';
+import { QueryInventoryDto, SaveCheckDto, QueryCheckRecordDto } from './dto/inventory.dto';
 
 @Controller('inventory')
 @UseGuards(AuthGuard('jwt'))
@@ -14,7 +15,7 @@ export class InventoryController {
   }
 
   @Get()
-  async getList(@Query() query: any) {
+  async getList(@Query() query: QueryInventoryDto) {
     const data = await this.inventoryService.getStockList(query);
     return { code: 200, data };
   }
@@ -38,7 +39,7 @@ export class StockController {
   constructor(private inventoryService: InventoryService) {}
 
   @Get('list')
-  async getList(@Query() query: any) {
+  async getList(@Query() query: QueryInventoryDto) {
     const data = await this.inventoryService.getStockList(query);
     return { code: 200, data };
   }
@@ -56,9 +57,12 @@ export class CheckController {
   constructor(private inventoryService: InventoryService) {}
 
   @Post('save')
-  async save(@Body() body: any, @Req() req: any) {
+  async save(@Body() body: SaveCheckDto, @Req() req: any) {
     const dto = {
       ...body,
+      location: body.location || '',
+      batchNo: body.batchNo || '',
+      remark: body.remark || '',
       operatorId: req.user.id,
       operatorName: req.user.name,
     };
@@ -67,7 +71,7 @@ export class CheckController {
   }
 
   @Get('records')
-  async getRecords(@Query() query: any) {
+  async getRecords(@Query() query: QueryCheckRecordDto) {
     const data = await this.inventoryService.getCheckRecords(query);
     return { code: 200, data };
   }

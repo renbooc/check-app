@@ -147,21 +147,19 @@
    KPI 卡片网格（2x2）
    ============================================================ */
 .kpi-grid {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 20rpx 20rpx;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 16rpx;
+  padding: 20rpx 20rpx;
 }
 
 .kpi-card {
-  width: calc(50% - 8rpx);
   background: #FFFFFF;
   border-radius: 12rpx;
   padding: 24rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
   display: flex;
   gap: 16rpx;
-  box-sizing: border-box;
 }
 
 .kpi-icon {

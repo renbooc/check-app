@@ -46,24 +46,21 @@ export class ReportController {
   }
 
   /**
-   * 消息通知列表（从低库存 + 待审核订单动态生成）
+   * 消息通知列表（持久化存储）
    */
   @Get('notifications')
   async getNotifications(@Query('unread') unread?: string) {
-    const data = await this.reportService.getNotifications();
-    if (unread === 'true') {
-      const unreadCount = data.list.filter((n) => !n.read).length;
-      return { code: 200, data: { list: [], total: unreadCount } };
-    }
+    const data = await this.reportService.getNotifications(unread === 'true');
     return { code: 200, data };
   }
 
   /**
-   * 标记单条通知已读（内存级，重启后重置）
+   * 标记单条通知已读
    */
   @Put('notifications/:id/read')
-  async markNotificationRead() {
-    return { code: 200, data: { success: true } };
+  async markNotificationRead(@Param('id') id: string) {
+    const data = await this.reportService.markNotificationRead(id);
+    return { code: 200, data };
   }
 
   /**
@@ -71,6 +68,7 @@ export class ReportController {
    */
   @Put('notifications/read-all')
   async markAllNotificationsRead() {
-    return { code: 200, data: { success: true } };
+    const data = await this.reportService.markAllNotificationsRead();
+    return { code: 200, data };
   }
 }

@@ -33,8 +33,8 @@ Page({
           title: item.title || '',
           content: item.content || item.message || '',
           timeText: util.formatDate(item.createdAt, 'MM-DD HH:mm'),
-          itemCls: item.read ? 'msg-item msg-read' : 'msg-item',
-          dotCls: item.read ? 'dot-hidden' : 'msg-dot',
+          itemCls: item.isRead ? 'msg-item msg-read' : 'msg-item',
+          dotCls: item.isRead ? 'dot-hidden' : 'msg-dot',
           typeCls: 'msg-type msg-type-' + (item.type || 'info')
         }
       })

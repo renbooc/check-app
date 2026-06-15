@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Inventory } from '../../entities/inventory.entity';
 import { Product } from '../../entities/product.entity';
 import { PurchaseOrder, PurchaseOrderStatus } from '../../entities/purchase-order.entity';
 import { PurchaseOrderItem } from '../../entities/purchase-order-item.entity';
 import { SalesOrder, SalesOrderStatus } from '../../entities/sales-order.entity';
 import { SalesOrderItem } from '../../entities/sales-order-item.entity';
+import { Notification, NotificationStatus } from '../../entities/notification.entity';
 
 @Injectable()
 export class ReportService {
@@ -23,6 +24,8 @@ export class ReportService {
     private salesRepo: Repository<SalesOrder>,
     @InjectRepository(SalesOrderItem)
     private salesItemRepo: Repository<SalesOrderItem>,
+    @InjectRepository(Notification)
+    private notificationRepo: Repository<Notification>,
   ) {}
 
   /**
@@ -33,7 +36,6 @@ export class ReportService {
     const start = startDate ? new Date(startDate) : new Date(now.getFullYear(), now.getMonth(), 1);
     const end = endDate ? new Date(endDate + 'T23:59:59') : now;
 
-    // 本月销售统计
     const monthlySales = await this.salesRepo
       .createQueryBuilder('so')
       .select('SUM(so.totalAmount)', 'total')
@@ -44,7 +46,6 @@ export class ReportService {
       .andWhere('so.createdAt >= :startDate', { startDate: start })
       .getRawOne();
 
-    // 本月采购统计
     const monthlyPurchase = await this.purchaseRepo
       .createQueryBuilder('po')
       .select('SUM(po.totalAmount)', 'total')
@@ -55,7 +56,6 @@ export class ReportService {
       .andWhere('po.createdAt >= :startDate', { startDate: start })
       .getRawOne();
 
-    // 库存周转率（简化计算：本月出库数 / 平均库存）
     const totalInventory = await this.inventoryRepo
       .createQueryBuilder('i')
       .select('SUM(i.quantity)', 'total')
@@ -139,63 +139,173 @@ export class ReportService {
   }
 
   /**
-   * 获取消息通知列表（动态生成：低库存预警 + 待审核订单）
+   * 同步通知：生成新通知 + 自动解决已失效的通知
+   *
+   * 生命周期: 不存在 → ACTIVE(未读) → READ(已读) → RESOLVED(已解决)
+   *           ACTIVE/READ  → 条件再次满足时更新内容保持状态
+   *           RESOLVED     → 条件重新出现时重新激活为 ACTIVE
    */
-  async getNotifications() {
-    const notifications: any[] = [];
+  private async syncNotifications() {
+    // ================================================================
+    // Phase 1: 遍历当前业务条件，创建或更新通知
+    // ================================================================
 
-    // 低库存预警
+    // ---- 低库存预警 ----
     const lowStock = await this.getLowStockProducts();
-    (lowStock.list || []).forEach((item: any) => {
-      notifications.push({
-        id: `low-stock-${item.productId}`,
-        type: 'warn',
-        title: '库存预警',
-        content: `${item.productName} 当前库存 ${item.quantity}，低于安全库存 ${item.minQuantity}`,
-        read: false,
-        createdAt: new Date().toISOString(),
-      });
-    });
+    const activeLowStockIds = (lowStock.list || []).map((item: any) => `low-stock-${item.productId}`);
 
-    // 待审核采购单
+    for (const item of lowStock.list || []) {
+      const sourceId = `low-stock-${item.productId}`;
+      const content = `${item.productName} 当前库存 ${item.quantity}，低于安全库存 ${item.minQuantity}`;
+      await this.upsertNotification(sourceId, 'low_stock', 'warn', '库存预警', content);
+    }
+
+    // ---- 待审核采购单 ----
     const pendingPurchase = await this.purchaseRepo.find({
       where: { status: PurchaseOrderStatus.PENDING },
-      relations: ['supplier'],
-      order: { createdAt: 'DESC' },
       take: 10,
     });
-    pendingPurchase.forEach((order) => {
-      notifications.push({
-        id: `purchase-${order.id}`,
-        type: 'info',
-        title: '采购单待审核',
-        content: `${order.orderNo} · ${(order.supplier as any)?.name || ''} · ¥${order.totalAmount}`,
-        read: false,
-        createdAt: order.createdAt,
-      });
-    });
+    const activePurchaseIds = pendingPurchase.map((o) => `purchase-${o.id}`);
 
-    // 待审核销售单
+    for (const order of pendingPurchase) {
+      const sourceId = `purchase-${order.id}`;
+      const content = `${order.orderNo} · ¥${order.totalAmount}`;
+      await this.upsertNotification(sourceId, 'purchase', 'info', '采购单待审核', content);
+    }
+
+    // ---- 待审核销售单 ----
     const pendingSales = await this.salesRepo.find({
       where: { status: SalesOrderStatus.PENDING },
-      relations: ['customer'],
-      order: { createdAt: 'DESC' },
       take: 10,
     });
-    pendingSales.forEach((order) => {
-      notifications.push({
-        id: `sales-${order.id}`,
-        type: 'info',
-        title: '销售单待审核',
-        content: `${order.orderNo} · ${(order.customer as any)?.name || ''} · ¥${order.totalAmount}`,
-        read: false,
-        createdAt: order.createdAt,
-      });
+    const activeSalesIds = pendingSales.map((o) => `sales-${o.id}`);
+
+    for (const order of pendingSales) {
+      const sourceId = `sales-${order.id}`;
+      const content = `${order.orderNo} · ¥${order.totalAmount}`;
+      await this.upsertNotification(sourceId, 'sales', 'info', '销售单待审核', content);
+    }
+
+    // ================================================================
+    // Phase 2: 自动解决已失效的通知（条件不再满足）
+    // ================================================================
+    const allActiveSourceIds = [...activeLowStockIds, ...activePurchaseIds, ...activeSalesIds];
+
+    // 查找所有 ACTIVE 或 READ 的通知，但当前条件下已经不存在的
+    const staleNotifications = await this.notificationRepo
+      .createQueryBuilder('n')
+      .where('n.status IN (:...statuses)', {
+        statuses: [NotificationStatus.ACTIVE, NotificationStatus.READ],
+      })
+      .andWhere('n.sourceId NOT IN (:...ids)', { ids: allActiveSourceIds })
+      .getMany();
+
+    if (staleNotifications.length > 0) {
+      await this.notificationRepo.update(
+        { id: In(staleNotifications.map((n) => n.id)) },
+        { status: NotificationStatus.RESOLVED, updatedAt: new Date() },
+      );
+    }
+  }
+
+  /**
+   * 创建或更新单条通知（按 sourceId + sourceType 去重）
+   */
+  private async upsertNotification(
+    sourceId: string,
+    sourceType: string,
+    type: string,
+    title: string,
+    content: string,
+  ) {
+    const existing = await this.notificationRepo.findOne({
+      where: { sourceId, sourceType },
+      order: { createdAt: 'DESC' },
     });
 
-    // 按时间降序排列
-    notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    if (!existing) {
+      // 全新的条件 → 创建 active 通知
+      const notification = this.notificationRepo.create({
+        type,
+        title,
+        content,
+        sourceId,
+        sourceType,
+        status: NotificationStatus.ACTIVE,
+      });
+      await this.notificationRepo.save(notification);
+      return;
+    }
 
-    return { list: notifications, total: notifications.length };
+    // 通知已存在，更新内容
+    // - resolved 状态的条件再次出现 → 重新激活
+    // - active/read 状态 → 保持状态，更新内容和时间
+    const isReappearing = existing.status === NotificationStatus.RESOLVED;
+    const updateData: any = {
+      content,
+      title,
+      type,
+      status: isReappearing ? NotificationStatus.ACTIVE : existing.status,
+      isRead: isReappearing ? false : existing.isRead,
+      updatedAt: new Date(),
+    };
+    if (!isReappearing && existing.readAt) {
+      updateData.readAt = existing.readAt;
+    }
+    await this.notificationRepo.update(existing.id, updateData);
+  }
+
+  /**
+   * 获取消息通知列表
+   * @param onlyActive true=只返回未处理的通知(active) false=返回所有未解决的(active+read)
+   */
+  async getNotifications(onlyActive?: boolean) {
+    await this.syncNotifications();
+
+    const where: any = {};
+    if (onlyActive) {
+      where.status = NotificationStatus.ACTIVE;
+    } else {
+      where.status = In([NotificationStatus.ACTIVE, NotificationStatus.READ]);
+    }
+
+    const [list, total] = await this.notificationRepo.findAndCount({
+      where,
+      order: { updatedAt: 'DESC' },
+      take: 50,
+    });
+
+    const activeCount = await this.notificationRepo.count({
+      where: { status: NotificationStatus.ACTIVE },
+    });
+
+    return {
+      list,
+      total,
+      activeCount,
+    };
+  }
+
+  /**
+   * 标记通知已读
+   */
+  async markNotificationRead(id: string) {
+    const result = await this.notificationRepo.update(id, {
+      isRead: true,
+      readAt: new Date(),
+      status: NotificationStatus.READ,
+    });
+    return { success: (result.affected ?? 0) > 0 };
+  }
+
+  /**
+   * 全部标记已读
+   */
+  async markAllNotificationsRead() {
+    const result = await this.notificationRepo.update(
+      { status: NotificationStatus.ACTIVE },
+      { status: NotificationStatus.READ, isRead: true, readAt: new Date() },
+    );
+    return { success: true, count: result.affected ?? 0 };
   }
 }
