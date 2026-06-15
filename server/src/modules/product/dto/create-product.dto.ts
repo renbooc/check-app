@@ -38,6 +38,10 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsString()
+  remark?: string;
+
+  @IsOptional()
+  @IsString()
   image?: string;
 }
 
@@ -77,6 +81,10 @@ export class UpdateProductDto {
   @IsOptional()
   @IsNumber()
   minQuantity?: number;
+
+  @IsOptional()
+  @IsString()
+  remark?: string;
 
   @IsOptional()
   @IsString()
