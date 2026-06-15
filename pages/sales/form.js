@@ -1,15 +1,39 @@
 const { api } = require('../../utils/request')
 const { showError, showSuccess } = require('../../utils/util')
 
+const STATUS_MAP = {
+  draft: '草稿',
+  pending: '待审核',
+  approved: '已审核',
+  delivered: '已出库',
+  cancelled: '已取消',
+}
+
+const EDITABLE_STATUSES = ['draft']
+
 Page({
   data: {
     id: null,
+    readonly: false,
+    orderNo: '',
 
     // Customer search
     customerKeyword: '',
     filteredCustomers: [],
     showCustomerResults: false,
     selectedCustomer: null,
+    _allCustomers: [],
+
+    // Warehouse
+    warehouses: [],
+    warehouseIndex: -1,
+    selectedWarehouse: null,
+
+    // Order info
+    expectedDate: '',
+    remark: '',
+    statusCls: 'draft',
+    statusText: '草稿',
 
     // Products list
     products: [],
@@ -17,16 +41,22 @@ Page({
     productSearchResults: [],
     showProductResults: false,
 
-    remark: '',
-    expectedDate: '',
+    // Items
     items: [],
+
+    // Summary
     totalQuantity: 0,
     totalAmount: '0.00',
-    submitting: false
+
+    // State
+    submitting: false,
   },
 
+  // ============================================================
+  //  Lifecycle
+  // ============================================================
   async onLoad(options) {
-    await Promise.all([this.loadCustomers(), this.loadProducts()])
+    await Promise.all([this.loadCustomers(), this.loadProducts(), this.loadWarehouses()])
     if (options.id) {
       this.setData({ id: options.id })
       await this.loadOrder(options.id)
@@ -51,39 +81,75 @@ Page({
     }
   },
 
+  async loadWarehouses() {
+    try {
+      const res = await api.get('/warehouses', { page: 1, pageSize: 200 })
+      this.setData({ warehouses: res.list || [] })
+    } catch (err) {
+      console.error('[SalesForm] loadWarehouses error:', err)
+    }
+  },
+
   async loadOrder(id) {
     try {
       const order = await api.get(`/sales/${id}`)
+      if (!order) { showError('订单不存在'); return }
+
       const allCustomers = this.data._allCustomers || []
       const customer = allCustomers.find(c => c.id === order.customerId)
-      const products = this.data.products
-      const items = (order.items || []).map(item => {
-        return {
-          productId: item.productId,
-          productName: item.productName,
-          productSpec: item.productSpec,
-          productUnit: item.productUnit,
-          quantity: item.quantity,
-          price: item.price,
-          amount: item.amount
+      const status = order.status || 'draft'
+      const readonly = !EDITABLE_STATUSES.includes(status)
+
+      // Match warehouse from loaded list
+      const warehouses = this.data.warehouses || []
+      let warehouseIdx = -1
+      let selWarehouse = null
+      if (order.warehouseId) {
+        warehouseIdx = warehouses.findIndex(w => w.id === order.warehouseId)
+        if (warehouseIdx >= 0) {
+          selWarehouse = warehouses[warehouseIdx]
+        } else {
+          selWarehouse = { id: order.warehouseId, name: order.warehouseName || '' }
         }
-      })
+      }
+
+      const items = (order.items || []).map(item => ({
+        productId: item.productId,
+        productName: item.productName,
+        productSpec: item.productSpec,
+        productUnit: item.productUnit,
+        quantity: item.quantity,
+        price: item.price,
+        amount: item.amount,
+        batchNo: item.batchNo || '',
+        productionDate: item.productionDate || '',
+        expiryDate: item.expiryDate || '',
+        locationCode: item.locationCode || '',
+      }))
+
       this.setData({
+        orderNo: order.orderNo || '',
         selectedCustomer: customer || null,
         customerKeyword: customer ? customer.name : '',
+        warehouseIndex: warehouseIdx,
+        selectedWarehouse: selWarehouse,
         remark: order.remark || '',
         expectedDate: order.expectedDate || '',
         items,
         totalQuantity: order.totalQuantity || 0,
-        totalAmount: (parseFloat(order.totalAmount) || 0).toFixed(2)
+        totalAmount: (parseFloat(order.totalAmount) || 0).toFixed(2),
+        readonly,
+        statusCls: status,
+        statusText: STATUS_MAP[status] || status,
       })
     } catch (err) {
       showError(err.message)
     }
   },
 
-  // ---- Customer search ----
-
+  // ============================================================
+  //  Customer search
+  // ============================================================
   onCustomerInput(e) {
     const keyword = e.detail.value
     const allCustomers = this.data._allCustomers || []
@@ -94,7 +160,7 @@ Page({
       customerKeyword: keyword,
       filteredCustomers: filtered,
       showCustomerResults: keyword.length > 0,
-      selectedCustomer: null
+      selectedCustomer: null,
     })
   },
 
@@ -117,7 +183,7 @@ Page({
       selectedCustomer: customer,
       customerKeyword: customer.name,
       showCustomerResults: false,
-      filteredCustomers: []
+      filteredCustomers: [],
     })
   },
 
@@ -126,12 +192,37 @@ Page({
       selectedCustomer: null,
       customerKeyword: '',
       showCustomerResults: false,
-      filteredCustomers: []
+      filteredCustomers: [],
     })
   },
 
-  // ---- 统一商品搜索 ----
+  // ============================================================
+  //  Warehouse
+  // ============================================================
+  onWarehouseChange(e) {
+    const idx = parseInt(e.detail.value, 10)
+    const warehouses = this.data.warehouses
+    const wh = warehouses[idx] || null
+    this.setData({
+      warehouseIndex: idx,
+      selectedWarehouse: wh,
+    })
+  },
 
+  // ============================================================
+  //  Order info
+  // ============================================================
+  onDateChange(e) {
+    this.setData({ expectedDate: e.detail.value })
+  },
+
+  onRemarkInput(e) {
+    this.setData({ remark: e.detail.value })
+  },
+
+  // ============================================================
+  //  Product search
+  // ============================================================
   onItemProductSearchInput(e) {
     const keyword = e.detail.value
     this.setData({ productKeyword: keyword })
@@ -159,30 +250,42 @@ Page({
 
   onItemProductSearchSelect(e) {
     const pIndex = parseInt(e.currentTarget.dataset.pindex)
-    const product = this.data.products[pIndex]
+    const product = this.data.productSearchResults[pIndex]
     if (!product) return
+
+    // Duplicate check
+    if (this.data.items.some(item => item.productId === product.id)) {
+      wx.showToast({ title: '商品已存在', icon: 'none' })
+      return
+    }
 
     const items = [...this.data.items, {
       productId: product.id,
       productName: product.name,
       productSpec: product.spec || '',
       productUnit: product.unit ? product.unit.name : '',
+      productManufacturer: product.manufacturer || '',
       quantity: '',
       price: '',
-      amount: '0.00'
+      amount: '0.00',
+      batchNo: '',
+      productionDate: '',
+      expiryDate: '',
+      locationCode: '',
     }]
 
     this.setData({
       items,
       productKeyword: '',
       productSearchResults: [],
-      showProductResults: false
+      showProductResults: false,
     })
     this.calcTotal()
   },
 
-  // ---- Item quantity / price ----
-
+  // ============================================================
+  //  Item quantity / price
+  // ============================================================
   onItemQuantityInput(e) {
     const index = e.currentTarget.dataset.index
     const quantity = parseFloat(e.detail.value) || 0
@@ -233,14 +336,40 @@ Page({
     this.calcTotal()
   },
 
-  onRemarkInput(e) {
-    this.setData({ remark: e.detail.value })
+  // ============================================================
+  //  Batch fields
+  // ============================================================
+  onBatchNoInput(e) {
+    const index = e.currentTarget.dataset.index
+    const items = [...this.data.items]
+    items[index].batchNo = e.detail.value
+    this.setData({ items })
   },
 
-  onDateChange(e) {
-    this.setData({ expectedDate: e.detail.value })
+  onProductionDateChange(e) {
+    const index = e.currentTarget.dataset.index
+    const items = [...this.data.items]
+    items[index].productionDate = e.detail.value
+    this.setData({ items })
   },
 
+  onExpiryDateChange(e) {
+    const index = e.currentTarget.dataset.index
+    const items = [...this.data.items]
+    items[index].expiryDate = e.detail.value
+    this.setData({ items })
+  },
+
+  onLocationCodeInput(e) {
+    const index = e.currentTarget.dataset.index
+    const items = [...this.data.items]
+    items[index].locationCode = e.detail.value
+    this.setData({ items })
+  },
+
+  // ============================================================
+  //  Calc
+  // ============================================================
   calcTotal() {
     const items = this.data.items
     let totalQuantity = 0
@@ -251,13 +380,20 @@ Page({
     })
     this.setData({
       totalQuantity,
-      totalAmount: totalAmount.toFixed(2)
+      totalAmount: totalAmount.toFixed(2),
     })
   },
 
+  // ============================================================
+  //  Validate & Submit
+  // ============================================================
   validate() {
     if (!this.data.selectedCustomer) {
       wx.showToast({ title: '请选择客户', icon: 'none' })
+      return false
+    }
+    if (this.data.warehouseIndex < 0) {
+      wx.showToast({ title: '请选择仓库', icon: 'none' })
       return false
     }
     const items = this.data.items
@@ -284,8 +420,11 @@ Page({
   },
 
   buildSubmitData() {
+    const warehouse = this.data.selectedWarehouse
     return {
       customerId: this.data.selectedCustomer.id,
+      warehouseId: warehouse ? warehouse.id : null,
+      warehouseName: warehouse ? warehouse.name : '',
       remark: this.data.remark,
       expectedDate: this.data.expectedDate || null,
       items: this.data.items.map(item => ({
@@ -294,8 +433,12 @@ Page({
         productSpec: item.productSpec,
         productUnit: item.productUnit,
         quantity: parseFloat(item.quantity),
-        price: parseFloat(item.price)
-      }))
+        price: parseFloat(item.price),
+        batchNo: item.batchNo || '',
+        productionDate: item.productionDate || '',
+        expiryDate: item.expiryDate || '',
+        locationCode: item.locationCode || '',
+      })),
     }
   },
 
@@ -331,7 +474,10 @@ Page({
       } else {
         order = await api.post('/sales', data)
       }
-      await api.put(`/sales/${order.id}/status`, { status: 'pending' })
+      // Submit for approval only when applicable
+      if (!this.data.id || this.data.statusCls === 'draft') {
+        await api.put(`/sales/${order.id}/status`, { status: 'pending' })
+      }
       showSuccess('提交成功')
       setTimeout(() => wx.navigateBack(), 1000)
     } catch (err) {
@@ -339,5 +485,46 @@ Page({
     } finally {
       this.setData({ submitting: false })
     }
-  }
+  },
+
+  // ============================================================
+  //  Audit actions (readonly mode)
+  // ============================================================
+  async onApprove() {
+    if (this.data.submitting) return
+    this.setData({ submitting: true })
+    try {
+      await api.put(`/sales/${this.data.id}/status`, { status: 'approved' })
+      showSuccess('审核通过')
+      this.setData({
+        statusCls: 'approved',
+        statusText: STATUS_MAP.approved,
+        submitting: false,
+      })
+    } catch (err) {
+      showError(err.message)
+      this.setData({ submitting: false })
+    }
+  },
+
+  async onDeliver() {
+    if (this.data.submitting) return
+    this.setData({ submitting: true })
+    try {
+      await api.put(`/sales/${this.data.id}/status`, { status: 'delivered' })
+      showSuccess('确认出库')
+      this.setData({
+        statusCls: 'delivered',
+        statusText: STATUS_MAP.delivered,
+        submitting: false,
+      })
+    } catch (err) {
+      showError(err.message)
+      this.setData({ submitting: false })
+    }
+  },
+
+  onBack() {
+    wx.navigateBack()
+  },
 })

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, Not } from 'typeorm';
 import { Supplier } from '../../entities/supplier.entity';
+import { toPinyinInitials } from '../../common/utils/pinyin';
 
 @Injectable()
 export class SupplierService {
@@ -11,10 +12,19 @@ export class SupplierService {
 
   async findAll(params: { page?: number; pageSize?: number; keyword?: string }) {
     const { page = 1, pageSize = 20, keyword } = params;
-    const where: any = { status: Not('void') };
-    if (keyword) where.name = Like(`%${keyword}%`);
+    if (keyword) {
+      const qb = this.supplierRepo.createQueryBuilder('s')
+        .where('s.status != :void', { void: 'void' })
+        .andWhere('(s.name LIKE :kw OR s.pinyin LIKE :kw OR s.phone LIKE :kw)',
+          { kw: `%${keyword}%` })
+        .skip((page - 1) * pageSize)
+        .take(pageSize)
+        .orderBy('s.createdAt', 'DESC');
+      const [list, total] = await qb.getManyAndCount();
+      return { list, total, page, pageSize };
+    }
     const [list, total] = await this.supplierRepo.findAndCount({
-      where,
+      where: { status: Not('void') },
       skip: (page - 1) * pageSize,
       take: pageSize,
       order: { createdAt: 'DESC' },
@@ -30,12 +40,17 @@ export class SupplierService {
     if (!dto.code) {
       dto.code = await this.generateCode();
     }
+    if (!dto.pinyin && dto.name) {
+      dto.pinyin = toPinyinInitials(dto.name);
+    }
     return this.supplierRepo.save(dto);
   }
 
   async update(id: string, dto: Partial<Supplier>) {
-    // 不允许修改编码
     if (dto.code) delete dto.code;
+    if (dto.name && !dto.pinyin) {
+      dto.pinyin = toPinyinInitials(dto.name);
+    }
     await this.supplierRepo.update(id, dto);
     return this.findOne(id);
   }

@@ -818,3 +818,108 @@
   border: none;
   text-align: center;
 }
+
+/* ---------- 商品搜索制造商 ---------- */
+.ps-item-manufacturer {
+  font-size: 20rpx;
+  color: #999999;
+}
+
+/* ---------- 商品额外字段（批号/生产日期/有效期/货位号） ---------- */
+.item-extra-fields {
+  margin-top: 14rpx;
+  padding-top: 14rpx;
+  border-top: 2rpx solid rgba(0, 0, 0, 0.04);
+}
+
+.item-extra-row {
+  display: flex;
+  gap: 14rpx;
+  margin-bottom: 10rpx;
+}
+
+.item-extra-row:last-child {
+  margin-bottom: 0;
+}
+
+.item-extra-field {
+  flex: 1;
+}
+
+.item-extra-field-half {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-extra-label {
+  display: block;
+  font-size: 22rpx;
+  color: #5c5c5c;
+  margin-bottom: 6rpx;
+}
+
+.item-extra-input {
+  background: #FFFFFF;
+  border-radius: 8rpx;
+  padding: 0 12rpx;
+  height: 60rpx;
+  font-size: 26rpx;
+  color: #333333;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.item-extra-picker {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 8rpx;
+  padding: 0 12rpx;
+  height: 60rpx;
+  font-size: 26rpx;
+  color: #333333;
+}
+
+.item-extra-picker.has-value {
+  color: #0077C2;
+}
+
+.item-extra-value {
+  font-size: 26rpx;
+  color: #333333;
+  height: 60rpx;
+  line-height: 60rpx;
+}
+
+/* ---------- 审核/入库按钮 ---------- */
+.action-audit {
+  background: linear-gradient(135deg, #52c41a, #73d13d);
+  color: #FFFFFF;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.action-audit:active {
+  opacity: 0.9;
+}
+
+.action-receive {
+  background: linear-gradient(135deg, #1890ff, #40a9ff);
+  color: #FFFFFF;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.action-receive:active {
+  opacity: 0.9;
+}
+
+/* ---------- 只读模式双按钮底部栏 ---------- */
+.bottom-inner-actions {
+  display: flex;
+  gap: 14rpx;
+  align-items: center;
+}
+
+.bottom-inner-actions .action-back {
+  flex: 0 0 160rpx;
+  width: auto;
+}

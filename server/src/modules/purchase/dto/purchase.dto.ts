@@ -22,6 +22,19 @@ export class PurchaseOrderItemDto {
 
   @IsNumber()
   price: number;
+
+  @IsString()
+  batchNo: string;
+
+  @IsString()
+  productionDate: string;
+
+  @IsString()
+  expiryDate: string;
+
+  @IsOptional()
+  @IsString()
+  locationCode?: string;
 }
 
 export class CreatePurchaseDto {
@@ -40,6 +53,14 @@ export class CreatePurchaseDto {
   @IsOptional()
   @IsString()
   expectedDate?: string;
+
+  @IsOptional()
+  @IsString()
+  warehouseId?: string;
+
+  @IsOptional()
+  @IsString()
+  warehouseName?: string;
 }
 
 export class UpdatePurchaseDto {
@@ -60,6 +81,14 @@ export class UpdatePurchaseDto {
   @IsOptional()
   @IsString()
   expectedDate?: string;
+
+  @IsOptional()
+  @IsString()
+  warehouseId?: string;
+
+  @IsOptional()
+  @IsString()
+  warehouseName?: string;
 }
 
 export class UpdatePurchaseStatusDto {

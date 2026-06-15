@@ -60,6 +60,17 @@
     </view>
 
     <view class="order-form-item">
+      <text class="order-form-label">仓库</text>
+      <picker mode="selector" range="{{warehouses}}" range-key="name" value="{{selectedWarehouseIndex}}" bindchange="onWarehouseChange" disabled="{{readonly}}">
+        <view class="order-form-picker {{warehouseName ? 'has-value' : ''}}">
+          <text wx:if="{{warehouseName}}">{{warehouseName}}</text>
+          <text wx:else class="placeholder">选择仓库</text>
+          <view class="picker-arrow" wx:if="{{!readonly}}"></view>
+        </view>
+      </picker>
+    </view>
+
+    <view class="order-form-item">
       <text class="order-form-label">订单编号</text>
       <text class="order-form-value" wx:if="{{orderNo}}">{{orderNo}}</text>
       <text class="order-form-value placeholder" wx:else>保存后自动生成</text>
@@ -133,6 +144,7 @@
           <view class="ps-item-info">
             <text class="ps-item-name">{{item.name}}</text>
             <text class="ps-item-spec">{{item.spec || '-'}} · {{item.unit ? item.unit.name : '-'}}</text>
+            <text class="ps-item-manufacturer" wx:if="{{item.productManufacturer || item.manufacturer}}">{{item.productManufacturer || item.manufacturer || ''}}</text>
           </view>
           <view class="ps-item-add">+</view>
         </view>
@@ -208,6 +220,62 @@
                 <text class="subtotal-value">¥{{item.amount || '0.00'}}</text>
               </view>
             </view>
+
+            <!-- 批号/生产日期/有效期/货位号 -->
+            <view class="item-extra-fields" wx:if="{{!readonly}}">
+              <view class="item-extra-row">
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">批号</text>
+                  <input class="item-extra-input" type="text" placeholder="必填" placeholder-class="placeholder" value="{{item.batchNo}}" data-index="{{index}}" bindinput="onItemBatchNoInput" />
+                </view>
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">货位号</text>
+                  <input class="item-extra-input" type="text" placeholder="选填" placeholder-class="placeholder" value="{{item.locationCode}}" data-index="{{index}}" bindinput="onItemLocationCodeInput" />
+                </view>
+              </view>
+              <view class="item-extra-row">
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">生产日期</text>
+                  <picker mode="date" value="{{item.productionDate}}" data-index="{{index}}" bindchange="onItemProductionDateChange">
+                    <view class="item-extra-picker {{item.productionDate ? 'has-value' : ''}}">
+                      <text wx:if="{{item.productionDate}}">{{item.productionDate}}</text>
+                      <text wx:else class="placeholder">必填</text>
+                    </view>
+                  </picker>
+                </view>
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">有效期</text>
+                  <picker mode="date" value="{{item.expiryDate}}" data-index="{{index}}" bindchange="onItemExpiryDateChange">
+                    <view class="item-extra-picker {{item.expiryDate ? 'has-value' : ''}}">
+                      <text wx:if="{{item.expiryDate}}">{{item.expiryDate}}</text>
+                      <text wx:else class="placeholder">必填</text>
+                    </view>
+                  </picker>
+                </view>
+              </view>
+            </view>
+            <view class="item-extra-fields" wx:else>
+              <view class="item-extra-row">
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">批号</text>
+                  <text class="item-extra-value">{{item.batchNo || '-'}}</text>
+                </view>
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">货位号</text>
+                  <text class="item-extra-value">{{item.locationCode || '-'}}</text>
+                </view>
+              </view>
+              <view class="item-extra-row">
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">生产日期</text>
+                  <text class="item-extra-value">{{item.productionDate || '-'}}</text>
+                </view>
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">有效期</text>
+                  <text class="item-extra-value">{{item.expiryDate || '-'}}</text>
+                </view>
+              </view>
+            </view>
           </view>
         </view>
 
@@ -241,8 +309,16 @@
 
   <!-- 只读模式底部按钮 -->
   <view class="bottom-bar" wx:else>
-    <view class="bottom-inner bottom-inner-single">
+    <view class="bottom-inner bottom-inner-single" wx:if="{{statusCls !== 'pending' && statusCls !== 'approved'}}">
       <button class="action-btn action-back" bindtap="onBack">返回列表</button>
+    </view>
+    <view class="bottom-inner bottom-inner-actions" wx:elif="{{statusCls === 'pending'}}">
+      <button class="action-btn action-back" bindtap="onBack">返回</button>
+      <button class="action-btn action-audit" bindtap="onApprove" disabled="{{submitting}}">{{submitting ? '处理中...' : '审核通过'}}</button>
+    </view>
+    <view class="bottom-inner bottom-inner-actions" wx:elif="{{statusCls === 'approved'}}">
+      <button class="action-btn action-back" bindtap="onBack">返回</button>
+      <button class="action-btn action-receive" bindtap="onReceive" disabled="{{submitting}}">{{submitting ? '处理中...' : '确认入库'}}</button>
     </view>
   </view>
 

@@ -22,6 +22,19 @@ export class SalesOrderItemDto {
 
   @IsNumber()
   price: number;
+
+  @IsString()
+  batchNo: string;
+
+  @IsString()
+  productionDate: string;
+
+  @IsString()
+  expiryDate: string;
+
+  @IsOptional()
+  @IsString()
+  locationCode?: string;
 }
 
 export class CreateSalesDto {
@@ -40,6 +53,14 @@ export class CreateSalesDto {
   @IsOptional()
   @IsString()
   expectedDate?: string;
+
+  @IsOptional()
+  @IsString()
+  warehouseId?: string;
+
+  @IsOptional()
+  @IsString()
+  warehouseName?: string;
 }
 
 export class UpdateSalesDto {
@@ -60,6 +81,14 @@ export class UpdateSalesDto {
   @IsOptional()
   @IsString()
   expectedDate?: string;
+
+  @IsOptional()
+  @IsString()
+  warehouseId?: string;
+
+  @IsOptional()
+  @IsString()
+  warehouseName?: string;
 }
 
 export class UpdateSalesStatusDto {

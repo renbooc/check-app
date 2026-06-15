@@ -36,7 +36,10 @@ export class SalesOrderItem {
   @Column({ length: 20, nullable: true })
   productUnit: string;
 
-  @Column({ type: 'int' })
+  @Column({ length: 100, nullable: true })
+  productManufacturer: string;
+
+  @Column({ type: 'decimal', precision: 12, scale: 2 })
   quantity: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
@@ -44,4 +47,16 @@ export class SalesOrderItem {
 
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   amount: number;
+
+  @Column({ length: 50 })
+  batchNo: string;
+
+  @Column({ type: 'date' })
+  productionDate: string;
+
+  @Column({ type: 'date' })
+  expiryDate: string;
+
+  @Column({ length: 50, nullable: true })
+  locationCode: string;
 }

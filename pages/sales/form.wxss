@@ -91,7 +91,7 @@
   color: #333333;
 }
 
-/* ---------- 客户/供应商搜索 ---------- */
+/* ---------- 客户搜索 ---------- */
 .search-field {
   display: flex;
   align-items: center;
@@ -224,6 +224,24 @@
   color: #5c5c5c;
 }
 
+/* ---------- 客户列布局（防止搜索结果偏移） ---------- */
+.order-form-item-column {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.order-form-item-column .order-form-label {
+  margin-bottom: 14rpx;
+}
+
+.order-form-item-column > view {
+  width: 100%;
+}
+
+.customer-search-wrap {
+  width: 100%;
+}
+
 /* ---------- 订单信息表单 ---------- */
 .order-form-item {
   display: flex;
@@ -279,6 +297,39 @@
   transform: rotate(45deg);
   margin-left: 10rpx;
   margin-top: -4rpx;
+}
+
+/* 只读字段值 */
+.order-form-value {
+  flex: 1;
+  text-align: right;
+  font-size: 28rpx;
+  color: #333333;
+  line-height: 80rpx;
+}
+
+/* ---------- 订单状态标签 ---------- */
+.status-tag-draft {
+  color: #999999;
+}
+
+.status-tag-pending {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.status-tag-approved {
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.status-tag-delivered {
+  color: #10B981;
+  font-weight: 600;
+}
+
+.status-tag-cancelled {
+  color: #999999;
 }
 
 /* ---------- 商品明细 ---------- */
@@ -386,6 +437,12 @@
   color: #cccccc;
 }
 
+.item-manufacturer {
+  font-size: 22rpx;
+  color: #059669;
+  opacity: 0.7;
+}
+
 .item-remove-btn {
   width: 36rpx;
   height: 36rpx;
@@ -488,6 +545,12 @@
 .ps-item-spec {
   font-size: 22rpx;
   color: #5c5c5c;
+}
+
+.ps-item-manufacturer {
+  font-size: 20rpx;
+  color: #059669;
+  opacity: 0.6;
 }
 
 .ps-item-add {
@@ -618,6 +681,80 @@
   color: #10B981;
 }
 
+/* ---------- 批号/生产日期/有效期/货位号 ---------- */
+.item-batch-row {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 10rpx;
+  padding-top: 10rpx;
+  border-top: 2rpx solid rgba(0, 0, 0, 0.03);
+}
+
+.item-batch-row:first-of-type {
+  border-top: none;
+  margin-top: 0;
+}
+
+.batch-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.batch-label {
+  display: block;
+  font-size: 20rpx;
+  color: #5c5c5c;
+  margin-bottom: 4rpx;
+}
+
+.batch-input {
+  height: 56rpx;
+  line-height: 56rpx;
+  background: #FFFFFF;
+  border-radius: 6rpx;
+  padding: 0 10rpx;
+  font-size: 24rpx;
+  color: #333333;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.batch-picker {
+  height: 56rpx;
+  line-height: 56rpx;
+  background: #FFFFFF;
+  border-radius: 6rpx;
+  padding: 0 10rpx;
+  font-size: 24rpx;
+  color: #333333;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.batch-picker.has-value {
+  color: #10B981;
+}
+
+.batch-value {
+  height: 56rpx;
+  line-height: 56rpx;
+  font-size: 24rpx;
+  color: #333333;
+  display: block;
+}
+
+/* 只读值 */
+.item-readonly-value {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 500;
+  height: 64rpx;
+  line-height: 64rpx;
+}
+
 /* ---------- 空商品提示 ---------- */
 .items-empty {
   padding: 40rpx 0;
@@ -713,4 +850,50 @@
 .action-btn[disabled] {
   opacity: 0.5;
   box-shadow: none;
+}
+
+/* ---------- 只读提示横幅 ---------- */
+.readonly-banner {
+  margin: 20rpx 20rpx -24rpx;
+  padding: 20rpx 24rpx;
+  background: #fff3e0;
+  border-radius: 12rpx;
+  text-align: center;
+  position: relative;
+  z-index: 3;
+}
+
+.readonly-banner-text {
+  font-size: 26rpx;
+  color: #e65100;
+  font-weight: 500;
+}
+
+/* ---------- 返回按钮 ---------- */
+.action-back {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: #f5f5f5;
+  color: #333333;
+  font-size: 28rpx;
+  font-weight: 500;
+  border-radius: 16rpx;
+  border: none;
+  text-align: center;
+}
+
+/* ---------- 审核按钮 ---------- */
+.action-audit {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #FFFFFF;
+  box-shadow: none;
+}
+
+.action-audit:active {
+  opacity: 0.9;
+}
+
+.action-audit-deliver {
+  background: linear-gradient(135deg, #F59E0B, #F97316);
 }

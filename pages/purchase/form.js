@@ -24,6 +24,12 @@ Page({
     selectedSupplier: null,
     _allSuppliers: [],
 
+    // 仓库
+    warehouses: [],
+    selectedWarehouseIndex: -1,
+    warehouseId: '',
+    warehouseName: '',
+
     // 订单信息
     expectedDate: "",
     remark: "",
@@ -51,7 +57,7 @@ Page({
   //  生命周期
   // ============================================================
   async onLoad(options) {
-    await Promise.all([this.loadSuppliers(), this.loadProducts()]);
+    await Promise.all([this.loadSuppliers(), this.loadProducts(), this.loadWarehouses()]);
     if (options.id) {
       this.setData({ id: options.id });
       await this.loadOrder(options.id);
@@ -76,6 +82,15 @@ Page({
     }
   },
 
+  async loadWarehouses() {
+    try {
+      const res = await api.get("/warehouses", { page: 1, pageSize: 200 });
+      this.setData({ warehouses: res.list || [] });
+    } catch (err) {
+      console.error("[PurchaseForm] loadWarehouses error:", err);
+    }
+  },
+
   async loadOrder(id) {
     try {
       const order = await api.get(`/purchase/${id}`);
@@ -95,7 +110,13 @@ Page({
         quantity: item.quantity,
         price: item.price,
         amount: item.amount,
+        batchNo: item.batchNo || "",
+        productionDate: item.productionDate || "",
+        expiryDate: item.expiryDate || "",
+        locationCode: item.locationCode || "",
       }));
+
+      const warehouseIdx = (this.data.warehouses || []).findIndex((w) => w.id === order.warehouseId);
 
       this.setData({
         orderNo: order.orderNo || '',
@@ -103,6 +124,9 @@ Page({
         supplierKeyword: supplier ? supplier.name : "",
         remark: order.remark || "",
         expectedDate: order.expectedDate || "",
+        warehouseId: order.warehouseId || "",
+        warehouseName: order.warehouseName || "",
+        selectedWarehouseIndex: warehouseIdx >= 0 ? warehouseIdx : -1,
         items,
         totalQuantity: order.totalQuantity || 0,
         totalAmount: (parseFloat(order.totalAmount) || 0).toFixed(2),
@@ -166,6 +190,21 @@ Page({
       showSupplierResults: false,
       filteredSuppliers: [],
     });
+  },
+
+  // ============================================================
+  //  仓库
+  // ============================================================
+  onWarehouseChange(e) {
+    const index = e.detail.value;
+    const warehouse = this.data.warehouses[index];
+    if (warehouse) {
+      this.setData({
+        selectedWarehouseIndex: index,
+        warehouseId: warehouse.id,
+        warehouseName: warehouse.name,
+      });
+    }
   },
 
   // ============================================================
@@ -237,6 +276,10 @@ Page({
         quantity: "",
         price: "",
         amount: "0.00",
+        batchNo: "",
+        productionDate: "",
+        expiryDate: "",
+        locationCode: "",
       },
     ];
 
@@ -272,6 +315,34 @@ Page({
     items[index].amount = ((items[index].quantity || 0) * price).toFixed(2);
     this.setData({ items });
     this.calcTotal();
+  },
+
+  onItemBatchNoInput(e) {
+    const index = e.currentTarget.dataset.index;
+    const items = [...this.data.items];
+    items[index].batchNo = e.detail.value;
+    this.setData({ items });
+  },
+
+  onItemLocationCodeInput(e) {
+    const index = e.currentTarget.dataset.index;
+    const items = [...this.data.items];
+    items[index].locationCode = e.detail.value;
+    this.setData({ items });
+  },
+
+  onItemProductionDateChange(e) {
+    const index = e.currentTarget.dataset.index;
+    const items = [...this.data.items];
+    items[index].productionDate = e.detail.value;
+    this.setData({ items });
+  },
+
+  onItemExpiryDateChange(e) {
+    const index = e.currentTarget.dataset.index;
+    const items = [...this.data.items];
+    items[index].expiryDate = e.detail.value;
+    this.setData({ items });
   },
 
   onQtyDecrease(e) {
@@ -341,6 +412,18 @@ Page({
         wx.showToast({ title: `第${i + 1}项单价无效`, icon: "none" });
         return false;
       }
+      if (!item.batchNo) {
+        wx.showToast({ title: `第${i + 1}项批号不能为空`, icon: "none" });
+        return false;
+      }
+      if (!item.productionDate) {
+        wx.showToast({ title: `第${i + 1}项生产日期不能为空`, icon: "none" });
+        return false;
+      }
+      if (!item.expiryDate) {
+        wx.showToast({ title: `第${i + 1}项有效期不能为空`, icon: "none" });
+        return false;
+      }
     }
     return true;
   },
@@ -348,6 +431,8 @@ Page({
   buildSubmitData() {
     return {
       supplierId: this.data.selectedSupplier.id,
+      warehouseId: this.data.warehouseId,
+      warehouseName: this.data.warehouseName,
       remark: this.data.remark,
       expectedDate: this.data.expectedDate || null,
       items: this.data.items.map((item) => ({
@@ -357,6 +442,10 @@ Page({
         productUnit: item.productUnit,
         quantity: parseFloat(item.quantity),
         price: parseFloat(item.price),
+        batchNo: item.batchNo || "",
+        productionDate: item.productionDate || "",
+        expiryDate: item.expiryDate || "",
+        locationCode: item.locationCode || "",
       })),
     };
   },
@@ -408,5 +497,33 @@ Page({
 
   onBack() {
     wx.navigateBack();
+  },
+
+  async onApprove() {
+    if (this.data.submitting) return;
+    this.setData({ submitting: true });
+    try {
+      await api.put(`/purchase/${this.data.id}/status`, { status: 'approved' });
+      showSuccess('审核通过');
+      setTimeout(() => wx.navigateBack(), 1000);
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      this.setData({ submitting: false });
+    }
+  },
+
+  async onReceive() {
+    if (this.data.submitting) return;
+    this.setData({ submitting: true });
+    try {
+      await api.put(`/purchase/${this.data.id}/status`, { status: 'received' });
+      showSuccess('确认入库');
+      setTimeout(() => wx.navigateBack(), 1000);
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      this.setData({ submitting: false });
+    }
   },
 });

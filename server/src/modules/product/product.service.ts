@@ -6,6 +6,7 @@ import { Category } from '../../entities/category.entity';
 import { Unit } from '../../entities/unit.entity';
 import { Warehouse } from '../../entities/warehouse.entity';
 import { Location } from '../../entities/location.entity';
+import { toPinyinInitials } from '../../common/utils/pinyin';
 
 @Injectable()
 export class ProductService {
@@ -50,7 +51,7 @@ export class ProductService {
 
     if (keyword) {
       qb.andWhere(
-        '(p.name LIKE :kw OR p.code LIKE :kw OR p.manufacturer LIKE :kw)',
+        '(p.name LIKE :kw OR p.code LIKE :kw OR p.manufacturer LIKE :kw OR p.pinyin LIKE :kw)',
         { kw: `%${keyword}%` },
       );
     }
@@ -69,6 +70,9 @@ export class ProductService {
   async create(dto: Partial<Product>) {
     if (!dto.code) {
       dto.code = await this.generateCode();
+    }
+    if (!dto.pinyin && dto.name) {
+      dto.pinyin = toPinyinInitials(dto.name);
     }
     const product = this.productRepo.create(dto);
     return this.productRepo.save(product);
@@ -89,6 +93,9 @@ export class ProductService {
   }
 
   async update(id: string, dto: Partial<Product>) {
+    if (dto.name && !dto.pinyin) {
+      dto.pinyin = toPinyinInitials(dto.name);
+    }
     await this.productRepo.update(id, dto);
     return this.findOne(id);
   }

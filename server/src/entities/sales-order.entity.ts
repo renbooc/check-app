@@ -55,6 +55,12 @@ export class SalesOrder {
   @Column({ length: 500, nullable: true })
   remark: string;
 
+  @Column({ nullable: true })
+  warehouseId: string;
+
+  @Column({ length: 100, nullable: true })
+  warehouseName: string;
+
   @OneToMany(() => SalesOrderItem, (item) => item.order)
   items: SalesOrderItem[];
 

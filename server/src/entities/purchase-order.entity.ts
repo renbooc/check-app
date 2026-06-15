@@ -55,6 +55,12 @@ export class PurchaseOrder {
   @Column({ length: 500, nullable: true })
   remark: string;
 
+  @Column({ nullable: true })
+  warehouseId: string;
+
+  @Column({ length: 100, nullable: true })
+  warehouseName: string;
+
   @OneToMany(() => PurchaseOrderItem, (item) => item.order)
   items: PurchaseOrderItem[];
 
