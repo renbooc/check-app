@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto, UpdateCustomerDto, QueryCustomerDto } from './dto/customer.dto';
@@ -21,6 +21,7 @@ export class CustomerController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   async create(@Body() body: CreateCustomerDto) {
     const data = await this.customerService.create(body);
     return { code: 200, data };

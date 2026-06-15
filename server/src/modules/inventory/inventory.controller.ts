@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { InventoryService } from './inventory.service';
 import { QueryInventoryDto, SaveCheckDto, QueryCheckRecordDto } from './dto/inventory.dto';
@@ -57,6 +57,7 @@ export class CheckController {
   constructor(private inventoryService: InventoryService) {}
 
   @Post('save')
+  @HttpCode(HttpStatus.OK)
   async save(@Body() body: SaveCheckDto, @Req() req: any) {
     const dto = {
       ...body,

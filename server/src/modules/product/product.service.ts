@@ -38,20 +38,27 @@ export class ProductService {
 
   async findAll(params: { page?: number; pageSize?: number; keyword?: string; categoryId?: string }) {
     const { page = 1, pageSize = 20, keyword, categoryId } = params;
-    const where: any = {};
+
+    const qb = this.productRepo
+      .createQueryBuilder('p')
+      .leftJoinAndSelect('p.unit', 'u')
+      .leftJoinAndSelect('p.category', 'c')
+      .where('p.status != :void', { void: 'void' })
+      .skip((page - 1) * pageSize)
+      .take(pageSize)
+      .orderBy('p.createdAt', 'DESC');
+
     if (keyword) {
-      where.name = Like(`%${keyword}%`);
+      qb.andWhere(
+        '(p.name LIKE :kw OR p.code LIKE :kw OR p.manufacturer LIKE :kw)',
+        { kw: `%${keyword}%` },
+      );
     }
     if (categoryId) {
-      where.categoryId = categoryId;
+      qb.andWhere('p.categoryId = :cid', { cid: categoryId });
     }
-    const [list, total] = await this.productRepo.findAndCount({
-      where,
-      relations: ['unit', 'category'],
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      order: { createdAt: 'DESC' },
-    });
+
+    const [list, total] = await qb.getManyAndCount();
     return { list, total, page, pageSize };
   }
 
@@ -87,7 +94,7 @@ export class ProductService {
   }
 
   async remove(id: string) {
-    await this.productRepo.update(id, { isActive: false });
+    await this.productRepo.update(id, { status: 'void', isActive: false });
     return { message: '删除成功' };
   }
 

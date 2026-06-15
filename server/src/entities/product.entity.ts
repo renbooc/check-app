@@ -53,6 +53,12 @@ export class Product {
   @Column({ length: 500, nullable: true })
   image: string;
 
+  @Column({ length: 500, nullable: true })
+  remark: string;
+
+  @Column({ length: 30, default: 'active' })
+  status: string;
+
   @Column({ default: true })
   isActive: boolean;
 

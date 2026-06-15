@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, Not } from 'typeorm';
 import { Customer } from '../../entities/customer.entity';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class CustomerService {
 
   async findAll(params: { page?: number; pageSize?: number; keyword?: string }) {
     const { page = 1, pageSize = 20, keyword } = params;
-    const where: any = { isActive: true };
+    const where: any = { status: Not('void') };
     if (keyword) where.name = Like(`%${keyword}%`);
     const [list, total] = await this.customerRepo.findAndCount({
       where,
@@ -40,7 +40,7 @@ export class CustomerService {
   }
 
   async remove(id: string) {
-    await this.customerRepo.update(id, { isActive: false });
+    await this.customerRepo.update(id, { status: 'void', isActive: false });
     return { message: '删除成功' };
   }
 

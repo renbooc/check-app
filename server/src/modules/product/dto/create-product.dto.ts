@@ -10,6 +10,10 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsString()
+  status?: string;
+
+  @IsOptional()
+  @IsString()
   approvalNo?: string;
 
   @IsOptional()
@@ -53,6 +57,10 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString()
   code?: string;
+
+  @IsOptional()
+  @IsString()
+  status?: string;
 
   @IsOptional()
   @IsString()

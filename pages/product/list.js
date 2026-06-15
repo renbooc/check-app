@@ -110,23 +110,15 @@ Page({
   // ==================== 数据处理 ====================
 
   enrichProduct(item) {
-    // 从 unit 对象提取单位名称
     const unitName = (item.unit && item.unit.name) || item.unitName || ''
-    // 从 category 对象提取分类名称
     const categoryName = (item.category && item.category.name) || item.categoryName || ''
-
-    // 商品状态：正常 / 已禁用
-    const isActive = item.isActive !== false
-    const statusCls = isActive ? 'active' : 'inactive'
-    const statusLabel = isActive ? '正常' : '已禁用'
-
+    const status = item.status || 'active'
     return {
       ...item,
       unitName,
       categoryName,
-      isActive,
-      statusCls,
-      statusLabel,
+      statusCls: status,
+      statusLabel: { active: '正常', discontinued_sales: '已停销', discontinued_purchase: '已停采', void: '已作废' }[status] || '正常',
     }
   },
 

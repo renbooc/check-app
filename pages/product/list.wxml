@@ -4,7 +4,7 @@
   <view class="search-bar">
     <view class="search-box">
       <view class="search-icon"></view>
-      <input class="search-input" placeholder="搜索商品名称/编码/条码" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearch" confirm-type="search" />
+      <input class="search-input" placeholder="搜索商品名称/编码/生产厂家" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearch" confirm-type="search" />
       <view class="search-clear" wx:if="{{keyword}}" bindtap="onClearSearch">
         <view class="clear-icon"></view>
       </view>
@@ -55,10 +55,13 @@
 
     <!-- 商品列表 -->
     <view class="product-list" wx:else>
-      <view class="product-card {{item.isActive === false ? 'card-disabled' : ''}}" wx:for="{{list}}" wx:key="id" bindtap="onEdit" data-id="{{item.id}}">
+      <view class="product-card" wx:for="{{list}}" wx:key="id" bindtap="onEdit" data-id="{{item.id}}">
         <view class="card-top">
-          <text class="product-name {{item.isActive === false ? 'name-disabled' : ''}}">{{item.name}}</text>
-          <view class="status-tag tag-{{item.statusCls}}">{{item.statusLabel}}</view>
+          <text class="product-name">{{item.name}}</text>
+          <view class="card-tags">
+            <view class="category-tag" wx:if="{{item.categoryName}}">{{item.categoryName}}</view>
+            <view class="status-tag tag-{{item.statusCls}}">{{item.statusLabel}}</view>
+          </view>
         </view>
         <view class="card-body">
           <view class="info-row">
@@ -80,7 +83,6 @@
             <text class="price-num">{{item.price || '0.00'}}</text>
             <text class="price-unit">/ {{item.unitName || '件'}}</text>
           </view>
-          <view class="category-tag" wx:if="{{item.categoryName}}">{{item.categoryName}}</view>
         </view>
       </view>
 

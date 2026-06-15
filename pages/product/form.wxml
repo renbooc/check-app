@@ -39,6 +39,21 @@
     </view>
 
     <view class="form-item">
+      <text class="form-label">商品状态</text>
+      <picker
+        mode="selector"
+        range="{{statusNames}}"
+        value="{{statusIndex}}"
+        bindchange="onStatusChange"
+      >
+        <view class="form-picker {{statusIndex >= 0 ? 'has-value' : ''}}">
+          <text>{{statusNames[statusIndex]}}</text>
+          <view class="picker-arrow"></view>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
       <text class="form-label">规格型号</text>
       <input
         class="form-input"

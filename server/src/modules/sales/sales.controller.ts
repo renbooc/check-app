@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, Query, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SalesService } from './sales.service';
 import { CreateSalesDto, UpdateSalesDto, UpdateSalesStatusDto, QuerySalesDto } from './dto/sales.dto';
@@ -21,6 +21,7 @@ export class SalesController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   async create(@Body() body: CreateSalesDto, @Req() req: any) {
     const dto = {
       ...body,

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SupplierService } from './supplier.service';
 import { CreateSupplierDto, UpdateSupplierDto, QuerySupplierDto } from './dto/supplier.dto';
@@ -21,6 +21,7 @@ export class SupplierController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   async create(@Body() body: CreateSupplierDto) {
     const data = await this.supplierService.create(body);
     return { code: 200, data };

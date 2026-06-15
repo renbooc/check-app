@@ -1,14 +1,23 @@
 const { api } = require('../../utils/request')
 const { showError, showSuccess } = require('../../utils/util')
 
+const STATUS_LIST = [
+  { value: 'active', label: '正常' },
+  { value: 'discontinued_sales', label: '已停销' },
+  { value: 'discontinued_purchase', label: '已停采' },
+  { value: 'void', label: '已作废' },
+]
+const STATUS_VALUES = STATUS_LIST.map(s => s.value)
+const STATUS_NAMES = STATUS_LIST.map(s => s.label)
+
 Page({
   data: {
     editingId: null,
     submitting: false,
-    // 表单字段 — 严格对应 Product 实体
     form: {
       name: '',
       code: '',
+      status: 'active',
       spec: '',
       unitId: '',
       categoryId: '',
@@ -16,15 +25,16 @@ Page({
       manufacturer: '',
       price: '',
       minQuantity: '',
-      remark: ''
+      remark: '',
     },
-    // 单位 & 分类选项
     unitList: [],
     categoryList: [],
     unitNames: [],
     categoryNames: [],
     unitIndex: -1,
-    categoryIndex: -1
+    categoryIndex: -1,
+    statusNames: STATUS_NAMES,
+    statusIndex: 0,
   },
 
   onLoad(options) {
@@ -36,20 +46,17 @@ Page({
     })
   },
 
-  // 并行加载单位和分类选项
   async loadOptions() {
     try {
       const [units, categories] = await Promise.all([
         api.get('/units'),
-        api.get('/categories')
+        api.get('/categories'),
       ])
-      const unitList = units || []
-      const categoryList = categories || []
       this.setData({
-        unitList,
-        categoryList,
-        unitNames: unitList.map(u => u.name),
-        categoryNames: categoryList.map(c => c.name)
+        unitList: units || [],
+        categoryList: categories || [],
+        unitNames: (units || []).map(u => u.name),
+        categoryNames: (categories || []).map(c => c.name),
       })
     } catch (err) {
       console.error('[ProductForm] loadOptions error:', err)
@@ -59,22 +66,18 @@ Page({
   async loadProduct(id) {
     try {
       const p = await api.get(`/products/${id}`)
-      if (!p) {
-        showError('商品不存在')
-        return
-      }
+      if (!p) { showError('商品不存在'); return }
 
       const unitId = (p.unit && p.unit.id) ? p.unit.id : (p.unitId || '')
       const categoryId = (p.category && p.category.id) ? p.category.id : (p.categoryId || '')
-
-      // 匹配 picker index
-      const unitIndex = this.data.unitList.findIndex(u => u.id === unitId)
-      const categoryIndex = this.data.categoryList.findIndex(c => c.id === categoryId)
+      const status = p.status || 'active'
+      const statusIndex = Math.max(0, STATUS_VALUES.indexOf(status))
 
       this.setData({
         form: {
           name: p.name || '',
           code: p.code || '',
+          status,
           spec: p.spec || '',
           unitId,
           categoryId,
@@ -82,10 +85,11 @@ Page({
           manufacturer: p.manufacturer || '',
           price: p.price != null ? String(p.price) : '',
           minQuantity: p.minQuantity != null ? String(p.minQuantity) : '',
-          remark: p.remark || ''
+          remark: p.remark || '',
         },
-        unitIndex,
-        categoryIndex
+        unitIndex: this.data.unitList.findIndex(u => u.id === unitId),
+        categoryIndex: this.data.categoryList.findIndex(c => c.id === categoryId),
+        statusIndex,
       })
     } catch (err) {
       showError(err.message)
@@ -101,10 +105,7 @@ Page({
     const idx = parseInt(e.detail.value)
     const unit = this.data.unitList[idx]
     if (unit) {
-      this.setData({
-        unitIndex: idx,
-        'form.unitId': unit.id
-      })
+      this.setData({ unitIndex: idx, 'form.unitId': unit.id })
     }
   },
 
@@ -112,11 +113,16 @@ Page({
     const idx = parseInt(e.detail.value)
     const cat = this.data.categoryList[idx]
     if (cat) {
-      this.setData({
-        categoryIndex: idx,
-        'form.categoryId': cat.id
-      })
+      this.setData({ categoryIndex: idx, 'form.categoryId': cat.id })
     }
+  },
+
+  onStatusChange(e) {
+    const idx = parseInt(e.detail.value)
+    this.setData({
+      statusIndex: idx,
+      'form.status': STATUS_VALUES[idx],
+    })
   },
 
   async onSubmit() {
@@ -132,6 +138,7 @@ Page({
       const payload = {
         name: form.name.trim(),
         code: form.code.trim(),
+        status: form.status,
         spec: form.spec.trim(),
         unitId: form.unitId || null,
         categoryId: form.categoryId || null,
@@ -139,7 +146,7 @@ Page({
         manufacturer: form.manufacturer.trim(),
         price: parseFloat(form.price) || 0,
         minQuantity: parseInt(form.minQuantity) || 0,
-        remark: form.remark.trim()
+        remark: form.remark.trim(),
       }
 
       if (editingId) {
@@ -154,5 +161,5 @@ Page({
     } finally {
       this.setData({ submitting: false })
     }
-  }
+  },
 })

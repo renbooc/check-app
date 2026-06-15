@@ -8,6 +8,8 @@ import {
   Param,
   Query,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ProductService } from '../product.service';
@@ -44,6 +46,7 @@ export class ProductController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
   async create(@Body() body: CreateProductDto) {
     const data = await this.productService.create(body);
     return { code: 200, data };

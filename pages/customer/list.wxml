@@ -54,7 +54,7 @@
         <view class="card-body">
           <view class="card-name-row">
             <text class="card-name">{{item.name}}</text>
-            <view class="card-arrow"></view>
+            <view class="status-tag tag-{{item.statusCls}}">{{item.statusLabel}}</view>
           </view>
           <view class="card-info-row" wx:if="{{item.contactPerson}}">
             <view class="info-icon info-icon-person"></view>
@@ -112,6 +112,15 @@
       <view class="form-row" wx:else>
         <text class="form-label">编码</text>
         <text class="form-readonly form-auto-code">保存后自动生成</text>
+      </view>
+      <view class="form-row">
+        <text class="form-label">状态</text>
+        <picker mode="selector" range="{{statusNames}}" value="{{statusIndex}}" bindchange="onStatusChange">
+          <view class="form-picker has-value">
+            <text>{{statusNames[statusIndex]}}</text>
+            <view class="picker-arrow"></view>
+          </view>
+        </picker>
       </view>
       <view class="form-row">
         <text class="form-label">名称</text>
