@@ -38,7 +38,7 @@ export class ProductService {
 
   async findAll(params: { page?: number; pageSize?: number; keyword?: string; categoryId?: string }) {
     const { page = 1, pageSize = 20, keyword, categoryId } = params;
-    const where: any = { isActive: true };
+    const where: any = {};
     if (keyword) {
       where.name = Like(`%${keyword}%`);
     }

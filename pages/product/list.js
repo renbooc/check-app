@@ -115,19 +115,18 @@ Page({
     // 从 category 对象提取分类名称
     const categoryName = (item.category && item.category.name) || item.categoryName || ''
 
-    // 模拟库存状态（真实环境应从 inventory 接口获取）
-    // 在产品列表暂缺库存数据时默认显示 normal
-    const stockStatus = 'normal'
-    const stockLabel = stockStatus === 'low' ? '库存不足'
-      : stockStatus === 'out' ? '缺货'
-      : '库存正常'
+    // 商品状态：正常 / 已禁用
+    const isActive = item.isActive !== false
+    const statusCls = isActive ? 'active' : 'inactive'
+    const statusLabel = isActive ? '正常' : '已禁用'
 
     return {
       ...item,
       unitName,
       categoryName,
-      stockStatus,
-      stockLabel,
+      isActive,
+      statusCls,
+      statusLabel,
     }
   },
 

@@ -55,10 +55,10 @@
 
     <!-- 商品列表 -->
     <view class="product-list" wx:else>
-      <view class="product-card" wx:for="{{list}}" wx:key="id" bindtap="onEdit" data-id="{{item.id}}">
+      <view class="product-card {{item.isActive === false ? 'card-disabled' : ''}}" wx:for="{{list}}" wx:key="id" bindtap="onEdit" data-id="{{item.id}}">
         <view class="card-top">
-          <text class="product-name">{{item.name}}</text>
-          <view class="product-category-tag" wx:if="{{item.categoryName}}">{{item.categoryName}}</view>
+          <text class="product-name {{item.isActive === false ? 'name-disabled' : ''}}">{{item.name}}</text>
+          <view class="status-tag tag-{{item.statusCls}}">{{item.statusLabel}}</view>
         </view>
         <view class="card-body">
           <view class="info-row">
@@ -80,10 +80,7 @@
             <text class="price-num">{{item.price || '0.00'}}</text>
             <text class="price-unit">/ {{item.unitName || '件'}}</text>
           </view>
-          <view class="stock-badge {{item.stockStatus || 'unknown'}}">
-            <view class="stock-dot"></view>
-            <text>{{item.stockLabel || '-'}}</text>
-          </view>
+          <view class="category-tag" wx:if="{{item.categoryName}}">{{item.categoryName}}</view>
         </view>
       </view>
 

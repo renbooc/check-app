@@ -262,6 +262,35 @@
   line-height: 1.4;
 }
 
+/* 状态标签 */
+.status-tag {
+  flex-shrink: 0;
+  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 20rpx;
+  line-height: 1.4;
+  margin-left: 12rpx;
+}
+
+.tag-active {
+  color: #52c41a;
+  background: rgba(82, 196, 26, 0.1);
+}
+
+.tag-inactive {
+  color: #999999;
+  background: rgba(153, 153, 153, 0.1);
+}
+
+/* 已禁用卡片 */
+.card-disabled {
+  opacity: 0.55;
+}
+
+.name-disabled {
+  text-decoration: line-through;
+}
+
 /* 卡片中间：信息行 */
 .card-body {
   margin-bottom: 16rpx;
@@ -327,45 +356,15 @@
   margin-left: 4rpx;
 }
 
-.stock-badge {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-  font-size: 22rpx;
-  padding: 6rpx 14rpx;
+/* 卡片底部分类标签（替代原库存标签位置） */
+.category-tag {
+  font-size: 20rpx;
+  color: #0077C2;
+  background: rgba(0, 119, 194, 0.08);
+  padding: 4rpx 14rpx;
   border-radius: 20rpx;
   flex-shrink: 0;
-}
-
-.stock-dot {
-  width: 10rpx;
-  height: 10rpx;
-  border-radius: 50%;
-}
-
-/* 库存状态颜色 */
-.stock-badge.normal {
-  background: rgba(82, 196, 26, 0.08);
-  color: #52c41a;
-}
-.stock-badge.normal .stock-dot {
-  background: #52c41a;
-}
-
-.stock-badge.low {
-  background: rgba(250, 173, 20, 0.1);
-  color: #d48806;
-}
-.stock-badge.low .stock-dot {
-  background: #faad14;
-}
-
-.stock-badge.out {
-  background: rgba(245, 34, 45, 0.08);
-  color: #cf1322;
-}
-.stock-badge.out .stock-dot {
-  background: #f5222d;
+  line-height: 1.4;
 }
 
 /* 加载更多 */
