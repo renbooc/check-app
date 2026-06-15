@@ -16,6 +16,7 @@ Page({
     showModal: false,
     editingId: null,
     form: {
+      code: '',
       name: '',
       contactPerson: '',
       phone: '',
@@ -94,7 +95,7 @@ Page({
     this.setData({
       showModal: true,
       editingId: null,
-      form: { name: '', contactPerson: '', phone: '', address: '', remark: '' }
+      form: { code: '', name: '', contactPerson: '', phone: '', address: '', remark: '' }
     })
   },
 
@@ -106,6 +107,7 @@ Page({
         showModal: true,
         editingId: id,
         form: {
+          code: item.code || '',
           name: item.name || '',
           contactPerson: item.contactPerson || '',
           phone: item.phone || '',

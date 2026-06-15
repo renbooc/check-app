@@ -11,6 +11,9 @@ export class Customer {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ length: 50, unique: true, nullable: true })
+  code: string;
+
   @Column({ length: 100 })
   name: string;
 

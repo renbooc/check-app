@@ -68,18 +68,17 @@ export class ProductService {
   }
 
   /**
-   * 生成唯一商品编码：SP + 14位时间戳 + 4位随机字符
+   * 生成顺序商品编码：P + 5位数字（从 00001 开始递增）
    */
   private async generateCode(): Promise<string> {
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-    const code = `SP${timestamp}${random}`;
-    // 检查是否已存在，极小概率碰撞
-    const exists = await this.productRepo.findOne({ where: { code } });
-    if (exists) {
-      return this.generateCode(); // 递归重新生成
-    }
-    return code;
+    const last = await this.productRepo
+      .createQueryBuilder('p')
+      .select('p.code')
+      .where("p.code ~ '^P[0-9]{5}$'")
+      .orderBy('p.code', 'DESC')
+      .getRawOne();
+    const seq = last ? parseInt(last.p_code.substring(1), 10) + 1 : 1;
+    return `P${String(seq).padStart(5, '0')}`;
   }
 
   async update(id: string, dto: Partial<Product>) {

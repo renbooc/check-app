@@ -106,6 +106,14 @@
       </view>
     </view>
     <view class="modal-body">
+      <view class="form-row" wx:if="{{editingId}}">
+        <text class="form-label">编码</text>
+        <text class="form-readonly">{{form.code}}</text>
+      </view>
+      <view class="form-row" wx:else>
+        <text class="form-label">编码</text>
+        <text class="form-readonly form-auto-code">保存后自动生成</text>
+      </view>
       <view class="form-row">
         <text class="form-label">名称</text>
         <input class="form-input" placeholder="供应商名称" value="{{form.name}}" bindinput="onFormFieldInput" data-field="name" />
