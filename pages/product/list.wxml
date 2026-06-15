@@ -69,6 +69,10 @@
             <text class="info-label">规格</text>
             <text class="info-val">{{item.spec}}</text>
           </view>
+          <view class="info-row" wx:if="{{item.manufacturer}}">
+            <text class="info-label">厂家</text>
+            <text class="info-val">{{item.manufacturer}}</text>
+          </view>
         </view>
         <view class="card-footer">
           <view class="price-area">
