@@ -7,7 +7,36 @@
     "minified": true,
     "enhance": true,
     "compileHotReLoad": true,
-    "useIsolateContext": true
+    "useIsolateContext": true,
+    "ignoreDevUnusedFiles": true
+  },
+  "packOptions": {
+    "ignore": [
+      {
+        "type": "folder",
+        "value": "server"
+      },
+      {
+        "type": "folder",
+        "value": "deploy"
+      },
+      {
+        "type": "file",
+        "value": ".env.example"
+      },
+      {
+        "type": "file",
+        "value": ".gitignore"
+      },
+      {
+        "type": "file",
+        "value": ".gitattributes"
+      },
+      {
+        "type": "file",
+        "value": "token.json"
+      }
+    ]
   },
   "compileType": "miniprogram",
   "libVersion": "3.3.4",
