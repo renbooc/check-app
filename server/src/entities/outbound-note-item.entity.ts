@@ -5,27 +5,22 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { SalesOrder } from './sales-order.entity';
-import { Product } from './product.entity';
+import { OutboundNote } from './outbound-note.entity';
 
-@Entity('sales_order_items')
-export class SalesOrderItem {
+@Entity('outbound_note_items')
+export class OutboundNoteItem {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  orderId: string;
+  outboundId: string;
 
-  @ManyToOne(() => SalesOrder)
-  @JoinColumn({ name: 'orderId' })
-  order: SalesOrder;
+  @ManyToOne(() => OutboundNote)
+  @JoinColumn({ name: 'outboundId' })
+  outboundNote: OutboundNote;
 
   @Column()
   productId: string;
-
-  @ManyToOne(() => Product)
-  @JoinColumn({ name: 'productId' })
-  product: Product;
 
   @Column({ length: 100 })
   productName: string;
@@ -48,4 +43,12 @@ export class SalesOrderItem {
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   amount: number;
 
+  @Column({ length: 50, nullable: true })
+  batchCode: string;
+
+  @Column({ length: 50, nullable: true })
+  batchNo: string;
+
+  @Column({ length: 50, nullable: true })
+  locationCode: string;
 }

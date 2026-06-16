@@ -139,10 +139,6 @@ Page({
         quantity: item.quantity,
         price: item.price,
         amount: item.amount,
-        batchNo: item.batchNo || '',
-        productionDate: item.productionDate || '',
-        expiryDate: item.expiryDate || '',
-        locationCode: item.locationCode || '',
       }))
 
       this.setData({
@@ -292,10 +288,6 @@ Page({
       quantity: '',
       price: '',
       amount: '0.00',
-      batchNo: '',
-      productionDate: '',
-      expiryDate: '',
-      locationCode: '',
     }]
 
     this.setData({
@@ -361,37 +353,6 @@ Page({
   },
 
   // ============================================================
-  //  Batch fields
-  // ============================================================
-  onBatchNoInput(e) {
-    const index = e.currentTarget.dataset.index
-    const items = [...this.data.items]
-    items[index].batchNo = e.detail.value
-    this.setData({ items })
-  },
-
-  onProductionDateChange(e) {
-    const index = e.currentTarget.dataset.index
-    const items = [...this.data.items]
-    items[index].productionDate = e.detail.value
-    this.setData({ items })
-  },
-
-  onExpiryDateChange(e) {
-    const index = e.currentTarget.dataset.index
-    const items = [...this.data.items]
-    items[index].expiryDate = e.detail.value
-    this.setData({ items })
-  },
-
-  onLocationCodeInput(e) {
-    const index = e.currentTarget.dataset.index
-    const items = [...this.data.items]
-    items[index].locationCode = e.detail.value
-    this.setData({ items })
-  },
-
-  // ============================================================
   //  Calc
   // ============================================================
   calcTotal() {
@@ -439,18 +400,6 @@ Page({
         wx.showToast({ title: `第${i + 1}项单价无效`, icon: 'none' })
         return false
       }
-      if (!item.batchNo) {
-        wx.showToast({ title: `第${i + 1}项批号不能为空`, icon: 'none' })
-        return false
-      }
-      if (!item.productionDate) {
-        wx.showToast({ title: `第${i + 1}项生产日期不能为空`, icon: 'none' })
-        return false
-      }
-      if (!item.expiryDate) {
-        wx.showToast({ title: `第${i + 1}项有效期不能为空`, icon: 'none' })
-        return false
-      }
     }
     return true
   },
@@ -470,10 +419,6 @@ Page({
         productUnit: item.productUnit,
         quantity: parseFloat(item.quantity),
         price: parseFloat(item.price),
-        batchNo: item.batchNo || '',
-        productionDate: item.productionDate || '',
-        expiryDate: item.expiryDate || '',
-        locationCode: item.locationCode || '',
       })),
     }
   },
@@ -548,12 +493,10 @@ Page({
     this.setData({ submitting: true })
     try {
       await api.put(`/sales/${this.data.id}/status`, { status: 'delivered' })
-      showSuccess('确认出库')
-      this.setData({
-        statusCls: 'delivered',
-        statusText: STATUS_MAP.delivered,
-        submitting: false,
-      })
+      showSuccess('出库单已生成')
+      setTimeout(() => {
+        wx.redirectTo({ url: '/pages/outbound/list' })
+      }, 1000)
     } catch (err) {
       showError(err.message)
       this.setData({ submitting: false })

@@ -20,7 +20,11 @@ Page({
     inboundKeyword: '',
     inboundList: [],
     inboundPage: 1,
-    inboundTotal: 0
+    inboundTotal: 0,
+    outboundKeyword: '',
+    outboundList: [],
+    outboundPage: 1,
+    outboundTotal: 0
   },
 
   onShow() {
@@ -66,6 +70,7 @@ Page({
       case 'purchase': return this.loadPurchase(append)
       case 'sales': return this.loadSales(append)
       case 'inbound': return this.loadInbound(append)
+      case 'outbound': return this.loadOutbound(append)
       case 'inventory': return this.loadInventory(append)
     }
   },
@@ -133,6 +138,22 @@ Page({
     }
   },
 
+  async loadOutbound(append) {
+    try {
+      const params = { page: this.data.outboundPage, pageSize: 20 }
+      if (this.data.outboundKeyword) params.keyword = this.data.outboundKeyword
+      const res = await api.get('/outbound', params)
+      const list = (res.list || []).map(i => ({ ...i, createdAt: formatDate(i.createdAt, 'YYYY-MM-DD HH:mm:ss') }))
+      this.setData({
+        outboundList: append ? [...this.data.outboundList, ...list] : list,
+        outboundTotal: res.total || 0
+      })
+    } catch (err) {
+      showError(err.message)
+      this.setData({ networkError: true })
+    }
+  },
+
   onPurchaseSearchInput(e) {
     this.setData({ purchaseKeyword: e.detail.value })
   },
@@ -176,6 +197,24 @@ Page({
   onInboundTap(e) {
     const id = e.currentTarget.dataset.id
     wx.navigateTo({ url: '/pages/inbound/form?id=' + id })
+  },
+
+  onOutboundSearchInput(e) {
+    this.setData({ outboundKeyword: e.detail.value })
+  },
+
+  onOutboundSearch() {
+    this.setData({ outboundPage: 1 })
+    this.loadOutbound()
+  },
+
+  onViewOutboundList() {
+    wx.navigateTo({ url: '/pages/outbound/list' })
+  },
+
+  onOutboundTap(e) {
+    const id = e.currentTarget.dataset.id
+    wx.navigateTo({ url: '/pages/outbound/form?id=' + id })
   },
 
   onAddPurchase() {

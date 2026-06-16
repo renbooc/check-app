@@ -1,0 +1,67 @@
+/* ============================================================
+   出库单列表 — 玫瑰色主题
+   ============================================================ */
+.page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+}
+.search-bar { padding: 20rpx 20rpx 0; position: sticky; top: 0; z-index: 10; background: #f5f5f5; }
+.search-box { display: flex; align-items: center; background: #fff; border-radius: 12rpx; padding: 0 20rpx; height: 76rpx; box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04); }
+.search-icon { width: 28rpx; height: 28rpx; border-radius: 50%; border: 4rpx solid #ccc; margin-right: 14rpx; flex-shrink: 0; position: relative; }
+.search-icon::after { content: ''; position: absolute; width: 4rpx; height: 10rpx; background: #ccc; bottom: -8rpx; right: -6rpx; transform: rotate(45deg); border-radius: 2rpx; }
+.search-input { flex: 1; height: 100%; font-size: 28rpx; color: #333; }
+.search-clear { width: 36rpx; height: 36rpx; display: flex; align-items: center; justify-content: center; }
+.clear-icon { width: 24rpx; height: 24rpx; border-radius: 50%; background: #ccc; position: relative; }
+.clear-icon::before,.clear-icon::after { content: ''; position: absolute; width: 12rpx; height: 2rpx; background: #fff; top: 50%; left: 50%; border-radius: 1rpx; }
+.clear-icon::before { transform: translate(-50%,-50%) rotate(45deg); }
+.clear-icon::after { transform: translate(-50%,-50%) rotate(-45deg); }
+.status-tabs { display: flex; gap: 12rpx; padding: 16rpx 20rpx 0; overflow-x: auto; white-space: nowrap; }
+.status-tab { padding: 10rpx 24rpx; border-radius: 100rpx; background: #fff; font-size: 24rpx; color: #5c5c5c; flex-shrink: 0; }
+.status-tab.active { background: #E83E8C; color: #fff; font-weight: 600; }
+.status-tab:active { opacity: 0.85; }
+.content-area { padding: 16rpx 20rpx 0; }
+.skeleton-wrap { display: flex; flex-direction: column; gap: 16rpx; }
+.skeleton-card { background: #fff; border-radius: 12rpx; padding: 28rpx; }
+.skeleton-row { display: flex; align-items: center; gap: 20rpx; }
+.skeleton-avatar { width: 64rpx; height: 64rpx; border-radius: 50%; background: #f0f0f0; flex-shrink: 0; }
+.skeleton-lines { flex: 1; display: flex; flex-direction: column; gap: 10rpx; }
+.skeleton-line { height: 24rpx; background: #f0f0f0; border-radius: 4rpx; }
+.skeleton-name { width: 40%; }
+.skeleton-phone { width: 60%; }
+.empty-wrap { padding: 100rpx 0; display: flex; flex-direction: column; align-items: center; gap: 16rpx; }
+.empty-icon-wrap { width: 120rpx; height: 120rpx; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; margin-bottom: 8rpx; }
+.empty-icon-search { width: 48rpx; height: 48rpx; border-radius: 50%; border: 6rpx solid #ccc; position: relative; }
+.empty-icon-search::after { content: ''; position: absolute; width: 6rpx; height: 20rpx; background: #ccc; bottom: -14rpx; right: -10rpx; transform: rotate(45deg); border-radius: 3rpx; }
+.empty-icon-box { width: 48rpx; height: 48rpx; border: 4rpx solid #ccc; border-radius: 8rpx; }
+.empty-title { font-size: 28rpx; font-weight: 600; color: #333; }
+.empty-desc { font-size: 24rpx; color: #999; }
+.list-wrap { display: flex; flex-direction: column; gap: 16rpx; }
+.list-card { display: flex; align-items: flex-start; background: #fff; border-radius: 12rpx; padding: 28rpx; box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04); }
+.list-card:active { background: #FFF0F5; }
+.card-left { flex-shrink: 0; margin-right: 20rpx; }
+.card-avatar { width: 64rpx; height: 64rpx; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28rpx; font-weight: 700; color: #fff; }
+.avatar-outbound { background: linear-gradient(135deg, #E83E8C, #F06292); }
+.card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10rpx; }
+.card-name-row { display: flex; align-items: center; gap: 10rpx; }
+.card-name { font-size: 28rpx; font-weight: 600; color: #333; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-info-row { display: flex; align-items: center; gap: 8rpx; }
+.card-info-text { font-size: 24rpx; color: #5c5c5c; }
+.info-icon-order { width: 20rpx; height: 14rpx; border: 3rpx solid #E83E8C; border-radius: 3rpx; flex-shrink: 0; position: relative; }
+.info-icon-order::after { content: ''; position: absolute; width: 3rpx; height: 8rpx; background: #E83E8C; top: -6rpx; left: 5rpx; border-radius: 1rpx; }
+.info-icon-qty { width: 16rpx; height: 16rpx; border-radius: 2rpx; background: #E83E8C; flex-shrink: 0; }
+.status-tag { font-size: 20rpx; font-weight: 500; padding: 4rpx 12rpx; border-radius: 100rpx; flex-shrink: 0; }
+.tag-pending { background: #FFF0F5; color: #E83E8C; }
+.tag-approved { background: #ECFDF5; color: #00B42A; }
+.tag-cancelled { background: #f5f5f5; color: #999; }
+.load-more { text-align: center; padding: 24rpx 0; }
+.load-more-text { font-size: 24rpx; color: #ccc; }
+.bottom-action { position: fixed; left: 0; right: 0; bottom: 0; z-index: 100; padding: 0 24rpx calc(24rpx + env(safe-area-inset-bottom)); background: linear-gradient(to top, #f5f7fa 60%, transparent); pointer-events: none; }
+.action-inner { display: flex; align-items: center; justify-content: space-between; background: #fff; border-radius: 20rpx; padding: 16rpx 20rpx; box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.08); pointer-events: auto; }
+.action-count { display: flex; align-items: baseline; gap: 4rpx; }
+.count-num { font-size: 36rpx; font-weight: 800; color: #E83E8C; }
+.count-label { font-size: 24rpx; color: #5c5c5c; }
+.action-btn { display: flex; align-items: center; gap: 8rpx; height: 80rpx; padding: 0 36rpx; border-radius: 16rpx; color: #fff; font-size: 28rpx; font-weight: 600; border: none; margin-left: auto; }
+.action-btn:active { opacity: 0.85; }
+.action-btn-outbound { background: #E83E8C; }
+.btn-plus { width: 28rpx; height: 28rpx; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'/%3E%3Cline x1='5' y1='12' x2='19' y2='12'/%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; }

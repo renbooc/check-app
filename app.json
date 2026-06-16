@@ -22,7 +22,9 @@
     "pages/message/message",
     "pages/inbound/list",
     "pages/inbound/form",
-    "pages/warehouse/list"
+    "pages/warehouse/list",
+    "pages/outbound/list",
+    "pages/outbound/form"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",

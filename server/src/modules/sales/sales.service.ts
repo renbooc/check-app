@@ -3,18 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { SalesOrder } from '../../entities/sales-order.entity';
 import { SalesOrderItem } from '../../entities/sales-order-item.entity';
-import { Inventory } from '../../entities/inventory.entity';
-import { InventoryDetail } from '../../entities/inventory-detail.entity';
-import { InventoryLog } from '../../entities/inventory-log.entity';
+import { OutboundService } from '../outbound/outbound.service';
 
 @Injectable()
 export class SalesService {
   constructor(
     @InjectRepository(SalesOrder) private orderRepo: Repository<SalesOrder>,
     @InjectRepository(SalesOrderItem) private itemRepo: Repository<SalesOrderItem>,
-    @InjectRepository(Inventory) private inventoryRepo: Repository<Inventory>,
-    @InjectRepository(InventoryDetail) private detailRepo: Repository<InventoryDetail>,
-    @InjectRepository(InventoryLog) private logRepo: Repository<InventoryLog>,
+    private outboundService: OutboundService,
   ) {}
 
   async findAll(params: { page?: number; pageSize?: number; keyword?: string; status?: string }) {
@@ -156,58 +152,11 @@ export class SalesService {
   async updateStatus(id: string, status: string, operatorId?: string, operatorName?: string) {
     await this.orderRepo.update(id, { status });
 
-    // 确认出库时按 FIFO 扣减库存
+    // 确认出库 → 生成出库单（待审核），不再直接扣减库存
     if (status === 'delivered') {
       const order = await this.findOne(id);
-      if (order && order.items) {
-        for (const item of order.items) {
-          const needQty = Math.abs(parseFloat(item.quantity as any) || 0);
-          if (needQty <= 0) continue;
-
-          // Get batches ordered by productionDate ASC (FIFO)
-          const batches = await this.detailRepo.find({
-            where: { productId: item.productId },
-            order: { productionDate: 'ASC', createdAt: 'ASC' },
-          });
-
-          let remaining = needQty;
-          for (const batch of batches) {
-            if (remaining <= 0) break;
-            const avail = batch.quantity;
-            if (avail <= 0) continue;
-
-            const deduct = Math.min(avail, remaining);
-            batch.quantity -= deduct;
-            remaining -= deduct;
-            await this.detailRepo.save(batch);
-
-            await this.logRepo.save({
-              productId: item.productId,
-              productName: item.productName,
-              type: 'sales_out',
-              changeQuantity: -deduct,
-              beforeQuantity: avail,
-              afterQuantity: batch.quantity,
-              relatedOrderId: id,
-              batchCode: batch.batchCode,
-              batchNo: batch.batchNo,
-              price: batch.price,
-              operatorId,
-              operatorName,
-            });
-          }
-
-          // Update inventory summary
-          const inv = await this.inventoryRepo.findOne({
-            where: { productId: item.productId },
-          });
-          if (inv) {
-            const beforeQty = inv.quantity;
-            inv.quantity = Math.max(0, inv.quantity - needQty);
-            if (inv.quantity === 0) { inv.avgPrice = 0; inv.amount = 0; }
-            await this.inventoryRepo.save(inv);
-          }
-        }
+      if (order) {
+        await this.outboundService.createFromSalesOrder(order, operatorId || '', operatorName || '');
       }
     }
     return this.findOne(id);

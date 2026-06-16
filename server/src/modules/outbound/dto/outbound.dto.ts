@@ -1,8 +1,8 @@
 import { IsString, IsOptional, IsNumber, IsArray, ValidateNested, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
-import { SalesOrderStatus } from '../../../entities/sales-order.entity';
+import { OutboundNoteStatus } from '../../../entities/outbound-note.entity';
 
-export class SalesOrderItemDto {
+export class OutboundNoteItemDto {
   @IsString()
   productId: string;
 
@@ -23,52 +23,36 @@ export class SalesOrderItemDto {
   @IsNumber()
   price: number;
 
+  @IsOptional()
+  @IsString()
+  batchNo?: string;
+
+  @IsOptional()
+  @IsString()
+  locationCode?: string;
 }
 
-export class CreateSalesDto {
-  @IsString()
-  customerId: string;
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => SalesOrderItemDto)
-  items: SalesOrderItemDto[];
-
+export class CreateOutboundDto {
   @IsOptional()
   @IsString()
-  remark?: string;
+  salesOrderId?: string;
 
-  @IsOptional()
-  @IsString()
-  expectedDate?: string;
-
-  @IsOptional()
-  @IsString()
-  warehouseId?: string;
-
-  @IsOptional()
-  @IsString()
-  warehouseName?: string;
-}
-
-export class UpdateSalesDto {
   @IsOptional()
   @IsString()
   customerId?: string;
 
   @IsOptional()
+  @IsString()
+  customerName?: string;
+
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => SalesOrderItemDto)
-  items?: SalesOrderItemDto[];
+  @Type(() => OutboundNoteItemDto)
+  items: OutboundNoteItemDto[];
 
   @IsOptional()
   @IsString()
   remark?: string;
-
-  @IsOptional()
-  @IsString()
-  expectedDate?: string;
 
   @IsOptional()
   @IsString()
@@ -79,12 +63,12 @@ export class UpdateSalesDto {
   warehouseName?: string;
 }
 
-export class UpdateSalesStatusDto {
-  @IsEnum(SalesOrderStatus)
-  status: SalesOrderStatus;
+export class UpdateOutboundStatusDto {
+  @IsEnum(OutboundNoteStatus)
+  status: OutboundNoteStatus;
 }
 
-export class QuerySalesDto {
+export class QueryOutboundDto {
   @IsOptional()
   @Type(() => Number)
   page?: number;
