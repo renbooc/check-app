@@ -63,6 +63,8 @@ Page({
     if (options.id) {
       this.setData({ id: options.id });
       await this.loadOrder(options.id);
+    } else {
+      this.defaultWarehouse();
     }
   },
 
@@ -87,9 +89,20 @@ Page({
   async loadWarehouses() {
     try {
       const res = await api.get("/warehouses", { page: 1, pageSize: 200 });
-      this.setData({ warehouses: res.list || [] });
+      this.setData({ warehouses: Array.isArray(res) ? res : (res.list || []) });
     } catch (err) {
       console.error("[PurchaseForm] loadWarehouses error:", err);
+    }
+  },
+
+  defaultWarehouse() {
+    const warehouses = this.data.warehouses || [];
+    if (warehouses.length > 0) {
+      this.setData({
+        selectedWarehouseIndex: 0,
+        warehouseId: warehouses[0].id,
+        warehouseName: warehouses[0].name,
+      });
     }
   },
 
@@ -303,22 +316,20 @@ Page({
   // ============================================================
   onItemQuantityInput(e) {
     const index = e.currentTarget.dataset.index;
-    const quantity = parseFloat(e.detail.value) || 0;
+    const raw = e.detail.value;
     const items = [...this.data.items];
-    items[index].quantity = quantity;
-    items[index].amount = (
-      quantity * parseFloat(items[index].price || 0)
-    ).toFixed(2);
+    items[index].quantity = raw;
+    items[index].amount = ((parseFloat(raw) || 0) * parseFloat(items[index].price || 0)).toFixed(2);
     this.setData({ items });
     this.calcTotal();
   },
 
   onItemPriceInput(e) {
     const index = e.currentTarget.dataset.index;
-    const price = parseFloat(e.detail.value) || 0;
+    const raw = e.detail.value;
     const items = [...this.data.items];
-    items[index].price = price;
-    items[index].amount = ((items[index].quantity || 0) * price).toFixed(2);
+    items[index].price = raw;
+    items[index].amount = ((parseFloat(raw) || 0) * (parseFloat(items[index].quantity) || 0)).toFixed(2);
     this.setData({ items });
     this.calcTotal();
   },
@@ -524,8 +535,10 @@ Page({
     this.setData({ submitting: true });
     try {
       await api.put(`/purchase/${this.data.id}/status`, { status: 'received' });
-      showSuccess('确认入库');
-      setTimeout(() => wx.navigateBack(), 1000);
+      showSuccess('入库单已生成');
+      setTimeout(() => {
+        wx.redirectTo({ url: '/pages/inbound/list' });
+      }, 1000);
     } catch (err) {
       showError(err.message);
     } finally {

@@ -129,6 +129,19 @@ export class ProductService {
     return this.warehouseRepo.save(dto);
   }
 
+  async getWarehouse(id: string) {
+    return this.warehouseRepo.findOne({ where: { id } });
+  }
+
+  async updateWarehouse(id: string, dto: Partial<Warehouse>) {
+    await this.warehouseRepo.update(id, dto);
+    return this.warehouseRepo.findOne({ where: { id } });
+  }
+
+  async deleteWarehouse(id: string) {
+    return this.warehouseRepo.delete(id);
+  }
+
   async getLocations(warehouseId?: string) {
     const where: any = {};
     if (warehouseId) where.warehouseId = warehouseId;

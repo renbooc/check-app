@@ -59,34 +59,26 @@
       </view>
     </view>
 
-    <view class="order-form-item" wx:if="{{id}}">
+    <view class="order-form-item">
       <text class="order-form-label">订单编号</text>
       <text class="order-form-value" wx:if="{{orderNo}}">{{orderNo}}</text>
       <text class="order-form-value placeholder" wx:else>保存后自动生成</text>
     </view>
 
-    <view class="order-form-item" wx:if="{{id}}">
+    <view class="order-form-item">
       <text class="order-form-label">订单状态</text>
       <text class="order-form-value status-tag-{{statusCls}}">{{statusText || '新建'}}</text>
     </view>
 
     <view class="order-form-item">
       <text class="order-form-label">仓库</text>
-      <picker
-        wx:if="{{warehouses.length > 0 && !readonly}}"
-        mode="selector"
-        range="{{warehouses}}"
-        range-key="name"
-        value="{{warehouseIndex >= 0 ? warehouseIndex : 0}}"
-        bindchange="onWarehouseChange"
-      >
-        <view class="order-form-picker {{warehouseIndex >= 0 ? 'has-value' : ''}}">
-          <text wx:if="{{warehouseIndex >= 0 && selectedWarehouse}}">{{selectedWarehouse.name}}</text>
+      <picker mode="selector" range="{{warehouses}}" range-key="name" value="{{warehouseIndex}}" bindchange="onWarehouseChange" disabled="{{readonly}}">
+        <view class="order-form-picker {{warehouseName ? 'has-value' : ''}}">
+          <text wx:if="{{warehouseName}}">{{warehouseName}}</text>
           <text wx:else class="placeholder">选择仓库</text>
-          <view class="picker-arrow"></view>
+          <view class="picker-arrow" wx:if="{{!readonly}}"></view>
         </view>
       </picker>
-      <text class="order-form-value" wx:else>{{selectedWarehouse ? selectedWarehouse.name : '未选择'}}</text>
     </view>
 
     <view class="order-form-item">
@@ -233,52 +225,58 @@
             </view>
 
             <!-- 批号/生产日期/有效期/货位号 -->
-            <view class="item-batch-row">
-              <view class="batch-field">
-                <text class="batch-label">批号</text>
-                <input
-                  class="batch-input"
-                  wx:if="{{!readonly}}"
-                  placeholder="选填"
-                  placeholder-class="placeholder"
-                  value="{{item.batchNo}}"
-                  data-index="{{index}}"
-                  bindinput="onBatchNoInput"
-                />
-                <text class="batch-value" wx:else>{{item.batchNo || '-'}}</text>
+            <view class="item-extra-fields" wx:if="{{!readonly}}">
+              <view class="item-extra-row">
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">批号</text>
+                  <input class="item-extra-input" type="text" placeholder="必填" placeholder-class="placeholder" value="{{item.batchNo}}" data-index="{{index}}" bindinput="onBatchNoInput" />
+                </view>
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">货位号</text>
+                  <input class="item-extra-input" type="text" placeholder="选填" placeholder-class="placeholder" value="{{item.locationCode}}" data-index="{{index}}" bindinput="onLocationCodeInput" />
+                </view>
               </view>
-              <view class="batch-field">
-                <text class="batch-label">生产日期</text>
-                <picker mode="date" value="{{item.productionDate}}" data-index="{{index}}" bindchange="onProductionDateChange" disabled="{{readonly}}">
-                  <view class="batch-picker {{item.productionDate ? 'has-value' : ''}}">
-                    <text wx:if="{{item.productionDate}}">{{item.productionDate}}</text>
-                    <text wx:else class="placeholder">选填</text>
-                  </view>
-                </picker>
+              <view class="item-extra-row">
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">生产日期</text>
+                  <picker mode="date" value="{{item.productionDate}}" data-index="{{index}}" bindchange="onProductionDateChange">
+                    <view class="item-extra-picker {{item.productionDate ? 'has-value' : ''}}">
+                      <text wx:if="{{item.productionDate}}">{{item.productionDate}}</text>
+                      <text wx:else class="placeholder">必填</text>
+                    </view>
+                  </picker>
+                </view>
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">有效期</text>
+                  <picker mode="date" value="{{item.expiryDate}}" data-index="{{index}}" bindchange="onExpiryDateChange">
+                    <view class="item-extra-picker {{item.expiryDate ? 'has-value' : ''}}">
+                      <text wx:if="{{item.expiryDate}}">{{item.expiryDate}}</text>
+                      <text wx:else class="placeholder">必填</text>
+                    </view>
+                  </picker>
+                </view>
               </view>
             </view>
-            <view class="item-batch-row">
-              <view class="batch-field">
-                <text class="batch-label">有效期</text>
-                <picker mode="date" value="{{item.expiryDate}}" data-index="{{index}}" bindchange="onExpiryDateChange" disabled="{{readonly}}">
-                  <view class="batch-picker {{item.expiryDate ? 'has-value' : ''}}">
-                    <text wx:if="{{item.expiryDate}}">{{item.expiryDate}}</text>
-                    <text wx:else class="placeholder">选填</text>
-                  </view>
-                </picker>
+            <view class="item-extra-fields" wx:else>
+              <view class="item-extra-row">
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">批号</text>
+                  <text class="item-extra-value">{{item.batchNo || '-'}}</text>
+                </view>
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">货位号</text>
+                  <text class="item-extra-value">{{item.locationCode || '-'}}</text>
+                </view>
               </view>
-              <view class="batch-field">
-                <text class="batch-label">货位号</text>
-                <input
-                  class="batch-input"
-                  wx:if="{{!readonly}}"
-                  placeholder="选填"
-                  placeholder-class="placeholder"
-                  value="{{item.locationCode}}"
-                  data-index="{{index}}"
-                  bindinput="onLocationCodeInput"
-                />
-                <text class="batch-value" wx:else>{{item.locationCode || '-'}}</text>
+              <view class="item-extra-row">
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">生产日期</text>
+                  <text class="item-extra-value">{{item.productionDate || '-'}}</text>
+                </view>
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">有效期</text>
+                  <text class="item-extra-value">{{item.expiryDate || '-'}}</text>
+                </view>
               </view>
             </view>
 

@@ -1,8 +1,8 @@
 import { IsString, IsOptional, IsNumber, IsArray, ValidateNested, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
-import { PurchaseOrderStatus } from '../../../entities/purchase-order.entity';
+import { InboundNoteStatus } from '../../../entities/inbound-note.entity';
 
-export class PurchaseOrderItemDto {
+export class InboundNoteItemDto {
   @IsString()
   productId: string;
 
@@ -37,22 +37,24 @@ export class PurchaseOrderItemDto {
   locationCode?: string;
 }
 
-export class CreatePurchaseDto {
+export class CreateInboundDto {
+  @IsString()
+  purchaseOrderId: string;
+
   @IsString()
   supplierId: string;
 
+  @IsString()
+  supplierName: string;
+
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => PurchaseOrderItemDto)
-  items: PurchaseOrderItemDto[];
+  @Type(() => InboundNoteItemDto)
+  items: InboundNoteItemDto[];
 
   @IsOptional()
   @IsString()
   remark?: string;
-
-  @IsOptional()
-  @IsString()
-  expectedDate?: string;
 
   @IsOptional()
   @IsString()
@@ -63,40 +65,12 @@ export class CreatePurchaseDto {
   warehouseName?: string;
 }
 
-export class UpdatePurchaseDto {
-  @IsOptional()
-  @IsString()
-  supplierId?: string;
-
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => PurchaseOrderItemDto)
-  items?: PurchaseOrderItemDto[];
-
-  @IsOptional()
-  @IsString()
-  remark?: string;
-
-  @IsOptional()
-  @IsString()
-  expectedDate?: string;
-
-  @IsOptional()
-  @IsString()
-  warehouseId?: string;
-
-  @IsOptional()
-  @IsString()
-  warehouseName?: string;
+export class UpdateInboundStatusDto {
+  @IsEnum(InboundNoteStatus)
+  status: InboundNoteStatus;
 }
 
-export class UpdatePurchaseStatusDto {
-  @IsEnum(PurchaseOrderStatus)
-  status: PurchaseOrderStatus;
-}
-
-export class QueryPurchaseDto {
+export class QueryInboundDto {
   @IsOptional()
   @Type(() => Number)
   page?: number;

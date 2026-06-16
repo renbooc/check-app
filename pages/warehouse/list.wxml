@@ -1,0 +1,127 @@
+<view class="page">
+
+  <!-- ========== 搜索栏 ========== -->
+  <view class="search-bar">
+    <view class="search-box">
+      <view class="search-icon"></view>
+      <input class="search-input" placeholder="搜索仓库名称/地址" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearch" confirm-type="search" />
+      <view class="search-clear" wx:if="{{keyword}}" bindtap="onClearSearch">
+        <view class="clear-icon"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 内容区域 ========== -->
+  <view class="content-area">
+
+    <!-- 加载骨架 -->
+    <view class="skeleton-wrap" wx:if="{{loading && list.length === 0}}">
+      <view class="skeleton-card" wx:for="{{[1,2,3]}}" wx:key="*this">
+        <view class="skeleton-row">
+          <view class="skeleton-avatar"></view>
+          <view class="skeleton-lines">
+            <view class="skeleton-line skeleton-name"></view>
+            <view class="skeleton-line skeleton-phone"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 搜索为空 -->
+    <view class="empty-wrap" wx:elif="{{searched && list.length === 0}}">
+      <view class="empty-icon-wrap">
+        <view class="empty-icon-search"></view>
+      </view>
+      <text class="empty-title">未找到匹配仓库</text>
+      <text class="empty-desc">试试其他关键词</text>
+    </view>
+
+    <!-- 数据为空 -->
+    <view class="empty-wrap" wx:elif="{{!loading && !searched && list.length === 0 && loaded}}">
+      <view class="empty-icon-wrap">
+        <view class="empty-icon-box"></view>
+      </view>
+      <text class="empty-title">暂无仓库</text>
+      <text class="empty-desc">点击下方按钮添加首个仓库</text>
+    </view>
+
+    <!-- 列表 -->
+    <view class="list-wrap" wx:else>
+      <view class="list-card" wx:for="{{list}}" wx:key="id" bindtap="onEdit" data-id="{{item.id}}">
+        <view class="card-left">
+          <view class="card-avatar avatar-warehouse">{{item.initial}}</view>
+        </view>
+        <view class="card-body">
+          <view class="card-name-row">
+            <text class="card-name">{{item.name}}</text>
+            <view class="status-tag tag-{{item.statusCls}}">{{item.statusLabel}}</view>
+          </view>
+          <view class="card-info-row" wx:if="{{item.address}}">
+            <view class="info-icon info-icon-addr"></view>
+            <text class="card-info-text">{{item.address}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 加载更多 -->
+      <view class="load-more" wx:if="{{list.length > 0 && list.length < total}}">
+        <text class="load-more-text">上拉加载更多</text>
+      </view>
+      <view class="load-more" wx:elif="{{list.length > 0 && list.length >= total && total > 0}}">
+        <text class="load-more-text">— 已显示全部 {{total}} 个仓库 —</text>
+      </view>
+    </view>
+
+  </view>
+
+  <!-- ========== 底部操作栏 ========== -->
+  <view class="bottom-action">
+    <view class="action-inner">
+      <view class="action-count" wx:if="{{total > 0}}">
+        <text class="count-num">{{total}}</text>
+        <text class="count-label">个仓库</text>
+      </view>
+      <view class="action-btn action-btn-warehouse" bindtap="onAdd">
+        <view class="btn-plus"></view>
+        <text>添加仓库</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 弹窗表单 ========== -->
+  <view class="modal-mask" wx:if="{{showModal}}" bindtap="onCloseModal"></view>
+  <view class="modal-panel {{showModal ? 'show' : ''}}">
+    <view class="modal-header">
+      <text class="modal-title">{{editingId ? '编辑仓库' : '新增仓库'}}</text>
+      <view class="modal-close" bindtap="onCloseModal">
+        <view class="close-icon"></view>
+      </view>
+    </view>
+    <view class="modal-body">
+      <view class="form-row">
+        <text class="form-label">名称</text>
+        <input class="form-input" placeholder="仓库名称" value="{{form.name}}" bindinput="onFormFieldInput" data-field="name" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">地址</text>
+        <input class="form-input" placeholder="仓库地址（选填）" value="{{form.address}}" bindinput="onFormFieldInput" data-field="address" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">状态</text>
+        <picker mode="selector" range="{{statusNames}}" value="{{statusIndex}}" bindchange="onStatusChange">
+          <view class="form-picker has-value">
+            <text>{{statusNames[statusIndex]}}</text>
+            <view class="picker-arrow"></view>
+          </view>
+        </picker>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-delete" wx:if="{{editingId}}" bindtap="onDelete">删除</button>
+      <view class="footer-right">
+        <button class="btn-cancel" bindtap="onCloseModal">取消</button>
+        <button class="btn-confirm btn-confirm-warehouse" bindtap="onSave">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

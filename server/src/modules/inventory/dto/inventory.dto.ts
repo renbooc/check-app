@@ -1,6 +1,15 @@
 import { IsString, IsOptional, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class QueryInventoryDto {
+  @IsOptional()
+  @Type(() => Number)
+  page?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  pageSize?: number;
+
   @IsOptional()
   @IsString()
   keyword?: string;
@@ -42,9 +51,11 @@ export class SaveCheckDto {
 
 export class QueryCheckRecordDto {
   @IsOptional()
+  @Type(() => Number)
   page?: number;
 
   @IsOptional()
+  @Type(() => Number)
   pageSize?: number;
 
   @IsOptional()

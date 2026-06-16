@@ -232,6 +232,9 @@
 
 .order-form-item-column .order-form-label {
   margin-bottom: 14rpx;
+  margin-right: 0;
+  text-align: left;
+  width: 100%;
 }
 
 .order-form-item-column > view {
@@ -681,69 +684,70 @@
   color: #10B981;
 }
 
-/* ---------- 批号/生产日期/有效期/货位号 ---------- */
-.item-batch-row {
+/* ---------- 商品额外字段（批号/生产日期/有效期/货位号） ---------- */
+.item-extra-fields {
+  margin-top: 14rpx;
+  padding-top: 14rpx;
+  border-top: 2rpx solid rgba(0, 0, 0, 0.04);
+}
+
+.item-extra-row {
   display: flex;
   gap: 14rpx;
-  margin-top: 10rpx;
-  padding-top: 10rpx;
-  border-top: 2rpx solid rgba(0, 0, 0, 0.03);
+  margin-bottom: 10rpx;
 }
 
-.item-batch-row:first-of-type {
-  border-top: none;
-  margin-top: 0;
+.item-extra-row:last-child {
+  margin-bottom: 0;
 }
 
-.batch-field {
+.item-extra-field {
+  flex: 1;
+}
+
+.item-extra-field-half {
   flex: 1;
   min-width: 0;
 }
 
-.batch-label {
+.item-extra-label {
   display: block;
-  font-size: 20rpx;
+  font-size: 22rpx;
   color: #5c5c5c;
-  margin-bottom: 4rpx;
+  margin-bottom: 6rpx;
 }
 
-.batch-input {
-  height: 56rpx;
-  line-height: 56rpx;
+.item-extra-input {
   background: #FFFFFF;
-  border-radius: 6rpx;
-  padding: 0 10rpx;
-  font-size: 24rpx;
+  border-radius: 8rpx;
+  padding: 0 12rpx;
+  height: 60rpx;
+  font-size: 26rpx;
   color: #333333;
   width: 100%;
   box-sizing: border-box;
 }
 
-.batch-picker {
-  height: 56rpx;
-  line-height: 56rpx;
+.item-extra-picker {
+  display: flex;
+  align-items: center;
   background: #FFFFFF;
-  border-radius: 6rpx;
-  padding: 0 10rpx;
-  font-size: 24rpx;
+  border-radius: 8rpx;
+  padding: 0 12rpx;
+  height: 60rpx;
+  font-size: 26rpx;
   color: #333333;
-  width: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.batch-picker.has-value {
+.item-extra-picker.has-value {
   color: #10B981;
 }
 
-.batch-value {
-  height: 56rpx;
-  line-height: 56rpx;
-  font-size: 24rpx;
+.item-extra-value {
+  font-size: 26rpx;
   color: #333333;
-  display: block;
+  height: 60rpx;
+  line-height: 60rpx;
 }
 
 /* 只读值 */

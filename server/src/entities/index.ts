@@ -14,3 +14,5 @@ export { PurchaseOrder } from './purchase-order.entity';
 export { PurchaseOrderItem } from './purchase-order-item.entity';
 export { SalesOrder } from './sales-order.entity';
 export { SalesOrderItem } from './sales-order-item.entity';
+export { InboundNote } from './inbound-note.entity';
+export { InboundNoteItem } from './inbound-note-item.entity';

@@ -1,0 +1,249 @@
+<view class="page">
+
+  <!-- ===== 页面头部 ===== -->
+  <view class="page-header">
+    <text class="page-header-title">{{id ? '采购入库单详情' : '新增采购入库单'}}</text>
+    <text class="page-header-sub">{{id ? (editing ? '编辑入库信息，确认后提交审核' : '查看入库信息，可编辑修改') : '填写以下信息创建入库单'}}</text>
+  </view>
+
+  <!-- 状态提示 -->
+  <view class="status-banner status-banner-{{statusCls}}" wx:if="{{id}}">
+    <text class="status-banner-text">● {{statusText}}</text>
+  </view>
+
+  <!-- ===== 入库单信息 ===== -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-header-left">
+        <view class="section-icon section-icon-inbound"></view>
+        <text class="section-title">入库单信息</text>
+      </view>
+    </view>
+
+    <view class="order-form-item order-form-item-column">
+      <text class="order-form-label">供应商</text>
+      <view class="supplier-selected-inline">
+        <view class="supplier-avatar-sm">{{supplierInitial}}</view>
+        <text class="supplier-name-inline">{{supplierName}}</text>
+      </view>
+    </view>
+
+    <view class="order-form-item">
+      <text class="order-form-label">入库单号</text>
+      <text class="order-form-value">{{orderNo}}</text>
+    </view>
+
+    <view class="order-form-item" wx:if="{{purchaseOrderNo}}">
+      <text class="order-form-label">来源采购单</text>
+      <text class="order-form-value purchase-link">{{purchaseOrderNo}}</text>
+    </view>
+
+    <view class="order-form-item">
+      <text class="order-form-label">仓库</text>
+      <text class="order-form-value">{{warehouseName || '未指定'}}</text>
+    </view>
+
+    <view class="order-form-item">
+      <text class="order-form-label">入库日期</text>
+      <picker mode="date" value="{{inboundDate}}" bindchange="onDateChange" disabled="{{!editing}}">
+        <view class="order-form-picker {{inboundDate ? 'has-value' : ''}}">
+          <text wx:if="{{inboundDate}}">{{inboundDate}}</text>
+          <text wx:else class="placeholder">选择日期</text>
+          <view class="picker-arrow" wx:if="{{!readonly}}"></view>
+        </view>
+      </picker>
+    </view>
+
+    <view class="order-form-item">
+      <text class="order-form-label">备注</text>
+      <input
+        class="order-form-input"
+        placeholder="选填"
+        placeholder-class="placeholder"
+        value="{{remark}}"
+        maxlength="200"
+        bindinput="onRemarkInput"
+        disabled="{{!editing}}"
+      />
+    </view>
+  </view>
+
+  <!-- ===== 商品明细 ===== -->
+  <view class="section-card">
+    <view class="section-header">
+      <view class="section-header-left">
+        <view class="section-icon section-icon-items"></view>
+        <text class="section-title">入库商品</text>
+      </view>
+      <view class="items-count">
+        <text class="items-count-num">{{items.length}}</text>
+        <text class="items-count-label">项</text>
+      </view>
+    </view>
+
+    <view class="items-list" wx:if="{{items.length > 0}}">
+      <view class="item-card" wx:for="{{items}}" wx:key="index">
+
+        <view class="item-card-body">
+          <!-- 行号徽章 -->
+          <view class="row-badge">
+            <text class="row-badge-text">{{index + 1}}</text>
+          </view>
+
+          <!-- 商品信息 -->
+          <view class="item-content">
+            <view class="item-content-top">
+              <view class="item-product-info">
+                <text class="item-name">{{item.productName}}</text>
+                <view class="item-meta">
+                  <text class="item-meta-text" wx:if="{{item.productSpec}}">{{item.productSpec}}</text>
+                  <text class="item-meta-divider" wx:if="{{item.productSpec && item.productUnit}}">·</text>
+                  <text class="item-meta-text" wx:if="{{item.productUnit}}">{{item.productUnit}}</text>
+                </view>
+                <text class="item-manufacturer">{{item.productManufacturer || '-'}}</text>
+              </view>
+              <view class="item-amount-top" wx:if="{{!editing}}">
+                <text class="item-amount-top-value">¥{{item.amount || '0.00'}}</text>
+              </view>
+              <view class="item-remove-btn" wx:if="{{editing}}" bindtap="onRemoveItem" data-index="{{index}}">
+                <text class="item-remove-icon">✕</text>
+              </view>
+            </view>
+
+            <!-- 编辑模式：数量/单价/小计 -->
+            <view class="item-prices" wx:if="{{editing}}">
+              <view class="item-prices-row">
+                <view class="item-price-field">
+                  <text class="item-price-label">数量</text>
+                  <view class="qty-control">
+                    <view class="qty-btn" bindtap="onQtyDecrease" data-index="{{index}}">−</view>
+                    <input class="qty-input" type="digit" placeholder="0" placeholder-class="placeholder-center" value="{{item.quantity}}" data-index="{{index}}" bindinput="onItemQuantityInput" />
+                    <view class="qty-btn" bindtap="onQtyIncrease" data-index="{{index}}">+</view>
+                  </view>
+                </view>
+                <view class="item-price-field">
+                  <text class="item-price-label">单价</text>
+                  <view class="price-wrap">
+                    <text class="price-symbol">¥</text>
+                    <input class="price-input" type="digit" placeholder="0.00" placeholder-class="placeholder-center" value="{{item.price}}" data-index="{{index}}" bindinput="onItemPriceInput" />
+                  </view>
+                </view>
+              </view>
+              <view class="item-subtotal">
+                <text class="subtotal-label">小计</text>
+                <text class="subtotal-value">¥{{item.amount || '0.00'}}</text>
+              </view>
+            </view>
+            <!-- 只读模式：数量/单价 -->
+            <view class="item-prices-readonly" wx:else>
+              <view class="price-inline-row">
+                <text class="price-inline-label">数量</text>
+                <text class="price-inline-value">{{item.quantity}}</text>
+                <text class="price-inline-sep">·</text>
+                <text class="price-inline-label">单价</text>
+                <text class="price-inline-value">¥{{item.price}}</text>
+              </view>
+            </view>
+
+            <!-- 批号/生产日期/有效期/货位号 -->
+            <view class="item-extra-fields" wx:if="{{editing}}">
+              <view class="item-extra-row">
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">批号</text>
+                  <input class="item-extra-input" type="text" placeholder="必填" placeholder-class="placeholder" value="{{item.batchNo}}" data-index="{{index}}" bindinput="onBatchNoInput" />
+                </view>
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">货位号</text>
+                  <input class="item-extra-input" type="text" placeholder="选填" placeholder-class="placeholder" value="{{item.locationCode}}" data-index="{{index}}" bindinput="onLocationCodeInput" />
+                </view>
+              </view>
+              <view class="item-extra-row">
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">生产日期</text>
+                  <picker mode="date" value="{{item.productionDate}}" data-index="{{index}}" bindchange="onProductionDateChange">
+                    <view class="item-extra-picker {{item.productionDate ? 'has-value' : ''}}">
+                      <text wx:if="{{item.productionDate}}">{{item.productionDate}}</text>
+                      <text wx:else class="placeholder">必填</text>
+                    </view>
+                  </picker>
+                </view>
+                <view class="item-extra-field item-extra-field-half">
+                  <text class="item-extra-label">有效期</text>
+                  <picker mode="date" value="{{item.expiryDate}}" data-index="{{index}}" bindchange="onExpiryDateChange">
+                    <view class="item-extra-picker {{item.expiryDate ? 'has-value' : ''}}">
+                      <text wx:if="{{item.expiryDate}}">{{item.expiryDate}}</text>
+                      <text wx:else class="placeholder">必填</text>
+                    </view>
+                  </picker>
+                </view>
+              </view>
+            </view>
+            <!-- 只读：批号/生产日期/有效期/货位号 -->
+            <view class="item-extra-readonly" wx:else>
+              <view class="item-extra-ro-row">
+                <view class="item-extra-ro-field">
+                  <text class="item-extra-ro-label">批号</text>
+                  <text class="item-extra-ro-value">{{item.batchNo || '-'}}</text>
+                </view>
+                <view class="item-extra-ro-field">
+                  <text class="item-extra-ro-label">生产日期</text>
+                  <text class="item-extra-ro-value">{{item.productionDate || '-'}}</text>
+                </view>
+              </view>
+              <view class="item-extra-ro-row">
+                <view class="item-extra-ro-field">
+                  <text class="item-extra-ro-label">有效期</text>
+                  <text class="item-extra-ro-value">{{item.expiryDate || '-'}}</text>
+                </view>
+                <view class="item-extra-ro-field">
+                  <text class="item-extra-ro-label">货位号</text>
+                  <text class="item-extra-ro-value">{{item.locationCode || '-'}}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+      </view>
+    </view>
+
+    <!-- 底部合计 -->
+    <view class="section-summary" wx:if="{{items.length > 0}}">
+      <view class="section-summary-row">
+        <text class="summary-label">合计</text>
+        <text class="summary-qty">{{totalQuantity || 0}} 件</text>
+        <text class="summary-amount">¥ {{totalAmount || '0.00'}}</text>
+      </view>
+    </view>
+
+    <view class="items-empty" wx:if="{{items.length === 0}}">
+      <text class="items-empty-text">暂无商品</text>
+    </view>
+  </view>
+
+  <!-- ===== 底部操作栏（待审核） ===== -->
+  <view class="bottom-bar" wx:if="{{statusCls === 'pending'}}">
+    <view class="bottom-inner">
+      <view class="bottom-inner-actions">
+        <button class="action-btn action-back" bindtap="onBack">返回</button>
+        <button class="action-btn action-edit-toggle" wx:if="{{!editing}}" bindtap="onToggleEdit" disabled="{{submitting}}">
+          编辑
+        </button>
+        <button class="action-btn action-save" wx:if="{{editing}}" bindtap="onSave" disabled="{{submitting}}">
+          {{submitting ? '保存中...' : '保存'}}
+        </button>
+        <button class="action-btn action-approve" bindtap="onApprove" disabled="{{submitting}}">
+          {{submitting ? '处理中...' : '审核通过'}}
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 底部操作栏（已审核/已取消 = 只读） ===== -->
+  <view class="bottom-bar" wx:else>
+    <view class="bottom-inner bottom-inner-single">
+      <button class="action-btn action-back-full" bindtap="onBack">返回列表</button>
+    </view>
+  </view>
+
+</view>

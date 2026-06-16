@@ -3,16 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { PurchaseOrder } from '../../entities/purchase-order.entity';
 import { PurchaseOrderItem } from '../../entities/purchase-order-item.entity';
-import { Inventory } from '../../entities/inventory.entity';
-import { InventoryLog } from '../../entities/inventory-log.entity';
+import { InboundService } from '../inbound/inbound.service';
 
 @Injectable()
 export class PurchaseService {
   constructor(
     @InjectRepository(PurchaseOrder) private orderRepo: Repository<PurchaseOrder>,
     @InjectRepository(PurchaseOrderItem) private itemRepo: Repository<PurchaseOrderItem>,
-    @InjectRepository(Inventory) private inventoryRepo: Repository<Inventory>,
-    @InjectRepository(InventoryLog) private logRepo: Repository<InventoryLog>,
+    private inboundService: InboundService,
   ) {}
 
   async findAll(params: { page?: number; pageSize?: number; keyword?: string; status?: string }) {
@@ -146,31 +144,11 @@ export class PurchaseService {
   async updateStatus(id: string, status: string, operatorId?: string, operatorName?: string) {
     await this.orderRepo.update(id, { status });
 
-    // 确认入库时更新库存
+    // 确认入库 → 生成入库单（待审核），不再直接改库存
     if (status === 'received') {
       const order = await this.findOne(id);
-      if (order && order.items) {
-        for (const item of order.items) {
-          const existing = await this.inventoryRepo.findOne({
-            where: { productId: item.productId },
-          });
-          if (existing) {
-            const beforeQty = existing.quantity;
-            existing.quantity += item.quantity;
-            await this.inventoryRepo.save(existing);
-            await this.logRepo.save({
-              productId: item.productId,
-              productName: item.productName,
-              type: 'purchase_in',
-              changeQuantity: item.quantity,
-              beforeQuantity: beforeQty,
-              afterQuantity: existing.quantity,
-              relatedOrderId: id,
-              operatorId,
-              operatorName,
-            });
-          }
-        }
+      if (order) {
+        await this.inboundService.createFromPurchaseOrder(order, operatorId || '', operatorName || '');
       }
     }
     return this.findOne(id);

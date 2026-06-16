@@ -140,6 +140,7 @@ export class InventoryService {
     const qb = this.inventoryRepo
       .createQueryBuilder('i')
       .leftJoinAndSelect('i.product', 'p')
+      .leftJoinAndSelect('p.unit', 'u')
       .leftJoinAndSelect('i.warehouse', 'w')
       .leftJoinAndSelect('i.location', 'l');
 

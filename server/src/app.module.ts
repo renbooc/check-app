@@ -14,6 +14,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
 import { PurchaseModule } from './modules/purchase/purchase.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { ReportModule } from './modules/report/report.module';
+import { InboundModule } from './modules/inbound/inbound.module';
 import { User } from './entities/user.entity';
 import { Product } from './entities/product.entity';
 import { Category } from './entities/category.entity';
@@ -31,6 +32,8 @@ import { PurchaseOrderItem } from './entities/purchase-order-item.entity';
 import { SalesOrder } from './entities/sales-order.entity';
 import { SalesOrderItem } from './entities/sales-order-item.entity';
 import { Notification } from './entities/notification.entity';
+import { InboundNote } from './entities/inbound-note.entity';
+import { InboundNoteItem } from './entities/inbound-note-item.entity';
 
 const entities = [
   User,
@@ -50,6 +53,8 @@ const entities = [
   SalesOrder,
   SalesOrderItem,
   Notification,
+  InboundNote,
+  InboundNoteItem,
 ];
 
 @Module({
@@ -93,6 +98,7 @@ const entities = [
     PurchaseModule,
     SalesModule,
     ReportModule,
+    InboundModule,
   ],
   controllers: [AppController],
   providers: [

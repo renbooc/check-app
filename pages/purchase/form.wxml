@@ -156,7 +156,7 @@
     <view class="items-list" wx:if="{{items.length > 0}}">
       <view class="item-card" wx:for="{{items}}" wx:key="index">
 
-        <view class="item-card-body">
+        <view class="item-card-body{{readonly ? ' item-card-body-readonly' : ''}}">
           <!-- 行号徽章 -->
           <view class="row-badge">
             <text class="row-badge-text">{{index + 1}}</text>
@@ -172,18 +172,22 @@
                   <text class="item-meta-divider" wx:if="{{item.productSpec && item.productUnit}}">·</text>
                   <text class="item-meta-text" wx:if="{{item.productUnit}}">{{item.productUnit}}</text>
                 </view>
-                <text class="item-manufacturer" wx:if="{{item.productManufacturer}}">{{item.productManufacturer}}</text>
+                <text class="item-manufacturer">{{item.productManufacturer || '-'}}</text>
+              </view>
+              <view class="item-amount-top" wx:if="{{readonly}}">
+                <text class="item-amount-top-value">¥{{item.amount || '0.00'}}</text>
               </view>
               <view class="item-remove-btn" wx:if="{{!readonly}}" bindtap="onRemoveItem" data-index="{{index}}">
                 <text class="item-remove-icon">✕</text>
               </view>
             </view>
 
-            <view class="item-prices">
+            <!-- 编辑模式：数量/单价/小计 -->
+            <view class="item-prices" wx:if="{{!readonly}}">
               <view class="item-prices-row">
                 <view class="item-price-field">
                   <text class="item-price-label">数量</text>
-                  <view class="qty-control" wx:if="{{!readonly}}">
+                  <view class="qty-control">
                     <view class="qty-btn" bindtap="onQtyDecrease" data-index="{{index}}">−</view>
                     <input
                       class="qty-input"
@@ -196,11 +200,10 @@
                     />
                     <view class="qty-btn" bindtap="onQtyIncrease" data-index="{{index}}">+</view>
                   </view>
-                  <text class="item-readonly-value" wx:else>{{item.quantity}}</text>
                 </view>
                 <view class="item-price-field">
                   <text class="item-price-label">单价</text>
-                  <view class="price-wrap" wx:if="{{!readonly}}">
+                  <view class="price-wrap">
                     <text class="price-symbol">¥</text>
                     <input
                       class="price-input"
@@ -212,12 +215,21 @@
                       bindinput="onItemPriceInput"
                     />
                   </view>
-                  <text class="item-readonly-value" wx:else>¥{{item.price}}</text>
                 </view>
               </view>
               <view class="item-subtotal">
                 <text class="subtotal-label">小计</text>
                 <text class="subtotal-value">¥{{item.amount || '0.00'}}</text>
+              </view>
+            </view>
+            <!-- 只读模式：数量/单价 -->
+            <view class="item-prices-readonly" wx:else>
+              <view class="price-inline-row">
+                <text class="price-inline-label">数量</text>
+                <text class="price-inline-value">{{item.quantity}}</text>
+                <text class="price-inline-sep">·</text>
+                <text class="price-inline-label">单价</text>
+                <text class="price-inline-value">¥{{item.price}}</text>
               </view>
             </view>
 
@@ -254,25 +266,26 @@
                 </view>
               </view>
             </view>
-            <view class="item-extra-fields" wx:else>
-              <view class="item-extra-row">
-                <view class="item-extra-field item-extra-field-half">
-                  <text class="item-extra-label">批号</text>
-                  <text class="item-extra-value">{{item.batchNo || '-'}}</text>
+            <!-- 只读：批号/生产日期/有效期/货位号 2行网格 -->
+            <view class="item-extra-readonly" wx:else>
+              <view class="item-extra-ro-row">
+                <view class="item-extra-ro-field">
+                  <text class="item-extra-ro-label">批号</text>
+                  <text class="item-extra-ro-value">{{item.batchNo || '-'}}</text>
                 </view>
-                <view class="item-extra-field item-extra-field-half">
-                  <text class="item-extra-label">货位号</text>
-                  <text class="item-extra-value">{{item.locationCode || '-'}}</text>
+                <view class="item-extra-ro-field">
+                  <text class="item-extra-ro-label">生产日期</text>
+                  <text class="item-extra-ro-value">{{item.productionDate || '-'}}</text>
                 </view>
               </view>
-              <view class="item-extra-row">
-                <view class="item-extra-field item-extra-field-half">
-                  <text class="item-extra-label">生产日期</text>
-                  <text class="item-extra-value">{{item.productionDate || '-'}}</text>
+              <view class="item-extra-ro-row">
+                <view class="item-extra-ro-field">
+                  <text class="item-extra-ro-label">有效期</text>
+                  <text class="item-extra-ro-value">{{item.expiryDate || '-'}}</text>
                 </view>
-                <view class="item-extra-field item-extra-field-half">
-                  <text class="item-extra-label">有效期</text>
-                  <text class="item-extra-value">{{item.expiryDate || '-'}}</text>
+                <view class="item-extra-ro-field">
+                  <text class="item-extra-ro-label">货位号</text>
+                  <text class="item-extra-ro-value">{{item.locationCode || '-'}}</text>
                 </view>
               </view>
             </view>

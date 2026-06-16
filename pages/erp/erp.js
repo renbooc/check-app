@@ -1,5 +1,5 @@
 const { api } = require('../../utils/request')
-const { showError, showSuccess } = require('../../utils/util')
+const { showError, showSuccess, formatDate } = require('../../utils/util')
 
 Page({
   data: {
@@ -16,7 +16,11 @@ Page({
     inventoryKeyword: '',
     inventoryList: [],
     inventoryPage: 1,
-    inventoryTotal: 0
+    inventoryTotal: 0,
+    inboundKeyword: '',
+    inboundList: [],
+    inboundPage: 1,
+    inboundTotal: 0
   },
 
   onShow() {
@@ -61,6 +65,7 @@ Page({
     switch (tab) {
       case 'purchase': return this.loadPurchase(append)
       case 'sales': return this.loadSales(append)
+      case 'inbound': return this.loadInbound(append)
       case 'inventory': return this.loadInventory(append)
     }
   },
@@ -70,8 +75,9 @@ Page({
       const params = { page: this.data.purchasePage, pageSize: 20 }
       if (this.data.purchaseKeyword) params.keyword = this.data.purchaseKeyword
       const res = await api.get('/purchase', params)
+      const list = (res.list || []).map(i => ({ ...i, createdAt: formatDate(i.createdAt, 'YYYY-MM-DD HH:mm:ss') }))
       this.setData({
-        purchaseList: append ? [...this.data.purchaseList, ...(res.list || [])] : (res.list || []),
+        purchaseList: append ? [...this.data.purchaseList, ...list] : list,
         purchaseTotal: res.total || 0
       })
     } catch (err) {
@@ -85,8 +91,9 @@ Page({
       const params = { page: this.data.salesPage, pageSize: 20 }
       if (this.data.salesKeyword) params.keyword = this.data.salesKeyword
       const res = await api.get('/sales', params)
+      const list = (res.list || []).map(i => ({ ...i, createdAt: formatDate(i.createdAt, 'YYYY-MM-DD HH:mm:ss') }))
       this.setData({
-        salesList: append ? [...this.data.salesList, ...(res.list || [])] : (res.list || []),
+        salesList: append ? [...this.data.salesList, ...list] : list,
         salesTotal: res.total || 0
       })
     } catch (err) {
@@ -103,6 +110,22 @@ Page({
       this.setData({
         inventoryList: append ? [...this.data.inventoryList, ...(res.list || [])] : (res.list || []),
         inventoryTotal: res.total || 0
+      })
+    } catch (err) {
+      showError(err.message)
+      this.setData({ networkError: true })
+    }
+  },
+
+  async loadInbound(append) {
+    try {
+      const params = { page: this.data.inboundPage, pageSize: 20 }
+      if (this.data.inboundKeyword) params.keyword = this.data.inboundKeyword
+      const res = await api.get('/inbound', params)
+      const list = (res.list || []).map(i => ({ ...i, createdAt: formatDate(i.createdAt, 'YYYY-MM-DD HH:mm:ss') }))
+      this.setData({
+        inboundList: append ? [...this.data.inboundList, ...list] : list,
+        inboundTotal: res.total || 0
       })
     } catch (err) {
       showError(err.message)
@@ -135,6 +158,24 @@ Page({
   onInventorySearch() {
     this.setData({ inventoryPage: 1 })
     this.loadInventory()
+  },
+
+  onInboundSearchInput(e) {
+    this.setData({ inboundKeyword: e.detail.value })
+  },
+
+  onInboundSearch() {
+    this.setData({ inboundPage: 1 })
+    this.loadInbound()
+  },
+
+  onViewInboundList() {
+    wx.navigateTo({ url: '/pages/inbound/list' })
+  },
+
+  onInboundTap(e) {
+    const id = e.currentTarget.dataset.id
+    wx.navigateTo({ url: '/pages/inbound/form?id=' + id })
   },
 
   onAddPurchase() {

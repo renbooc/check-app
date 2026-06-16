@@ -328,7 +328,7 @@
 }
 
 .item-card {
-  background: #f5f5f5;
+  background: #f0f6fc;
   border-radius: 12rpx;
   padding: 0;
 }
@@ -891,11 +891,101 @@
   line-height: 60rpx;
 }
 
+/* ---------- 只读模式商品名突出 ---------- */
+.item-card-body-readonly .item-name {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+/* ---------- 只读模式：数量/单价 内联 ---------- */
+.item-prices-readonly {
+  margin-top: 14rpx;
+  padding-top: 12rpx;
+  border-top: 2rpx solid rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.price-inline-row {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.price-inline-label {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.price-inline-value {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 600;
+}
+
+.price-inline-sep {
+  font-size: 20rpx;
+  color: #cccccc;
+  margin: 0 6rpx;
+}
+
+/* ---------- 只读模式：小计在右顶部 ---------- */
+.item-amount-top {
+  flex-shrink: 0;
+  margin-left: 20rpx;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 2rpx;
+}
+
+.item-amount-top-value {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #0077C2;
+  line-height: 1.3;
+}
+
+/* ---------- 只读模式：批号/日期/货位号 2行网格 ---------- */
+.item-extra-readonly {
+  margin-top: 10rpx;
+  padding-top: 10rpx;
+  border-top: 2rpx solid rgba(0, 0, 0, 0.04);
+}
+
+.item-extra-ro-row {
+  display: flex;
+  gap: 14rpx;
+  margin-bottom: 6rpx;
+}
+
+.item-extra-ro-row:last-child {
+  margin-bottom: 0;
+}
+
+.item-extra-ro-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.item-extra-ro-label {
+  font-size: 22rpx;
+  color: #999999;
+  flex-shrink: 0;
+}
+
+.item-extra-ro-value {
+  font-size: 24rpx;
+  color: #555555;
+}
+
 /* ---------- 审核/入库按钮 ---------- */
 .action-audit {
-  background: linear-gradient(135deg, #52c41a, #73d13d);
+  background: linear-gradient(135deg, #0057A0, #0077C2);
   color: #FFFFFF;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  box-shadow: none;
 }
 
 .action-audit:active {
@@ -903,9 +993,9 @@
 }
 
 .action-receive {
-  background: linear-gradient(135deg, #1890ff, #40a9ff);
+  background: linear-gradient(135deg, #0D9E6F, #10B981);
   color: #FFFFFF;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  box-shadow: none;
 }
 
 .action-receive:active {

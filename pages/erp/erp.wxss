@@ -215,19 +215,51 @@
   overflow: hidden;
 }
 
+.inv-name-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10rpx;
+  margin-bottom: 6rpx;
+  overflow: hidden;
+}
+
 .inv-name {
   font-size: 30rpx;
   font-weight: 600;
   color: #333333;
-  margin-bottom: 6rpx;
+  flex-shrink: 0;
+  max-width: 70%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .inv-code {
+  font-size: 22rpx;
+  color: #aaaaaa;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inv-spec-row {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
   font-size: 24rpx;
   color: #5c5c5c;
+  margin-bottom: 4rpx;
+}
+
+.inv-spec-sep {
+  font-size: 20rpx;
+  color: #cccccc;
+}
+
+.inv-manufacturer {
+  font-size: 22rpx;
+  color: #999999;
+  margin-bottom: 2rpx;
 }
 
 .inv-stock {

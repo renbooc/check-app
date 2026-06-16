@@ -98,9 +98,11 @@ export class UpdateSalesStatusDto {
 
 export class QuerySalesDto {
   @IsOptional()
+  @Type(() => Number)
   page?: number;
 
   @IsOptional()
+  @Type(() => Number)
   pageSize?: number;
 
   @IsOptional()

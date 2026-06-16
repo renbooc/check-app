@@ -1,4 +1,2 @@
 <icon wx:if="{{isBuiltin}}" type="{{type}}" size="{{size}}" color="{{color}}" />
-<view wx:else class="custom-icon custom-icon-{{type}}" style="width: {{size}}px; height: {{size}}px;">
-  <view class="custom-icon-inner" style="border-color: {{color}}; background-color: {{type === 'dot' || type === 'circle' ? color : 'transparent'}};"></view>
-</view>
+<image wx:else class="icon-img" src="{{iconSrc}}" mode="aspectFit" style="width: {{size}}px; height: {{size}}px;" />

@@ -64,6 +64,9 @@ export class SalesService {
     operatorId: string;
     operatorName: string;
     remark?: string;
+    expectedDate?: string;
+    warehouseId?: string;
+    warehouseName?: string;
   }) {
     const orderNo = await this.generateOrderNo();
     let totalAmount = 0;
@@ -79,6 +82,8 @@ export class SalesService {
       operatorName: dto.operatorName,
       remark: dto.remark,
       expectedDate: (dto as any).expectedDate || null,
+      warehouseId: (dto as any).warehouseId || null,
+      warehouseName: (dto as any).warehouseName || null,
     });
     const savedOrder = await this.orderRepo.save(order);
 
@@ -110,6 +115,8 @@ export class SalesService {
     }>;
     remark?: string;
     expectedDate?: string;
+    warehouseId?: string;
+    warehouseName?: string;
   }) {
     const order = await this.orderRepo.findOne({ where: { id } });
     if (!order) throw new NotFoundException('销售订单不存在');
@@ -117,6 +124,8 @@ export class SalesService {
     if (dto.customerId !== undefined) order.customerId = dto.customerId;
     if (dto.remark !== undefined) order.remark = dto.remark;
     if (dto.expectedDate !== undefined) order.expectedDate = dto.expectedDate;
+    if (dto.warehouseId !== undefined) order.warehouseId = dto.warehouseId;
+    if (dto.warehouseName !== undefined) order.warehouseName = dto.warehouseName;
 
     if (dto.items) {
       await this.itemRepo.delete({ orderId: id });

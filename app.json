@@ -19,7 +19,10 @@
     "pages/product/detail",
     "pages/settings/settings",
     "pages/about/about",
-    "pages/message/message"
+    "pages/message/message",
+    "pages/inbound/list",
+    "pages/inbound/form",
+    "pages/warehouse/list"
   ],
   "window": {
     "navigationBarBackgroundColor": "#ffffff",

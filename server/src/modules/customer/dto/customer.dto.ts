@@ -1,4 +1,5 @@
 import { IsString, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateCustomerDto {
   @IsString()
@@ -61,9 +62,11 @@ export class UpdateCustomerDto {
 
 export class QueryCustomerDto {
   @IsOptional()
+  @Type(() => Number)
   page?: number;
 
   @IsOptional()
+  @Type(() => Number)
   pageSize?: number;
 
   @IsOptional()
