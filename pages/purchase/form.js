@@ -516,6 +516,20 @@ Page({
     wx.navigateBack();
   },
 
+  async onWithdraw() {
+    if (this.data.submitting) return;
+    this.setData({ submitting: true });
+    try {
+      await api.put(`/purchase/${this.data.id}/status`, { status: 'draft' });
+      showSuccess('已撤回');
+      await this.loadOrder(this.data.id);
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      this.setData({ submitting: false });
+    }
+  },
+
   async onApprove() {
     if (this.data.submitting) return;
     this.setData({ submitting: true });

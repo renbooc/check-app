@@ -80,7 +80,7 @@
       </view>
     </view>
 
-    <!-- ===== 快捷操作 ===== -->
+    <!-- ===== 快捷操作（2行×5列） ===== -->
     <view class="entry-card">
       <text class="entry-title">快捷操作</text>
       <view class="entry-grid">
@@ -88,13 +88,13 @@
           <view class="entry-icon icon-bg-green">
             <image class="entry-icon-img" src="/images/icon-clipboard.png" mode="aspectFit"></image>
           </view>
-          <text class="entry-text">采购入库</text>
+          <text class="entry-text">采购订单</text>
         </view>
         <view class="entry-item" bindtap="onQuickAction" data-type="sales">
           <view class="entry-icon icon-bg-blue">
             <image class="entry-icon-img" src="/images/icon-document.png" mode="aspectFit"></image>
           </view>
-          <text class="entry-text">销售出库</text>
+          <text class="entry-text">销售订单</text>
         </view>
         <view class="entry-item" bindtap="onQuickAction" data-type="check">
           <view class="entry-icon icon-bg-amber">
@@ -114,11 +114,35 @@
           </view>
           <text class="entry-text">库存查询</text>
         </view>
-        <view class="entry-item" bindtap="onGoReport">
+        <view class="entry-item" bindtap="onQuickAction" data-type="inbound">
           <view class="entry-icon icon-bg-rose">
+            <image class="entry-icon-img" src="/images/icon-history.png" mode="aspectFit"></image>
+          </view>
+          <text class="entry-text">采购入库</text>
+        </view>
+        <view class="entry-item" bindtap="onGoProduct">
+          <view class="entry-icon icon-bg-blue">
+            <image class="entry-icon-img" src="/images/icon-check-circle.png" mode="aspectFit"></image>
+          </view>
+          <text class="entry-text">商品管理</text>
+        </view>
+        <view class="entry-item" bindtap="onGoWarehouse">
+          <view class="entry-icon icon-bg-cyan">
+            <image class="entry-icon-img" src="/images/icon-sync.png" mode="aspectFit"></image>
+          </view>
+          <text class="entry-text">仓库管理</text>
+        </view>
+        <view class="entry-item" bindtap="onGoReport">
+          <view class="entry-icon icon-bg-amber">
             <image class="entry-icon-img" src="/images/icon-record.png" mode="aspectFit"></image>
           </view>
           <text class="entry-text">经营报表</text>
+        </view>
+        <view class="entry-item" bindtap="onGoMore">
+          <view class="entry-icon icon-bg-gray">
+            <view class="icon-dots-v"></view>
+          </view>
+          <text class="entry-text">更多</text>
         </view>
       </view>
     </view>

@@ -209,6 +209,18 @@ Page({
     wx.navigateTo({ url: '/pages/message/message' })
   },
 
+  onGoProduct() {
+    wx.navigateTo({ url: '/pages/product/list' })
+  },
+
+  onGoWarehouse() {
+    wx.navigateTo({ url: '/pages/warehouse/list' })
+  },
+
+  onGoMore() {
+    wx.switchTab({ url: '/pages/mine/mine' })
+  },
+
   loadUnreadCount() {
     var that = this
     api.get('/report/notifications', { unread: true, pageSize: 1 }).then(function (res) {
@@ -239,10 +251,10 @@ Page({
     var type = e.currentTarget.dataset.type
     switch (type) {
       case 'purchase':
-        wx.navigateTo({ url: '/pages/purchase/form' })
+        wx.navigateTo({ url: '/pages/purchase/list' })
         break
       case 'sales':
-        wx.navigateTo({ url: '/pages/sales/form' })
+        wx.navigateTo({ url: '/pages/sales/list' })
         break
       case 'check':
         wx.navigateTo({ url: '/pages/check/check' })
@@ -255,6 +267,9 @@ Page({
             wx.navigateTo({ url: '/pages/stock/stock?keyword=' + encodeURIComponent(res.result) })
           }
         })
+        break
+      case 'inbound':
+        wx.navigateTo({ url: '/pages/inbound/list' })
         break
     }
   },

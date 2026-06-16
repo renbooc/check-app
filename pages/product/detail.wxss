@@ -126,6 +126,32 @@ page {
   gap: 10rpx;
 }
 
+.section-header-toggle {
+  cursor: pointer;
+}
+
+.section-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.toggle-arrow {
+  width: 16rpx;
+  height: 16rpx;
+  border-right: 3rpx solid #cccccc;
+  border-bottom: 3rpx solid #cccccc;
+  transform: rotate(45deg);
+  margin-top: -4rpx;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.toggle-arrow.expanded {
+  transform: rotate(-135deg);
+  margin-top: 4rpx;
+}
+
 .section-icon {
   width: 32rpx;
   height: 32rpx;
@@ -148,6 +174,100 @@ page {
 
 .section-icon-logs {
   background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+}
+
+.section-icon-batch {
+  background: linear-gradient(135deg, #0EA5E9, #38BDF8);
+}
+
+/* ---------- 批次列表 ---------- */
+.batch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.batch-card {
+  background: #f5f5f5;
+  border-radius: 12rpx;
+  padding: 20rpx;
+}
+
+.batch-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14rpx;
+}
+
+.batch-code-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.batch-code-label {
+  font-size: 20rpx;
+  color: #999999;
+  flex-shrink: 0;
+}
+
+.batch-code {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #555555;
+  font-family: monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.batch-qty-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 2rpx;
+  flex-shrink: 0;
+  margin-left: 12rpx;
+}
+
+.batch-qty-num {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #333333;
+  line-height: 1;
+}
+
+.batch-qty-unit {
+  font-size: 22rpx;
+  color: #5c5c5c;
+}
+
+.batch-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6rpx 0;
+  padding-top: 12rpx;
+  border-top: 2rpx solid rgba(0, 0, 0, 0.05);
+}
+
+.batch-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.batch-detail-label {
+  font-size: 20rpx;
+  color: #999999;
+  flex-shrink: 0;
+  min-width: 3em;
+}
+
+.batch-detail-value {
+  font-size: 22rpx;
+  color: #555555;
 }
 
 .section-title {

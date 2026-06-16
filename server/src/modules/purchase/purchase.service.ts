@@ -77,6 +77,8 @@ export class PurchaseService {
       operatorName: dto.operatorName,
       remark: dto.remark,
       expectedDate: (dto as any).expectedDate || null,
+      warehouseId: (dto as any).warehouseId || null,
+      warehouseName: (dto as any).warehouseName || null,
     });
     const savedOrder = await this.orderRepo.save(order);
 
@@ -108,6 +110,8 @@ export class PurchaseService {
     }>;
     remark?: string;
     expectedDate?: string;
+    warehouseId?: string;
+    warehouseName?: string;
   }) {
     const order = await this.orderRepo.findOne({ where: { id } });
     if (!order) throw new NotFoundException('采购订单不存在');
@@ -115,6 +119,8 @@ export class PurchaseService {
     if (dto.supplierId !== undefined) order.supplierId = dto.supplierId;
     if (dto.remark !== undefined) order.remark = dto.remark;
     if (dto.expectedDate !== undefined) order.expectedDate = dto.expectedDate;
+    if (dto.warehouseId !== undefined) order.warehouseId = dto.warehouseId;
+    if (dto.warehouseName !== undefined) order.warehouseName = dto.warehouseName;
 
     if (dto.items) {
       // 删除旧明细

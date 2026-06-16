@@ -96,7 +96,7 @@
   <!-- ========== 底部操作栏 ========== -->
   <view class="bottom-action">
     <view class="action-inner">
-      <view class="action-count" wx:if="{{total > 0}}">
+      <view class="action-count">
         <text class="count-num">{{pendingCount}}</text>
         <text class="count-label">单待审核</text>
       </view>

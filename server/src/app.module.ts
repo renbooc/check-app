@@ -34,6 +34,7 @@ import { SalesOrderItem } from './entities/sales-order-item.entity';
 import { Notification } from './entities/notification.entity';
 import { InboundNote } from './entities/inbound-note.entity';
 import { InboundNoteItem } from './entities/inbound-note-item.entity';
+import { InventoryDetail } from './entities/inventory-detail.entity';
 
 const entities = [
   User,
@@ -55,6 +56,7 @@ const entities = [
   Notification,
   InboundNote,
   InboundNoteItem,
+  InventoryDetail,
 ];
 
 @Module({

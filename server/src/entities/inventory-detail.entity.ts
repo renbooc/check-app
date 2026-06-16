@@ -10,8 +10,8 @@ import {
 import { Product } from './product.entity';
 import { Warehouse } from './warehouse.entity';
 
-@Entity('inventory')
-export class Inventory {
+@Entity('inventory_details')
+export class InventoryDetail {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -29,20 +29,29 @@ export class Inventory {
   @JoinColumn({ name: 'warehouseId' })
   warehouse: Warehouse;
 
+  @Column({ length: 50 })
+  batchCode: string;
+
+  @Column({ length: 50 })
+  batchNo: string;
+
+  @Column({ type: 'date', nullable: true })
+  productionDate: string;
+
+  @Column({ type: 'date', nullable: true })
+  expiryDate: string;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  price: number;
+
   @Column({ type: 'int', default: 0 })
   quantity: number;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
-  avgPrice: number;
+  @Column({ type: 'int', default: 0 })
+  pendingQuantity: number;
 
-  @Column({ type: 'decimal', precision: 14, scale: 2, default: 0 })
-  amount: number;
-
-  @Column({ length: 100, nullable: true })
-  latestSupplier: string;
-
-  @Column({ type: 'date', nullable: true })
-  latestInboundDate: string;
+  @Column({ length: 50, nullable: true })
+  locationCode: string;
 
   @CreateDateColumn()
   createdAt: Date;

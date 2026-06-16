@@ -4,6 +4,7 @@ import { Repository, Like } from 'typeorm';
 import { InboundNote } from '../../entities/inbound-note.entity';
 import { InboundNoteItem } from '../../entities/inbound-note-item.entity';
 import { Inventory } from '../../entities/inventory.entity';
+import { InventoryDetail } from '../../entities/inventory-detail.entity';
 import { InventoryLog } from '../../entities/inventory-log.entity';
 
 @Injectable()
@@ -13,6 +14,7 @@ export class InboundService {
     @InjectRepository(InboundNoteItem) private itemRepo: Repository<InboundNoteItem>,
     @InjectRepository(Inventory) private inventoryRepo: Repository<Inventory>,
     @InjectRepository(InventoryLog) private logRepo: Repository<InventoryLog>,
+    @InjectRepository(InventoryDetail) private detailRepo: Repository<InventoryDetail>,
   ) {}
 
   async findAll(params: { page?: number; pageSize?: number; keyword?: string; status?: string }) {
@@ -231,34 +233,79 @@ export class InboundService {
 
     await this.noteRepo.update(id, { status });
 
-    // Update inventory on approval
     if (status === 'approved' && note.items) {
-      for (const item of note.items) {
+      const orderNo = note.orderNo;
+      const today = new Date();
+      const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+      // Resolve warehouse: use note's warehouse or fallback to first active warehouse
+      let whId = note.warehouseId || '';
+      if (!whId) {
+        const firstWh = await this.inventoryRepo.query('SELECT id FROM warehouses WHERE "isActive" = true ORDER BY "createdAt" ASC LIMIT 1');
+        whId = (firstWh && firstWh.length > 0) ? firstWh[0].id : '';
+      }
+
+      for (let i = 0; i < note.items.length; i++) {
+        const item = note.items[i];
         const qty = parseFloat(item.quantity as any) || 0;
+        const price = parseFloat(item.price as any) || 0;
+        const lineNo = String(i + 1).padStart(4, '0');
+        const batchCode = `${orderNo}${lineNo}`;
+
+        // 1. Create inventory detail (batch record)
+        const detail = this.detailRepo.create({
+          productId: item.productId,
+          warehouseId: whId,
+          batchCode,
+          batchNo: item.batchNo || '',
+          productionDate: item.productionDate || null,
+          expiryDate: item.expiryDate || null,
+          price,
+          quantity: qty,
+          locationCode: item.locationCode || null,
+        } as any);
+        await this.detailRepo.save(detail as any);
+
+        // 2. Update inventory summary (weighted average)
         let inv: any = await this.inventoryRepo.findOne({
-          where: { productId: item.productId },
+          where: { productId: item.productId, warehouseId: whId },
         });
         if (!inv) {
           inv = this.inventoryRepo.create({
             productId: item.productId,
-            warehouseId: note.warehouseId || '',
-            batchNo: item.batchNo || '',
-            expiryDate: item.expiryDate || null,
+            warehouseId: whId,
             quantity: 0,
+            avgPrice: 0,
+            amount: 0,
           } as any);
           inv = await this.inventoryRepo.save(inv as any);
         }
-        const beforeQty = inv.quantity;
-        inv.quantity += qty;
+
+        const oldQty = inv.quantity;
+        const oldAmount = parseFloat(inv.amount) || 0;
+        const newQty = oldQty + qty;
+        const newAmount = oldAmount + (price * qty);
+        const avgPrice = newQty > 0 ? newAmount / newQty : 0;
+
+        inv.quantity = newQty;
+        inv.avgPrice = avgPrice;
+        inv.amount = newAmount;
+        inv.latestSupplier = note.supplierName || null;
+        inv.latestInboundDate = dateStr;
         await this.inventoryRepo.save(inv);
+
+        // 3. Write inventory log with batch info
         await this.logRepo.save({
           productId: item.productId,
           productName: item.productName,
           type: 'purchase_in',
           changeQuantity: qty,
-          beforeQuantity: beforeQty,
-          afterQuantity: inv.quantity,
+          beforeQuantity: oldQty,
+          afterQuantity: newQty,
           relatedOrderId: id,
+          batchCode,
+          batchNo: item.batchNo || '',
+          price,
           operatorId,
           operatorName,
         });

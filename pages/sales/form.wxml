@@ -316,6 +316,14 @@
     <view class="bottom-inner bottom-actions">
       <button class="action-btn action-back" bindtap="onBack">返回列表</button>
       <button
+        class="action-btn action-withdraw"
+        wx:if="{{statusCls === 'pending'}}"
+        bindtap="onWithdraw"
+        disabled="{{submitting}}"
+      >
+        {{submitting ? '处理中...' : '撤回'}}
+      </button>
+      <button
         class="action-btn action-audit"
         wx:if="{{statusCls === 'pending'}}"
         bindtap="onApprove"

@@ -16,6 +16,9 @@ Page({
     inventory: null,
     warehouses: [],
     logs: [],
+    batches: [],
+    showBatches: false,
+    showLogs: false,
     stockAmount: '0.00',
     isLowStock: false,
     statusLabel: '',
@@ -51,6 +54,7 @@ Page({
       // 库存解构
       const inv = (invRes && invRes.inventory) ? invRes.inventory : null
       const rawLogs = (invRes && invRes.logs) ? invRes.logs.slice(0, 8) : []
+      const batches = (invRes && invRes.batches) ? invRes.batches : []
       const quantity = inv ? (inv.quantity || 0) : 0
       const warehouses = (inv && inv.warehouses) ? inv.warehouses : []
       const stockAmount = (quantity * price).toFixed(2)
@@ -77,6 +81,7 @@ Page({
         product: { ...product, unitName, categoryName, price: price.toFixed(2) },
         inventory: inv,
         warehouses,
+        batches,
         logs,
         stockAmount,
         isLowStock,
@@ -93,6 +98,14 @@ Page({
 
   onEdit() {
     wx.navigateTo({ url: '/pages/product/form?id=' + this.data.productId })
+  },
+
+  onToggleBatches() {
+    this.setData({ showBatches: !this.data.showBatches })
+  },
+
+  onToggleLogs() {
+    this.setData({ showLogs: !this.data.showLogs })
   },
 
   goBack() {

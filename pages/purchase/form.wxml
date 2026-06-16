@@ -327,6 +327,7 @@
     </view>
     <view class="bottom-inner bottom-inner-actions" wx:elif="{{statusCls === 'pending'}}">
       <button class="action-btn action-back" bindtap="onBack">返回</button>
+      <button class="action-btn action-withdraw" bindtap="onWithdraw" disabled="{{submitting}}">{{submitting ? '处理中...' : '撤回'}}</button>
       <button class="action-btn action-audit" bindtap="onApprove" disabled="{{submitting}}">{{submitting ? '处理中...' : '审核通过'}}</button>
     </view>
     <view class="bottom-inner bottom-inner-actions" wx:elif="{{statusCls === 'approved'}}">

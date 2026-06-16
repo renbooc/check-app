@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Inventory } from '../../entities/inventory.entity';
+import { InventoryDetail } from '../../entities/inventory-detail.entity';
 import { InventoryLog } from '../../entities/inventory-log.entity';
 import { StockCheck } from '../../entities/stock-check.entity';
 import { StockCheckItem } from '../../entities/stock-check-item.entity';
@@ -16,6 +17,7 @@ import { Customer } from '../../entities/customer.entity';
 export class InventoryService {
   constructor(
     @InjectRepository(Inventory) private inventoryRepo: Repository<Inventory>,
+    @InjectRepository(InventoryDetail) private detailRepo: Repository<InventoryDetail>,
     @InjectRepository(InventoryLog) private logRepo: Repository<InventoryLog>,
     @InjectRepository(StockCheck) private checkRepo: Repository<StockCheck>,
     @InjectRepository(StockCheckItem) private checkItemRepo: Repository<StockCheckItem>,
@@ -141,17 +143,13 @@ export class InventoryService {
       .createQueryBuilder('i')
       .leftJoinAndSelect('i.product', 'p')
       .leftJoinAndSelect('p.unit', 'u')
-      .leftJoinAndSelect('i.warehouse', 'w')
-      .leftJoinAndSelect('i.location', 'l');
+      .leftJoinAndSelect('i.warehouse', 'w');
 
     if (params.keyword) {
       qb.andWhere('(p.name LIKE :kw OR p.code LIKE :kw)', { kw: `%${params.keyword}%` });
     }
     if (params.warehouseId) {
       qb.andWhere('i.warehouseId = :wid', { wid: params.warehouseId });
-    }
-    if (params.locationId) {
-      qb.andWhere('i.locationId = :lid', { lid: params.locationId });
     }
 
     const list = await qb.orderBy('i.updatedAt', 'DESC').getMany();
@@ -161,7 +159,7 @@ export class InventoryService {
   async getStockDetail(id: string) {
     const inventory = await this.inventoryRepo.findOne({
       where: { id },
-      relations: ['product', 'warehouse', 'location'],
+      relations: ['product', 'warehouse'],
     });
     if (!inventory) return null;
     const logs = await this.logRepo.find({
@@ -175,7 +173,7 @@ export class InventoryService {
   async getStockByProductId(productId: string) {
     const inventories = await this.inventoryRepo.find({
       where: { productId },
-      relations: ['product', 'warehouse', 'location'],
+      relations: ['product', 'warehouse'],
     });
     if (!inventories || inventories.length === 0) return null;
 
@@ -187,16 +185,22 @@ export class InventoryService {
       take: 20,
     });
 
+    const batches = await this.detailRepo.find({
+      where: { productId },
+      order: { createdAt: 'DESC' },
+      take: 50,
+    });
+
     return {
       inventory: {
         ...inventories[0],
         quantity: totalQuantity,
         warehouses: inventories.map(i => ({
           warehouse: i.warehouse,
-          location: i.location,
           quantity: i.quantity,
         })),
       },
+      batches,
       logs,
     };
   }
@@ -238,24 +242,13 @@ export class InventoryService {
     });
     await this.checkItemRepo.save(item);
 
-    // 同步更新库存表
-    if (dto.location) {
-      const location = await this.locationRepo.findOne({
-        where: { code: dto.location },
-      });
-      if (location) {
-        const inventoryRecord = await this.inventoryRepo.findOne({
-          where: {
-            productId: dto.productId,
-            locationId: location.id,
-          },
-        });
-        if (inventoryRecord) {
-          const beforeQty = inventoryRecord.quantity;
-          inventoryRecord.quantity = dto.checkCount;
-          await this.inventoryRepo.save(inventoryRecord);
-        }
-      }
+    // 同步更新库存总表
+    const inventoryRecord = await this.inventoryRepo.findOne({
+      where: { productId: dto.productId },
+    });
+    if (inventoryRecord) {
+      inventoryRecord.quantity = dto.checkCount;
+      await this.inventoryRepo.save(inventoryRecord);
     }
 
     const log = this.logRepo.create({

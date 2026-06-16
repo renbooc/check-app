@@ -43,7 +43,7 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "工作台",
+        "text": "首页",
         "iconPath": "images/tab-home.png",
         "selectedIconPath": "images/tab-home-active.png"
       },
@@ -72,9 +72,6 @@
       "desc": "需要使用相机进行条码扫描"
     }
   },
-  "requiredPrivateInfos": [
-    "getLocation",
-    "chooseLocation"
-  ],
+  "requiredPrivateInfos": ["getLocation", "chooseLocation"],
   "sitemapLocation": "sitemap.json"
 }

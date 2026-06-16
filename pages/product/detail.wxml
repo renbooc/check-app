@@ -110,16 +110,73 @@
       </view>
     </view>
 
+    <!-- ===== 批次信息卡片 ===== -->
+    <view class="section-card" wx:if="{{batches.length > 0}}">
+      <view class="section-header section-header-toggle" bindtap="onToggleBatches">
+        <view class="section-header-left">
+          <view class="section-icon section-icon-batch"></view>
+          <text class="section-title">批次信息</text>
+        </view>
+        <view class="section-header-right">
+          <view class="count-badge">
+            <text class="count-badge-num">{{batches.length}}</text>
+            <text class="count-badge-label">批</text>
+          </view>
+          <view class="toggle-arrow {{showBatches ? 'expanded' : ''}}"></view>
+        </view>
+      </view>
+
+      <view class="batch-list" wx:if="{{showBatches}}">
+        <view class="batch-card" wx:for="{{batches}}" wx:key="id">
+          <view class="batch-top">
+            <view class="batch-code-wrap">
+              <text class="batch-code-label">批次</text>
+              <text class="batch-code">{{item.batchCode}}</text>
+            </view>
+            <view class="batch-qty-wrap">
+              <text class="batch-qty-num">{{item.quantity}}</text>
+              <text class="batch-qty-unit">{{product.unitName || '件'}}</text>
+            </view>
+          </view>
+          <view class="batch-detail">
+            <view class="batch-detail-item">
+              <text class="batch-detail-label">批号</text>
+              <text class="batch-detail-value">{{item.batchNo}}</text>
+            </view>
+            <view class="batch-detail-item" wx:if="{{item.price}}">
+              <text class="batch-detail-label">进价</text>
+              <text class="batch-detail-value">¥{{item.price}}</text>
+            </view>
+            <view class="batch-detail-item" wx:if="{{item.productionDate}}">
+              <text class="batch-detail-label">生产</text>
+              <text class="batch-detail-value">{{item.productionDate}}</text>
+            </view>
+            <view class="batch-detail-item" wx:if="{{item.expiryDate}}">
+              <text class="batch-detail-label">效期</text>
+              <text class="batch-detail-value">{{item.expiryDate}}</text>
+            </view>
+            <view class="batch-detail-item" wx:if="{{item.locationCode}}">
+              <text class="batch-detail-label">货位</text>
+              <text class="batch-detail-value">{{item.locationCode}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <!-- ===== 出入库记录卡片 ===== -->
     <view class="section-card" wx:if="{{logs.length > 0}}">
-      <view class="section-header">
+      <view class="section-header section-header-toggle" bindtap="onToggleLogs">
         <view class="section-header-left">
           <view class="section-icon section-icon-logs"></view>
           <text class="section-title">出入库记录</text>
         </view>
+        <view class="section-header-right">
+          <view class="toggle-arrow {{showLogs ? 'expanded' : ''}}"></view>
+        </view>
       </view>
 
-      <view class="log-list">
+      <view class="log-list" wx:if="{{showLogs}}">
         <view class="log-item" wx:for="{{logs}}" wx:key="id">
           <view class="log-left">
             <text class="log-tag log-tag-{{item.tagClass}}">{{item.tagLabel}}</text>

@@ -31,6 +31,15 @@ export class InventoryLog {
   @Column({ nullable: true })
   relatedOrderId: string;
 
+  @Column({ length: 50, nullable: true })
+  batchCode: string;
+
+  @Column({ length: 50, nullable: true })
+  batchNo: string;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  price: number;
+
   @Column({ nullable: true })
   operatorId: string;
 

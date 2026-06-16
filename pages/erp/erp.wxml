@@ -45,7 +45,7 @@
       <view class="order-card" wx:for="{{purchaseList}}" wx:key="id" bindtap="onPurchaseTap" data-id="{{item.id}}">
         <view class="order-header">
           <text class="order-no">{{item.orderNo}}</text>
-          <text class="order-status status-{{item.status}}">{{item.status === 'pending' ? '待审核' : item.status === 'approved' ? '已审核' : item.status === 'received' ? '已入库' : item.status}}</text>
+          <text class="order-status status-{{item.status}}">{{item.status === 'draft' ? '草稿' : item.status === 'pending' ? '待审核' : item.status === 'approved' ? '已审核' : item.status === 'received' ? '已入库' : item.status}}</text>
         </view>
         <view class="order-body">
           <text class="order-party">{{item.supplier ? item.supplier.name : '-'}}</text>
@@ -83,7 +83,7 @@
       <view class="order-card" wx:for="{{salesList}}" wx:key="id" bindtap="onSalesTap" data-id="{{item.id}}">
         <view class="order-header">
           <text class="order-no">{{item.orderNo}}</text>
-          <text class="order-status status-{{item.status}}">{{item.status === 'pending' ? '待审核' : item.status === 'approved' ? '已审核' : item.status === 'delivered' ? '已出库' : item.status}}</text>
+          <text class="order-status status-{{item.status}}">{{item.status === 'draft' ? '草稿' : item.status === 'pending' ? '待审核' : item.status === 'approved' ? '已审核' : item.status === 'delivered' ? '已出库' : item.status}}</text>
         </view>
         <view class="order-body">
           <text class="order-party">{{item.customer ? item.customer.name : '-'}}</text>
@@ -121,7 +121,7 @@
       <view class="order-card" wx:for="{{inboundList}}" wx:key="id" bindtap="onInboundTap" data-id="{{item.id}}">
         <view class="order-header">
           <text class="order-no">{{item.orderNo}}</text>
-          <text class="order-status status-{{item.status}}">{{item.status === 'pending' ? '待审核' : item.status === 'approved' ? '已审核' : item.status}}</text>
+          <text class="order-status status-{{item.status}}">{{item.status === 'draft' ? '草稿' : item.status === 'pending' ? '待审核' : item.status === 'approved' ? '已审核' : item.status === 'cancelled' ? '已取消' : item.status}}</text>
         </view>
         <view class="order-body">
           <text class="order-party">{{item.supplierName || '-'}}</text>

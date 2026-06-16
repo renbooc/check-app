@@ -992,6 +992,16 @@
   opacity: 0.9;
 }
 
+.action-withdraw {
+  background: #FFFFFF;
+  color: #5c5c5c;
+  border: 2rpx solid #cccccc;
+}
+
+.action-withdraw:active {
+  background: #f5f5f5;
+}
+
 .action-receive {
   background: linear-gradient(135deg, #0D9E6F, #10B981);
   color: #FFFFFF;
