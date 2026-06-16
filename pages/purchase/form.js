@@ -429,18 +429,6 @@ Page({
         wx.showToast({ title: `第${i + 1}项单价无效`, icon: "none" });
         return false;
       }
-      if (!item.batchNo) {
-        wx.showToast({ title: `第${i + 1}项批号不能为空`, icon: "none" });
-        return false;
-      }
-      if (!item.productionDate) {
-        wx.showToast({ title: `第${i + 1}项生产日期不能为空`, icon: "none" });
-        return false;
-      }
-      if (!item.expiryDate) {
-        wx.showToast({ title: `第${i + 1}项有效期不能为空`, icon: "none" });
-        return false;
-      }
     }
     return true;
   },

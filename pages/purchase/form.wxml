@@ -238,7 +238,7 @@
               <view class="item-extra-row">
                 <view class="item-extra-field item-extra-field-half">
                   <text class="item-extra-label">批号</text>
-                  <input class="item-extra-input" type="text" placeholder="必填" placeholder-class="placeholder" value="{{item.batchNo}}" data-index="{{index}}" bindinput="onItemBatchNoInput" />
+                  <input class="item-extra-input" type="text" placeholder="选填" placeholder-class="placeholder" value="{{item.batchNo}}" data-index="{{index}}" bindinput="onItemBatchNoInput" />
                 </view>
                 <view class="item-extra-field item-extra-field-half">
                   <text class="item-extra-label">货位号</text>
@@ -251,7 +251,7 @@
                   <picker mode="date" value="{{item.productionDate}}" data-index="{{index}}" bindchange="onItemProductionDateChange">
                     <view class="item-extra-picker {{item.productionDate ? 'has-value' : ''}}">
                       <text wx:if="{{item.productionDate}}">{{item.productionDate}}</text>
-                      <text wx:else class="placeholder">必填</text>
+                      <text wx:else class="placeholder">选填</text>
                     </view>
                   </picker>
                 </view>
@@ -260,7 +260,7 @@
                   <picker mode="date" value="{{item.expiryDate}}" data-index="{{index}}" bindchange="onItemExpiryDateChange">
                     <view class="item-extra-picker {{item.expiryDate ? 'has-value' : ''}}">
                       <text wx:if="{{item.expiryDate}}">{{item.expiryDate}}</text>
-                      <text wx:else class="placeholder">必填</text>
+                      <text wx:else class="placeholder">选填</text>
                     </view>
                   </picker>
                 </view>

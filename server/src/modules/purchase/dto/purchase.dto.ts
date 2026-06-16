@@ -23,14 +23,17 @@ export class PurchaseOrderItemDto {
   @IsNumber()
   price: number;
 
+  @IsOptional()
   @IsString()
-  batchNo: string;
+  batchNo?: string;
 
+  @IsOptional()
   @IsString()
-  productionDate: string;
+  productionDate?: string;
 
+  @IsOptional()
   @IsString()
-  expiryDate: string;
+  expiryDate?: string;
 
   @IsOptional()
   @IsString()
