@@ -539,6 +539,51 @@
   color: #cccccc;
 }
 
+/* 固定下拉（键盘弹出时悬浮在键盘上方） */
+.ps-list-fixed {
+  position: fixed;
+  left: 20rpx;
+  right: 20rpx;
+  z-index: 999;
+  max-height: 50vh;
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.1), 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.ps-list-fixed-inner {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.ps-list-fixed .ps-item:first-child {
+  padding-top: 20rpx;
+}
+
+.ps-list-fixed .ps-item:last-child {
+  padding-bottom: 20rpx;
+  border-bottom: none;
+}
+
+/* 固定供应商/客户下拉（键盘弹出时） */
+.search-results-fixed {
+  position: fixed;
+  left: 20rpx;
+  right: 20rpx;
+  z-index: 999;
+  max-height: 50vh;
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.1), 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.search-results-fixed-inner {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
 /* 数量/单价 */
 .item-prices {
   margin-top: 16rpx;

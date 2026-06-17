@@ -35,16 +35,30 @@
             placeholder="搜索供应商名称"
             placeholder-class="placeholder"
             value="{{supplierKeyword}}"
+            adjust-position="false"
             bindinput="onSupplierInput"
             bindfocus="onSupplierFocus"
             bindblur="onSupplierBlur"
+            bindkeyboardheight="onKeyboardHeightChange"
           />
         </view>
-        <view class="search-results" wx:if="{{showSupplierResults && filteredSuppliers.length > 0}}">
+        <!-- 正常下拉 -->
+        <view class="search-results" wx:if="{{showSupplierResults && filteredSuppliers.length > 0 && !showFixedDropdown}}">
           <view class="search-result-item" wx:for="{{filteredSuppliers}}" wx:key="id" data-index="{{index}}" bindtap="onSupplierSelect">
             <view class="result-item-info">
               <text class="result-item-name">{{item.name}}</text>
               <text class="result-item-contact" wx:if="{{item.contactPerson}}">{{item.contactPerson}}</text>
+            </view>
+          </view>
+        </view>
+        <!-- 固定下拉（键盘弹出时） -->
+        <view class="search-results-fixed" wx:if="{{showSupplierResults && filteredSuppliers.length > 0 && showFixedDropdown}}" style="bottom: {{keyboardHeight + 20}}px;">
+          <view class="search-results-fixed-inner">
+            <view class="search-result-item" wx:for="{{filteredSuppliers}}" wx:key="id" data-index="{{index}}" bindtap="onSupplierSelect">
+              <view class="result-item-info">
+                <text class="result-item-name">{{item.name}}</text>
+                <text class="result-item-contact" wx:if="{{item.contactPerson}}">{{item.contactPerson}}</text>
+              </view>
             </view>
           </view>
         </view>
@@ -128,12 +142,15 @@
           placeholder="搜索商品名称，点击添加"
           placeholder-class="placeholder"
           value="{{productKeyword}}"
+          adjust-position="false"
           bindinput="onProductSearchInput"
           bindfocus="onProductSearchFocus"
           bindblur="onProductSearchBlur"
+          bindkeyboardheight="onKeyboardHeightChange"
         />
       </view>
-      <view class="ps-list" wx:if="{{showProductResults && productSearchResults.length > 0}}">
+      <!-- 正常下拉（键盘未弹出时） -->
+      <view class="ps-list" wx:if="{{showProductResults && productSearchResults.length > 0 && !showFixedDropdown}}">
         <view
           class="ps-item"
           wx:for="{{productSearchResults}}"
@@ -147,6 +164,25 @@
             <text class="ps-item-manufacturer" wx:if="{{item.productManufacturer || item.manufacturer}}">{{item.productManufacturer || item.manufacturer || ''}}</text>
           </view>
           <view class="ps-item-add">+</view>
+        </view>
+      </view>
+      <!-- 固定下拉（键盘弹出时，悬浮在键盘上方） -->
+      <view class="ps-list-fixed" wx:if="{{showProductResults && productSearchResults.length > 0 && showFixedDropdown}}" style="bottom: {{keyboardHeight + 20}}px;">
+        <view class="ps-list-fixed-inner">
+          <view
+            class="ps-item"
+            wx:for="{{productSearchResults}}"
+            wx:key="id"
+            data-pid="{{item.id}}"
+            bindtap="onProductSearchSelect"
+          >
+            <view class="ps-item-info">
+              <text class="ps-item-name">{{item.name}}</text>
+              <text class="ps-item-spec">{{item.spec || '-'}} · {{item.unit ? item.unit.name : '-'}}</text>
+              <text class="ps-item-manufacturer" wx:if="{{item.productManufacturer || item.manufacturer}}">{{item.productManufacturer || item.manufacturer || ''}}</text>
+            </view>
+            <view class="ps-item-add">+</view>
+          </view>
         </view>
       </view>
       <text class="ps-empty-text" wx:elif="{{showProductResults && productSearchResults.length === 0}}">未找到匹配的商品</text>

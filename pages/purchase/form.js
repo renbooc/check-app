@@ -43,6 +43,9 @@ Page({
     productSearchResults: [],
     showProductResults: false,
     products: [],
+    // 键盘高度（解决手机键盘遮挡下拉问题）
+    keyboardHeight: 0,
+    showFixedDropdown: false,
 
     // 已添加商品行
     items: [],
@@ -185,7 +188,7 @@ Page({
 
   onSupplierBlur() {
     setTimeout(() => {
-      this.setData({ showSupplierResults: false });
+      this.setData({ showSupplierResults: false, showFixedDropdown: false });
     }, 200);
   },
 
@@ -198,6 +201,7 @@ Page({
       supplierName: supplier.name,
       supplierKeyword: supplier.name,
       showSupplierResults: false,
+      showFixedDropdown: false,
       filteredSuppliers: [],
     });
   },
@@ -207,6 +211,7 @@ Page({
       selectedSupplier: null,
       supplierKeyword: "",
       showSupplierResults: false,
+      showFixedDropdown: false,
       filteredSuppliers: [],
     });
   },
@@ -269,8 +274,17 @@ Page({
 
   onProductSearchBlur() {
     setTimeout(() => {
-      this.setData({ showProductResults: false });
+      this.setData({ showProductResults: false, showFixedDropdown: false });
     }, 250);
+  },
+
+  onKeyboardHeightChange(e) {
+    const height = e.detail.height || 0;
+    const hasResults = this.data.showProductResults || this.data.showSupplierResults;
+    this.setData({
+      keyboardHeight: height,
+      showFixedDropdown: height > 0 && hasResults,
+    });
   },
 
   onProductSearchSelect(e) {
@@ -307,6 +321,7 @@ Page({
       productKeyword: "",
       productSearchResults: [],
       showProductResults: false,
+      showFixedDropdown: false,
     });
     this.calcTotal();
   },
