@@ -15,16 +15,15 @@ export class PurchaseService {
 
   async findAll(params: { page?: number; pageSize?: number; keyword?: string; status?: string }) {
     const { page = 1, pageSize = 20, keyword, status } = params;
-    const where: any = {};
-    if (keyword) where.orderNo = Like(`%${keyword}%`);
-    if (status) where.status = status;
-    const [list, total] = await this.orderRepo.findAndCount({
-      where,
-      relations: ['supplier'],
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      order: { createdAt: 'DESC' },
-    });
+    const qb = this.orderRepo.createQueryBuilder('o')
+      .leftJoinAndSelect('o.supplier', 's')
+      .loadRelationCountAndMap('o.itemsCount', 'o.items')
+      .skip((page - 1) * pageSize)
+      .take(pageSize)
+      .orderBy('o.createdAt', 'DESC');
+    if (keyword) qb.andWhere('o.orderNo LIKE :kw', { kw: `%${keyword}%` });
+    if (status) qb.andWhere('o.status = :status', { status });
+    const [list, total] = await qb.getManyAndCount();
     return { list, total, page, pageSize };
   }
 

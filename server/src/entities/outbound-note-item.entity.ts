@@ -49,6 +49,12 @@ export class OutboundNoteItem {
   @Column({ length: 50, nullable: true })
   batchNo: string;
 
+  @Column({ type: 'date', nullable: true })
+  productionDate: string;
+
+  @Column({ type: 'date', nullable: true })
+  expiryDate: string;
+
   @Column({ length: 50, nullable: true })
   locationCode: string;
 }

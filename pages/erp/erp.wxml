@@ -57,8 +57,8 @@
         <view class="order-footer">
           <text class="order-date">{{item.createdAt}}</text>
           <view class="order-actions">
-            <text class="order-qty">{{item.items ? item.items.length : 0}} 种商品</text>
-            <view class="btn-action btn-receive" wx:if="{{item.status === 'pending'}}" catchtap="onConfirmReceipt" data-id="{{item.id}}">确认入库</view>
+            <text class="order-qty">{{item.itemsCount || 0}} 种商品</text>
+            <view class="btn-action btn-receive" wx:if="{{item.status === 'approved'}}" catchtap="onConfirmReceipt" data-id="{{item.id}}">确认入库</view>
           </view>
         </view>
       </view>
@@ -95,8 +95,8 @@
         <view class="order-footer">
           <text class="order-date">{{item.createdAt}}</text>
           <view class="order-actions">
-            <text class="order-qty">{{item.items ? item.items.length : 0}} 种商品</text>
-            <view class="btn-action btn-deliver" wx:if="{{item.status === 'pending'}}" catchtap="onConfirmDelivery" data-id="{{item.id}}">确认出库</view>
+            <text class="order-qty">{{item.itemsCount || 0}} 种商品</text>
+            <view class="btn-action btn-deliver" wx:if="{{item.status === 'approved'}}" catchtap="onConfirmDelivery" data-id="{{item.id}}">确认出库</view>
           </view>
         </view>
       </view>

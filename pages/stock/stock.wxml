@@ -40,29 +40,18 @@
           <view class="card-info">
             <text class="card-name">{{item.product.name}}</text>
             <text class="card-spec">{{item.product.spec}} / {{item.product.unit ? item.product.unit.name : ''}}</text>
+            <text class="card-manufacturer">{{item.product.manufacturer || '-'}}</text>
           </view>
           <view class="card-qty">
             <text class="qty-num">{{item.quantity}}</text>
             <text class="qty-unit">{{item.product.unit ? item.product.unit.name : ''}}</text>
           </view>
         </view>
-        <!-- 底部：编号 + 库位 + 批号 + 有效期 -->
+        <!-- 底部：编号 -->
         <view class="card-meta">
           <view class="meta-item">
             <text class="meta-label">编号</text>
             <text class="meta-value">{{item.product.code}}</text>
-          </view>
-          <view class="meta-item">
-            <text class="meta-label">批号</text>
-            <text class="meta-value">{{item.batches.length > 0 ? item.batches[0].batchNo : '-'}}</text>
-          </view>
-          <view class="meta-item">
-            <text class="meta-label">有效期</text>
-            <text class="meta-value">{{item.batches.length > 0 ? item.batches[0].expiryDate : '-'}}</text>
-          </view>
-          <view class="meta-item">
-            <text class="meta-label">生产日期</text>
-            <text class="meta-value">{{item.batches.length > 0 ? item.batches[0].productionDate : '-'}}</text>
           </view>
         </view>
       </view>
@@ -79,73 +68,68 @@
       </view>
     </view>
     <block wx:if="{{detailProduct}}">
-      <view class="detail-body">
-        <view class="detail-row">
-          <text class="detail-label">药品名称</text>
-          <text class="detail-value">{{detailProduct.product.name}}</text>
+      <scroll-view class="detail-body" scroll-y enhanced show-scrollbar="{{false}}">
+        <!-- ====== 商品概要 ====== -->
+        <view class="product-hero">
+          <view class="hero-top">
+            <view class="hero-info">
+              <text class="hero-name">{{detailProduct.product.name}}</text>
+              <text class="hero-spec">{{detailProduct.product.spec}} / {{detailProduct.product.unit ? detailProduct.product.unit.name : ''}}</text>
+              <text class="hero-manufacturer">{{detailProduct.product.manufacturer || '-'}}</text>
+            </view>
+            <view class="hero-qty">
+              <text class="hero-qty-num">{{detailProduct.quantity}}</text>
+              <text class="hero-qty-unit">{{detailProduct.product.unit ? detailProduct.product.unit.name : '件'}}</text>
+            </view>
+          </view>
         </view>
-        <view class="detail-row">
-          <text class="detail-label">规格</text>
-          <text class="detail-value">{{detailProduct.product.spec}}</text>
-        </view>
-        <view class="detail-row">
-          <text class="detail-label">单位</text>
-          <text class="detail-value">{{detailProduct.product.unit ? detailProduct.product.unit.name : ''}}</text>
-        </view>
-        <view class="detail-row">
-          <text class="detail-label">编号</text>
-          <text class="detail-value">{{detailProduct.product.code}}</text>
-        </view>
-        <view class="detail-row">
-          <text class="detail-label">生产厂家</text>
-          <text class="detail-value">{{detailProduct.product.manufacturer || '-'}}</text>
-        </view>
-        <view class="detail-row">
-          <text class="detail-label">库存数量</text>
-          <text class="detail-value highlight">{{detailProduct.quantity}}</text>
-        </view>
-        <view class="detail-row">
-          <text class="detail-label">仓库</text>
-          <text class="detail-value">{{detailProduct.warehouse ? detailProduct.warehouse.name : '-'}}</text>
-        </view>
-      </view>
 
-      <!-- 批次明细 -->
-      <view class="detail-section-title">批次明细</view>
-      <view class="batch-list">
-        <view class="batch-item" wx:for="{{detailProduct.batches}}" wx:key="id">
-          <view class="batch-item-row">
-            <view class="batch-field">
-              <text class="batch-label">批号</text>
-              <text class="batch-value">{{item.batchNo}}</text>
-            </view>
-            <view class="batch-field">
-              <text class="batch-label">数量</text>
-              <text class="batch-value">{{item.quantity}}</text>
-            </view>
+        <!-- ====== 基本信息网格 ====== -->
+        <view class="info-grid">
+          <view class="info-cell">
+            <text class="info-cell-label">编号</text>
+            <text class="info-cell-value">{{detailProduct.product.code}}</text>
           </view>
-          <view class="batch-item-row">
-            <view class="batch-field">
-              <text class="batch-label">生产日期</text>
-              <text class="batch-value">{{item.productionDate || '-'}}</text>
-            </view>
-            <view class="batch-field">
-              <text class="batch-label">有效期</text>
-              <text class="batch-value">{{item.expiryDate || '-'}}</text>
-            </view>
+          <view class="info-cell">
+            <text class="info-cell-label">仓库</text>
+            <text class="info-cell-value">{{detailProduct.warehouse ? detailProduct.warehouse.name : '-'}}</text>
           </view>
-          <view class="batch-item-row">
-            <view class="batch-field">
-              <text class="batch-label">库位</text>
-              <text class="batch-value">{{item.locationCode || '-'}}</text>
+        </view>
+
+        <!-- ====== 批次明细 ====== -->
+        <view class="batch-section">
+          <view class="batch-header">
+            <text class="batch-title">批次明细</text>
+            <text class="batch-count">{{detailProduct.batches.length}} 批</text>
+          </view>
+
+          <view wx:if="{{detailProduct.batches.length === 0}}" class="batch-empty">
+            <text>暂无批次数据</text>
+          </view>
+
+          <view class="batch-table" wx:else>
+            <!-- 表头 -->
+            <view class="batch-thead">
+              <text class="th th-batch">批号</text>
+              <text class="th th-date">生产日期</text>
+              <text class="th th-date">有效期</text>
+              <text class="th th-loc">库位</text>
+              <text class="th th-qty">数量</text>
+              <text class="th th-price">单价</text>
             </view>
-            <view class="batch-field">
-              <text class="batch-label">单价</text>
-              <text class="batch-value">¥{{item.price}}</text>
+            <!-- 行 -->
+            <view class="batch-trow" wx:for="{{detailProduct.batches}}" wx:key="id">
+              <text class="td td-batch">{{item.batchNo}}</text>
+              <text class="td td-date">{{item.productionDate || '-'}}</text>
+              <text class="td td-date">{{item.expiryDate || '-'}}</text>
+              <text class="td td-loc">{{item.locationCode || '-'}}</text>
+              <text class="td td-qty">{{item.quantity}}</text>
+              <text class="td td-price">¥{{item.price}}</text>
             </view>
           </view>
         </view>
-      </view>
+      </scroll-view>
+
       <view class="detail-footer">
         <button class="detail-btn" bindtap="onGoCheck" data-id="{{detailProduct.id}}">去盘点</button>
       </view>

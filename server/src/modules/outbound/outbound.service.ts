@@ -78,17 +78,17 @@ export class OutboundService {
     } as any);
     const savedNote = await this.noteRepo.save(note as any);
 
-    // Build outbound items by allocating batches via FIFO
+    // Build outbound items by allocating batches via FEFO (近效期先出)
     const outboundItems: any[] = [];
     for (const item of (salesOrder.items || [])) {
       const needQty = parseFloat(item.quantity) || 0;
       const price = parseFloat(item.price) || 0;
       if (needQty <= 0) continue;
 
-      // Find available batches sorted by productionDate ASC (FIFO)
+      // 按有效期 ASC → 生产日期 ASC 排序：近效期先出、同效期先产先出
       const batches = await this.detailRepo.find({
         where: { productId: item.productId },
-        order: { productionDate: 'ASC', createdAt: 'ASC' },
+        order: { expiryDate: 'ASC', productionDate: 'ASC', createdAt: 'ASC' },
       });
 
       let remaining = needQty;
@@ -114,13 +114,15 @@ export class OutboundService {
           amount,
           batchCode: batch.batchCode,
           batchNo: batch.batchNo,
-          locationCode: item.locationCode || null,
+          productionDate: batch.productionDate,
+          expiryDate: batch.expiryDate,
+          locationCode: batch.locationCode || null,
         } as any));
 
         remaining -= deduct;
       }
 
-      // If not enough stock, still create item without batch allocation
+      // 如果库存不足，剩余量仍创建出库明细（无批次分配）
       if (remaining > 0) {
         const amount = remaining * price;
         totalAmount += amount;
@@ -236,14 +238,14 @@ export class OutboundService {
     await this.noteRepo.update(id, { status });
 
     if (status === 'approved' && note.items) {
-      // FIFO deduction from inventory_detail
+      // FEFO 扣减库存：近效期先出
       for (const item of note.items) {
         const needQty = Math.abs(parseFloat(item.quantity as any) || 0);
         if (needQty <= 0) continue;
 
         const batches = await this.detailRepo.find({
           where: { productId: item.productId },
-          order: { productionDate: 'ASC', createdAt: 'ASC' },
+          order: { expiryDate: 'ASC', productionDate: 'ASC', createdAt: 'ASC' },
         });
 
         let remaining = needQty;

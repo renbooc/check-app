@@ -52,6 +52,8 @@ Page({
         price: item.price,
         amount: item.amount,
         batchNo: item.batchNo || '',
+        productionDate: item.productionDate || '',
+        expiryDate: item.expiryDate || '',
         locationCode: item.locationCode || '',
       }))
 
@@ -151,6 +153,34 @@ Page({
       totalAmount += parseFloat(item.amount) || 0
     })
     this.setData({ totalQuantity, totalAmount: totalAmount.toFixed(2) })
+  },
+
+  onBatchNoInput(e) {
+    const index = e.currentTarget.dataset.index
+    const items = [...this.data.items]
+    items[index].batchNo = e.detail.value
+    this.setData({ items })
+  },
+
+  onProductionDateChange(e) {
+    const index = e.currentTarget.dataset.index
+    const items = [...this.data.items]
+    items[index].productionDate = e.detail.value
+    this.setData({ items })
+  },
+
+  onExpiryDateChange(e) {
+    const index = e.currentTarget.dataset.index
+    const items = [...this.data.items]
+    items[index].expiryDate = e.detail.value
+    this.setData({ items })
+  },
+
+  onLocationCodeInput(e) {
+    const index = e.currentTarget.dataset.index
+    const items = [...this.data.items]
+    items[index].locationCode = e.detail.value
+    this.setData({ items })
   },
 
   async onSave() {

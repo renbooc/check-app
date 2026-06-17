@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Inventory } from '../../entities/inventory.entity';
 import { InventoryDetail } from '../../entities/inventory-detail.entity';
 import { InventoryLog } from '../../entities/inventory-log.entity';
@@ -159,7 +159,7 @@ export class InventoryService {
     let batches: InventoryDetail[] = [];
     if (productIds.length > 0) {
       batches = await this.detailRepo.find({
-        where: { productId: productIds as any },
+        where: { productId: In(productIds) },
         order: { createdAt: 'DESC' },
       });
     }

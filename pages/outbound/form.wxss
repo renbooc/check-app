@@ -79,6 +79,17 @@
 .item-extra-ro-field { flex: 1; display: flex; align-items: center; gap: 6rpx; }
 .item-extra-ro-label { font-size: 22rpx; color: #999; flex-shrink: 0; }
 .item-extra-ro-value { font-size: 24rpx; color: #555; }
+
+/* 编辑模式：批号/生产日期/有效期/货位号 */
+.item-extra-fields { margin-top: 14rpx; padding-top: 14rpx; border-top: 2rpx solid rgba(0,0,0,0.04); }
+.item-extra-row { display: flex; gap: 14rpx; margin-bottom: 10rpx; }
+.item-extra-row:last-child { margin-bottom: 0; }
+.item-extra-field { flex: 1; }
+.item-extra-field-half { flex: 1; min-width: 0; }
+.item-extra-label { display: block; font-size: 22rpx; color: #5c5c5c; margin-bottom: 6rpx; }
+.item-extra-input { background: #FFFFFF; border-radius: 8rpx; padding: 0 12rpx; height: 60rpx; font-size: 26rpx; color: #333333; width: 100%; box-sizing: border-box; }
+.item-extra-picker { display: flex; align-items: center; background: #FFFFFF; border-radius: 8rpx; padding: 0 12rpx; height: 60rpx; font-size: 26rpx; color: #5c5c5c; }
+.item-extra-picker.has-value { color: #E83E8C; }
 .items-empty { padding: 40rpx 0; text-align: center; }
 .items-empty-text { font-size: 26rpx; color: #ccc; }
 
