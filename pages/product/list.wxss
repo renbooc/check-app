@@ -439,7 +439,8 @@
   gap: 8rpx;
   height: 80rpx;
   padding: 0 36rpx;
-  background: #0077C2;
+  margin-left: auto;
+  background: #F59E0B;
   border-radius: 16rpx;
   color: #ffffff;
   font-size: 28rpx;
