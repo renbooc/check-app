@@ -264,8 +264,29 @@ Page({
     }
   },
 
+  validateRequired() {
+    const items = this.data.items
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]
+      if (!item.batchNo) {
+        wx.showToast({ title: `第${i + 1}项批号未录入，请点击编辑后填写`, icon: 'none', duration: 2000 })
+        return false
+      }
+      if (!item.productionDate) {
+        wx.showToast({ title: `第${i + 1}项生产日期未录入，请点击编辑后填写`, icon: 'none', duration: 2000 })
+        return false
+      }
+      if (!item.expiryDate) {
+        wx.showToast({ title: `第${i + 1}项有效期未录入，请点击编辑后填写`, icon: 'none', duration: 2000 })
+        return false
+      }
+    }
+    return true
+  },
+
   async onApprove() {
     if (this.data.submitting) return
+    if (!this.validateRequired()) return
     this.setData({ submitting: true })
     try {
       await api.put('/inbound/' + this.data.id + '/status', { status: 'approved' })
