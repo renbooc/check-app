@@ -306,13 +306,19 @@ const ENV_MAP = {
 ```bash
 cd /opt/erp
 
+
+git pull origin main
+
+# 先从宿主机上复制到容器内
+docker cp docs/outbound-note-schema.sql erp-db:/tmp/outbound-note-schema.sql
+# 执行数据库脚本 erp_user数据库用户名  erp_db数据库名
+docker exec erp-db sh -c 'psql -U erp_user -d erp_db -f /tmp/inventory-batch-schema.sql'
+
 # 使用 docker compose 构建并启动（后台运行）
 # --env-file 指定环境变量来源，确保 db 和 app 使用相同的凭据
-git pull origin main
 sudo docker compose --env-file .env.production up -d --build
 
-# 执行数据库脚本 erp_user数据库用户名  erp_db数据库名
-docker exec erp-db sh -c 'psql -U erp_user -d erp_db -f /docs/inventory-batch-schema.sql'
+
 ```
 
 首次构建大约需要 3~8 分钟（下载基础镜像 + 安装依赖 + 编译 TypeScript）。

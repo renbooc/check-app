@@ -46,10 +46,10 @@ export class InboundNoteItem {
   @Column({ length: 50 })
   batchNo: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   productionDate: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   expiryDate: string;
 
   @Column({ length: 50, nullable: true })

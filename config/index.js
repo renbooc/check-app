@@ -1,7 +1,7 @@
 const ENV_MAP = {
   dev: {
-    baseUrl: "http://localhost:3000",
-    // baseUrl: "https://api.rccjoy.com.cn",
+    // baseUrl: "http://localhost:3000",
+    baseUrl: "https://api.rccjoy.com.cn",
     env: "development",
     debug: true,
   },

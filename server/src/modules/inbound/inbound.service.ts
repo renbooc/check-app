@@ -96,9 +96,9 @@ export class InboundService {
         price,
         amount,
         batchNo: item.batchNo || '',
-        productionDate: item.productionDate || '',
-        expiryDate: item.expiryDate || '',
-        locationCode: item.locationCode || '',
+        productionDate: item.productionDate || null,
+        expiryDate: item.expiryDate || null,
+        locationCode: item.locationCode || null,
       } as any);
     });
     await this.itemRepo.save(items);
@@ -158,6 +158,10 @@ export class InboundService {
         inboundId: savedNote.id,
         ...item,
         amount,
+        productionDate: item.productionDate || null,
+        expiryDate: item.expiryDate || null,
+        batchNo: item.batchNo || null,
+        locationCode: item.locationCode || null,
       });
     });
     await this.itemRepo.save(items);
@@ -212,9 +216,9 @@ export class InboundService {
           quantity: qty,
           price,
           amount,
-          batchNo: item.batchNo || '',
-          productionDate: item.productionDate || '',
-          expiryDate: item.expiryDate || '',
+          batchNo: item.batchNo || null,
+          productionDate: item.productionDate || null,
+          expiryDate: item.expiryDate || null,
           locationCode: item.locationCode || null,
         } as any);
       });

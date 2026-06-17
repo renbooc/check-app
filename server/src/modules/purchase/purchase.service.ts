@@ -90,6 +90,10 @@ export class PurchaseService {
         orderId: savedOrder.id,
         ...item,
         amount,
+        productionDate: item.productionDate || null,
+        expiryDate: item.expiryDate || null,
+        batchNo: item.batchNo || null,
+        locationCode: item.locationCode || null,
       });
     });
     await this.itemRepo.save(items);
@@ -118,7 +122,7 @@ export class PurchaseService {
 
     if (dto.supplierId !== undefined) order.supplierId = dto.supplierId;
     if (dto.remark !== undefined) order.remark = dto.remark;
-    if (dto.expectedDate !== undefined) order.expectedDate = dto.expectedDate;
+    if (dto.expectedDate !== undefined) order.expectedDate = dto.expectedDate || null;
     if (dto.warehouseId !== undefined) order.warehouseId = dto.warehouseId;
     if (dto.warehouseName !== undefined) order.warehouseName = dto.warehouseName;
 
@@ -136,6 +140,10 @@ export class PurchaseService {
           orderId: id,
           ...item,
           amount,
+          productionDate: item.productionDate || null,
+          expiryDate: item.expiryDate || null,
+          batchNo: item.batchNo || null,
+          locationCode: item.locationCode || null,
         });
       });
       await this.itemRepo.save(items);
