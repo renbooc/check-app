@@ -58,6 +58,10 @@ export class PurchaseService {
       productUnit?: string;
       quantity: number;
       price: number;
+      productionDate?: string;
+      expiryDate?: string;
+      batchNo?: string;
+      locationCode?: string;
     }>;
     operatorId: string;
     operatorName: string;
@@ -86,7 +90,8 @@ export class PurchaseService {
       const amount = item.quantity * item.price;
       totalAmount += amount;
       totalQuantity += item.quantity;
-      return this.itemRepo.create({
+      const entity = this.itemRepo.create();
+      Object.assign(entity, {
         orderId: savedOrder.id,
         ...item,
         amount,
@@ -95,8 +100,9 @@ export class PurchaseService {
         batchNo: item.batchNo || null,
         locationCode: item.locationCode || null,
       });
+      return entity;
     });
-    await this.itemRepo.save(items);
+    await this.itemRepo.save(items as any);
 
     await this.orderRepo.update(savedOrder.id, { totalAmount, totalQuantity });
     return this.findOne(savedOrder.id);
@@ -111,6 +117,10 @@ export class PurchaseService {
       productUnit?: string;
       quantity: number;
       price: number;
+      productionDate?: string;
+      expiryDate?: string;
+      batchNo?: string;
+      locationCode?: string;
     }>;
     remark?: string;
     expectedDate?: string;
@@ -136,7 +146,8 @@ export class PurchaseService {
         const amount = item.quantity * item.price;
         totalAmount += amount;
         totalQuantity += item.quantity;
-        return this.itemRepo.create({
+        const entity = this.itemRepo.create();
+        Object.assign(entity, {
           orderId: id,
           ...item,
           amount,
@@ -145,8 +156,9 @@ export class PurchaseService {
           batchNo: item.batchNo || null,
           locationCode: item.locationCode || null,
         });
+        return entity;
       });
-      await this.itemRepo.save(items);
+      await this.itemRepo.save(items as any);
       order.totalAmount = totalAmount;
       order.totalQuantity = totalQuantity;
     }

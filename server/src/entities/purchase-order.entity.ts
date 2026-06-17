@@ -50,7 +50,7 @@ export class PurchaseOrder {
   operatorName: string;
 
   @Column({ type: 'date', nullable: true })
-  expectedDate: string;
+  expectedDate: string | null;
 
   @Column({ length: 500, nullable: true })
   remark: string;

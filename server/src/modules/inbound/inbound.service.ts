@@ -99,9 +99,9 @@ export class InboundService {
         productionDate: item.productionDate || null,
         expiryDate: item.expiryDate || null,
         locationCode: item.locationCode || null,
-      } as any);
+      });
     });
-    await this.itemRepo.save(items);
+    await this.itemRepo.save(items as any);
 
     await this.noteRepo.update(savedNote.id, { totalAmount, totalQuantity });
     return this.findOne(savedNote.id);
@@ -158,13 +158,13 @@ export class InboundService {
         inboundId: savedNote.id,
         ...item,
         amount,
-        productionDate: item.productionDate || null,
-        expiryDate: item.expiryDate || null,
-        batchNo: item.batchNo || null,
-        locationCode: item.locationCode || null,
+        productionDate: (item as any).productionDate || null,
+        expiryDate: (item as any).expiryDate || null,
+        batchNo: (item as any).batchNo || null,
+        locationCode: (item as any).locationCode || null,
       });
     });
-    await this.itemRepo.save(items);
+    await this.itemRepo.save(items as any);
 
     await this.noteRepo.update(savedNote.id, { totalAmount, totalQuantity });
     return this.findOne(savedNote.id);
