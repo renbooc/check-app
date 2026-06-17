@@ -134,9 +134,10 @@ Page({
 
       var todaySales = parseFloat(overviewRes.todaySales) || 0
       var todayPurchase = parseFloat(overviewRes.todayPurchase) || 0
-      var margin = Math.max(todaySales - todayPurchase, 0)
-      var trend = parseFloat(overviewRes.todaySalesTrend) || 0
+      var monthSales = parseFloat(overviewRes.monthSales) || 0
+      var trend = parseFloat(overviewRes.salesTrend) || 0
       var trendAbs = Math.abs(trend)
+      var pendingChecks = overviewRes.pendingChecks || 0
 
       var tab = this.data.orderTab
       this.setData({
@@ -145,8 +146,8 @@ Page({
         // Hero
         todaySalesDisplay: formatMoney(todaySales),
         salesCountText: (overviewRes.todaySalesCount || 0) + ' 笔订单',
-        purchaseText: '采购 ¥' + formatMoney(todayPurchase),
-        marginText: '毛利 ¥' + formatMoney(margin),
+        purchaseText: '今日采购 ¥' + formatMoney(todayPurchase),
+        marginText: '本月销售 ¥' + formatMoney(monthSales),
         showTrend: trend !== 0,
         trendCls: trend > 0 ? 'trend trend-up' : 'trend trend-down',
         trendArrow: trend > 0 ? '↑' : '↓',
@@ -154,8 +155,8 @@ Page({
         // KPI
         inventoryValueDisplay: formatMoney(overviewRes.inventoryValue),
         productCountText: (overviewRes.productCount || 0) + ' 种商品',
-        pendingChecks: overviewRes.pendingTypes || overviewRes.pendingChecks || 0,
-        pendingWarnCls: (overviewRes.pendingTypes || overviewRes.pendingChecks || 0) > 0 ? 'kpi-num kpi-num-warn' : 'kpi-num',
+        pendingChecks: pendingChecks,
+        pendingWarnCls: pendingChecks > 0 ? 'kpi-num kpi-num-warn' : 'kpi-num',
         customerCount: overviewRes.customerCount || 0,
         // 订单
         currentOrders: tab === 'purchase' ? purchaseList : salesList,

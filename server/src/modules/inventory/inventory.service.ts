@@ -31,9 +31,36 @@ export class InventoryService {
   async getOverview() {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    // 今日时间范围
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(todayStart.getTime() + 86400000);
 
-    // 本月销售统计
-    const monthlySales = await this.salesRepo
+    // ===== 今日销售（已审核/已出库） =====
+    const todaySales = await this.salesRepo
+      .createQueryBuilder('so')
+      .select('COALESCE(SUM(so.totalAmount), 0)', 'total')
+      .addSelect('COUNT(*)', 'count')
+      .where('so.status IN (:...statuses)', {
+        statuses: [SalesOrderStatus.APPROVED, SalesOrderStatus.DELIVERED],
+      })
+      .andWhere('so.createdAt >= :startDate', { startDate: todayStart })
+      .andWhere('so.createdAt < :endDate', { endDate: todayEnd })
+      .getRawOne();
+
+    // ===== 今日采购（已审核/已入库） =====
+    const todayPurchase = await this.purchaseRepo
+      .createQueryBuilder('po')
+      .select('COALESCE(SUM(po.totalAmount), 0)', 'total')
+      .addSelect('COUNT(*)', 'count')
+      .where('po.status IN (:...statuses)', {
+        statuses: [PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.RECEIVED],
+      })
+      .andWhere('po.createdAt >= :startDate', { startDate: todayStart })
+      .andWhere('po.createdAt < :endDate', { endDate: todayEnd })
+      .getRawOne();
+
+    // ===== 本月销售（用于趋势对比） =====
+    const monthSales = await this.salesRepo
       .createQueryBuilder('so')
       .select('COALESCE(SUM(so.totalAmount), 0)', 'total')
       .addSelect('COUNT(*)', 'count')
@@ -43,34 +70,7 @@ export class InventoryService {
       .andWhere('so.createdAt >= :startDate', { startDate: startOfMonth })
       .getRawOne();
 
-    // 本月采购统计（修复：RECEIVED 重复 -> APPROVED + RECEIVED）
-    const monthlyPurchase = await this.purchaseRepo
-      .createQueryBuilder('po')
-      .select('COALESCE(SUM(po.totalAmount), 0)', 'total')
-      .addSelect('COUNT(*)', 'count')
-      .where('po.status IN (:...statuses)', {
-        statuses: [PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.RECEIVED],
-      })
-      .andWhere('po.createdAt >= :startDate', { startDate: startOfMonth })
-      .getRawOne();
-
-    // 库存周转率
-    const totalInventory = await this.inventoryRepo
-      .createQueryBuilder('i')
-      .select('COALESCE(SUM(i.quantity), 0)', 'total')
-      .getRawOne();
-
-    const monthlyOutbound = await this.salesItemRepo
-      .createQueryBuilder('si')
-      .innerJoin('si.order', 'so')
-      .select('COALESCE(SUM(si.quantity), 0)', 'total')
-      .where('so.status IN (:...statuses)', {
-        statuses: [SalesOrderStatus.APPROVED, SalesOrderStatus.DELIVERED],
-      })
-      .andWhere('so.createdAt >= :startDate', { startDate: startOfMonth })
-      .getRawOne();
-
-    // 上月销售统计（用于计算趋势）
+    // 上月销售（用于趋势对比）
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
     const lastMonthSales = await this.salesRepo
@@ -83,58 +83,56 @@ export class InventoryService {
       .andWhere('so.createdAt < :endDate', { endDate: startOfMonth })
       .getRawOne();
 
-    // 库存总值
+    // ===== 库存总值（按产品售价估算） =====
     const inventoryValue = await this.inventoryRepo
       .createQueryBuilder('i')
       .innerJoin('i.product', 'p')
       .select('COALESCE(SUM(i.quantity * p.price), 0)', 'total')
       .getRawOne();
 
-    // 商品种数
+    // ===== 商品种数 =====
     const productCount = await this.inventoryRepo
       .createQueryBuilder('i')
       .select('COUNT(DISTINCT i.productId)', 'count')
       .getRawOne();
 
-    // 待盘点数
+    // ===== 待盘点数 =====
     const pendingCheckCount = await this.checkRepo
       .createQueryBuilder('sc')
       .select('COUNT(*)', 'count')
       .where('sc.status = :status', { status: 'pending' })
       .getRawOne();
 
-    // 客户总数（修复：之前缺失该字段）
+    // ===== 客户总数 =====
     const customerCount = await this.customerRepo
       .createQueryBuilder('c')
       .select('COUNT(*)', 'count')
       .where('c.isActive = true')
       .getRawOne();
 
-    // 周转率
-    const avgInventory = (parseFloat(totalInventory?.total || '0')) / 2;
-    const turnoverRate = avgInventory > 0
-      ? ((parseFloat(monthlyOutbound?.total || '0')) / avgInventory).toFixed(1)
-      : '0';
-
-    // 销售趋势
-    const currentTotal = parseFloat(monthlySales?.total || '0');
+    // ===== 销售额趋势 =====
+    const currentMonthTotal = parseFloat(monthSales?.total || '0');
     const lastTotal = parseFloat(lastMonthSales?.total || '0');
-    const todaySalesTrend = lastTotal > 0
-      ? parseFloat((((currentTotal - lastTotal) / lastTotal) * 100).toFixed(1))
+    const salesTrend = lastTotal > 0
+      ? parseFloat((((currentMonthTotal - lastTotal) / lastTotal) * 100).toFixed(1))
       : 0;
 
     return {
-      todaySales: currentTotal,
-      todaySalesCount: parseInt(monthlySales?.count || '0'),
-      todaySalesTrend,
-      todayPurchase: parseFloat(monthlyPurchase?.total || '0'),
-      todayPurchaseCount: parseInt(monthlyPurchase?.count || '0'),
+      // 今日数据
+      todaySales: parseFloat(todaySales?.total || '0'),
+      todaySalesCount: parseInt(todaySales?.count || '0'),
+      todayPurchase: parseFloat(todayPurchase?.total || '0'),
+      todayPurchaseCount: parseInt(todayPurchase?.count || '0'),
+      // 本月数据
+      monthSales: parseFloat(monthSales?.total || '0'),
+      monthSalesCount: parseInt(monthSales?.count || '0'),
+      // 趋势（本月 vs 上月）
+      salesTrend,
+      // 库存
       inventoryValue: parseFloat(inventoryValue?.total || '0'),
       productCount: parseInt(productCount?.count || '0'),
       pendingChecks: parseInt(pendingCheckCount?.count || '0'),
-      pendingTypes: parseInt(pendingCheckCount?.count || '0'),
-      turnoverRate,
-      customerCount: parseInt(customerCount?.count || '0'), // 新增客户数
+      customerCount: parseInt(customerCount?.count || '0'),
     };
   }
 
