@@ -86,8 +86,11 @@ export class OutboundService {
       if (needQty <= 0) continue;
 
       // 按有效期 ASC → 生产日期 ASC 排序：近效期先出、同效期先产先出
+      const whId = salesOrder.warehouseId || (salesOrder as any).warehouseId || '';
+      const batchWhere: any = { productId: item.productId };
+      if (whId) batchWhere.warehouseId = whId;
       const batches = await this.detailRepo.find({
-        where: { productId: item.productId },
+        where: batchWhere,
         order: { expiryDate: 'ASC', productionDate: 'ASC', createdAt: 'ASC' },
       });
 
@@ -243,8 +246,10 @@ export class OutboundService {
         const needQty = Math.abs(parseFloat(item.quantity as any) || 0);
         if (needQty <= 0) continue;
 
+        const batchWhere: any = { productId: item.productId };
+        if (note.warehouseId) batchWhere.warehouseId = note.warehouseId;
         const batches = await this.detailRepo.find({
-          where: { productId: item.productId },
+          where: batchWhere,
           order: { expiryDate: 'ASC', productionDate: 'ASC', createdAt: 'ASC' },
         });
 

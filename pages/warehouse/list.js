@@ -62,12 +62,13 @@ Page({
 
   async loadList(append) {
     try {
-      const res = await api.get('/warehouses', { page: 1, pageSize: 200 })
+      const page = this.data.page
+      const res = await api.get('/warehouses', { page, pageSize: 20 })
       const raw = Array.isArray(res) ? res : (res.list || [])
       const enriched = raw.map(this.enrichItem.bind(this))
       this.setData({
-        list: enriched,
-        total: enriched.length,
+        list: append ? [...this.data.list, ...enriched] : enriched,
+        total: res.total || enriched.length,
         loading: false,
         loaded: true,
       })

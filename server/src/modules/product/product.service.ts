@@ -6,6 +6,7 @@ import { Category } from '../../entities/category.entity';
 import { Unit } from '../../entities/unit.entity';
 import { Warehouse } from '../../entities/warehouse.entity';
 import { Location } from '../../entities/location.entity';
+import { InventoryDetail } from '../../entities/inventory-detail.entity';
 import { toPinyinInitials } from '../../common/utils/pinyin';
 
 @Injectable()
@@ -16,10 +17,11 @@ export class ProductService {
     @InjectRepository(Unit) private unitRepo: Repository<Unit>,
     @InjectRepository(Warehouse) private warehouseRepo: Repository<Warehouse>,
     @InjectRepository(Location) private locationRepo: Repository<Location>,
+    @InjectRepository(InventoryDetail) private detailRepo: Repository<InventoryDetail>,
   ) {}
 
   async searchProducts(keyword: string) {
-    const list = await this.productRepo.find({
+    const products = await this.productRepo.find({
       where: [
         { name: Like(`%${keyword}%`), isActive: true },
         { code: Like(`%${keyword}%`), isActive: true },
@@ -27,14 +29,78 @@ export class ProductService {
       relations: ['unit', 'category'],
       take: 20,
     });
+
+    // 补充库存信息
+    const productIds = products.map(p => p.id);
+    let inventoryMap = new Map<string, { stockCount: number; batchNo: string; expiryDate: string; locationCode: string }>();
+    if (productIds.length > 0) {
+      const details = await this.detailRepo
+        .createQueryBuilder('d')
+        .select('d.productId', 'productId')
+        .addSelect('SUM(d.quantity)', 'stockCount')
+        .addSelect('d.batchNo', 'batchNo')
+        .addSelect('d.expiryDate', 'expiryDate')
+        .addSelect('d.locationCode', 'locationCode')
+        .where('d.productId IN (:...ids)', { ids: productIds })
+        .groupBy('d.productId')
+        .addGroupBy('d.batchNo')
+        .addGroupBy('d.expiryDate')
+        .addGroupBy('d.locationCode')
+        .orderBy('d.expiryDate', 'ASC')
+        .getRawMany();
+      for (const d of details) {
+        if (!inventoryMap.has(d.productId)) {
+          inventoryMap.set(d.productId, {
+            stockCount: parseInt(d.stockCount) || 0,
+            batchNo: d.batchNo || '',
+            expiryDate: d.expiryDate || '',
+            locationCode: d.locationCode || '',
+          });
+        }
+      }
+    }
+
+    const list = products.map(p => {
+      const inv = inventoryMap.get(p.id);
+      return {
+        ...p,
+        stockCount: inv?.stockCount || 0,
+        batchNo: inv?.batchNo || '',
+        expiryDate: inv?.expiryDate || '',
+        location: inv?.locationCode || '',
+      };
+    });
     return { list, total: list.length };
   }
 
   async findByBarcode(code: string) {
-    return this.productRepo.findOne({
+    const product = await this.productRepo.findOne({
       where: { code, isActive: true },
       relations: ['unit', 'category'],
     });
+    if (!product) return null;
+
+    // 补充库存信息
+    const detail = await this.detailRepo
+      .createQueryBuilder('d')
+      .select('SUM(d.quantity)', 'stockCount')
+      .addSelect('d.batchNo', 'batchNo')
+      .addSelect('d.expiryDate', 'expiryDate')
+      .addSelect('d.locationCode', 'locationCode')
+      .where('d.productId = :pid', { pid: product.id })
+      .groupBy('d.batchNo')
+      .addGroupBy('d.expiryDate')
+      .addGroupBy('d.locationCode')
+      .orderBy('d.expiryDate', 'ASC')
+      .getRawOne();
+
+    return {
+      ...product,
+      stockCount: parseInt(detail?.stockCount) || 0,
+      batchNo: detail?.batchNo || '',
+      expiryDate: detail?.expiryDate || '',
+      location: detail?.locationCode || '',
+    };
   }
 
   async findAll(params: { page?: number; pageSize?: number; keyword?: string; categoryId?: string }) {

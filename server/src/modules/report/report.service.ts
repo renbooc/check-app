@@ -196,13 +196,16 @@ export class ReportService {
     const allActiveSourceIds = [...activeLowStockIds, ...activePurchaseIds, ...activeSalesIds];
 
     // 查找所有 ACTIVE 或 READ 的通知，但当前条件下已经不存在的
-    const staleNotifications = await this.notificationRepo
-      .createQueryBuilder('n')
-      .where('n.status IN (:...statuses)', {
-        statuses: [NotificationStatus.ACTIVE, NotificationStatus.READ],
-      })
-      .andWhere('n.sourceId NOT IN (:...ids)', { ids: allActiveSourceIds })
-      .getMany();
+    let staleNotifications: any[] = [];
+    if (allActiveSourceIds.length > 0) {
+      staleNotifications = await this.notificationRepo
+        .createQueryBuilder('n')
+        .where('n.status IN (:...statuses)', {
+          statuses: [NotificationStatus.ACTIVE, NotificationStatus.READ],
+        })
+        .andWhere('n.sourceId NOT IN (:...ids)', { ids: allActiveSourceIds })
+        .getMany();
+    }
 
     if (staleNotifications.length > 0) {
       await this.notificationRepo.update(

@@ -79,10 +79,7 @@ const entities = [
         database: config.get('DB_DATABASE', 'erp_db'),
         entities,
         synchronize:
-          config.get(
-            'DB_SYNCHRONIZE',
-            String(config.get('NODE_ENV') !== 'production'),
-          ) === 'true',
+          config.get<string>('DB_SYNCHRONIZE', 'false') === 'true',
       }),
     }),
     ThrottlerModule.forRootAsync({

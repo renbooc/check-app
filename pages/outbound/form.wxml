@@ -24,7 +24,7 @@
       <text class="order-form-label">客户</text>
       <view class="customer-selected-inline">
         <view class="customer-avatar-sm">{{customerInitial}}</view>
-        <text class="customer-name-inline">{{supplierName || customerName}}</text>
+        <text class="customer-name-inline">{{customerName}}</text>
       </view>
     </view>
 
