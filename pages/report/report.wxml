@@ -43,9 +43,9 @@
           <image class="kpi-icon-img" src="/images/icon-document.png" mode="aspectFit"></image>
         </view>
         <view class="kpi-body">
-          <text class="kpi-label">销售收入</text>
+          <text class="kpi-label">销售总额</text>
           <text class="kpi-value">¥{{report.totalSales}}</text>
-          <text class="kpi-sub">{{report.salesCount}} 笔</text>
+          <text class="kpi-sub">{{report.salesCount}} 笔 · 已审核出库单</text>
         </view>
       </view>
       <view class="kpi-card">
@@ -53,9 +53,9 @@
           <image class="kpi-icon-img" src="/images/icon-clipboard.png" mode="aspectFit"></image>
         </view>
         <view class="kpi-body">
-          <text class="kpi-label">采购支出</text>
+          <text class="kpi-label">采购总额</text>
           <text class="kpi-value">¥{{report.totalPurchase}}</text>
-          <text class="kpi-sub">{{report.purchaseCount}} 笔</text>
+          <text class="kpi-sub">{{report.purchaseCount}} 笔 · 已审核入库单</text>
         </view>
       </view>
       <view class="kpi-card">
@@ -63,9 +63,9 @@
           <image class="kpi-icon-img" src="/images/icon-record.png" mode="aspectFit"></image>
         </view>
         <view class="kpi-body">
-          <text class="kpi-label">毛利润</text>
-          <text class="kpi-value">¥{{report.grossProfit}}</text>
-          <text class="kpi-sub">利润率 {{report.profitRate}}%</text>
+          <text class="kpi-label">净差额</text>
+          <text class="kpi-value {{report.netDiff >= 0 ? 'value-positive' : 'value-negative'}}">¥{{report.netDiff}}</text>
+          <text class="kpi-sub">占收入 {{report.diffRate}}%</text>
         </view>
       </view>
       <view class="kpi-card">

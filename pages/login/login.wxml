@@ -23,7 +23,8 @@
     <view class="form-group">
       <text class="form-label">密码</text>
       <view class="input-wrapper">
-        <input class="form-input" placeholder="请输入密码" password="{{!showPassword}}" value="{{password}}" bindinput="onPasswordInput" />
+        <input wx:if="{{showPassword}}" class="form-input" placeholder="请输入密码" value="{{password}}" bindinput="onPasswordInput" />
+        <input wx:else class="form-input" placeholder="请输入密码" password="{{true}}" value="{{password}}" bindinput="onPasswordInput" />
         <view class="toggle-pwd" bindtap="togglePassword">
           <text class="toggle-text">{{showPassword ? '隐藏' : '显示'}}</text>
         </view>

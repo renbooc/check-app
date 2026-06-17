@@ -131,20 +131,20 @@ Page({
         api.get('/report/low-stock')
       ])
 
-      const totalSales = parseFloat(overviewRes.todaySales || 0)
-      const totalPurchase = parseFloat(overviewRes.todayPurchase || 0)
-      const grossProfit = totalSales - totalPurchase
-      const profitRate = totalSales > 0 ? ((grossProfit / totalSales) * 100).toFixed(1) : '0'
+      const totalSales = parseFloat(overviewRes.totalSales || 0)
+      const totalPurchase = parseFloat(overviewRes.totalPurchase || 0)
+      const netDiff = totalSales - totalPurchase
+      const diffRate = totalSales > 0 ? ((netDiff / totalSales) * 100).toFixed(1) : (totalPurchase > 0 ? '-100' : '0')
 
       this.setData({
         loading: false,
         report: {
           totalSales: totalSales.toFixed(2),
-          salesCount: overviewRes.todaySalesCount || 0,
+          salesCount: overviewRes.salesCount || 0,
           totalPurchase: totalPurchase.toFixed(2),
-          purchaseCount: overviewRes.todayPurchaseCount || 0,
-          grossProfit: grossProfit.toFixed(2),
-          profitRate,
+          purchaseCount: overviewRes.purchaseCount || 0,
+          netDiff: netDiff.toFixed(2),
+          diffRate,
           turnoverRate: overviewRes.turnoverRate || '0',
           topProducts: topRes.list || [],
           lowStockProducts: lowRes.list || []

@@ -212,6 +212,103 @@
   color: #999;
 }
 
+/* ===== 卡片底栏（编号左 + 预警右） ===== */
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f5f5f5;
+}
+
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx 24rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ===== 预警标识（彩色圆点+呼吸灯） ===== */
+.card-warnings {
+  display: flex;
+  flex-shrink: 0;
+  gap: 12rpx;
+  margin-left: 12rpx;
+  align-items: center;
+}
+
+.warn-item {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.warn-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: warnPulse 2s ease-in-out infinite;
+}
+
+.warn-dot-expired {
+  background: #E53E3E;
+  box-shadow: 0 0 6rpx rgba(229, 62, 62, 0.5);
+}
+
+.warn-dot-expiring {
+  background: #E68A00;
+  box-shadow: 0 0 6rpx rgba(230, 138, 0, 0.5);
+}
+
+.warn-dot-lowstock {
+  background: #0077C2;
+  box-shadow: 0 0 6rpx rgba(0, 119, 194, 0.5);
+}
+
+.warn-label {
+  font-size: 20rpx;
+  color: #888;
+  white-space: nowrap;
+}
+
+@keyframes warnPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* ===== 批次预警圆点（详情弹层） ===== */
+.td-batch {
+  display: flex !important;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.batch-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: warnPulse 2s ease-in-out infinite;
+}
+
+.batch-dot-expired {
+  background: #E53E3E;
+  box-shadow: 0 0 6rpx rgba(229, 62, 62, 0.6);
+}
+
+.batch-dot-expiring {
+  background: #E68A00;
+  box-shadow: 0 0 6rpx rgba(230, 138, 0, 0.6);
+}
+
+.batch-no-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* 库存量（视觉焦点） */
 .card-qty {
   display: flex;
@@ -232,15 +329,6 @@
   font-size: 20rpx;
   color: #5c5c5c;
   margin-top: 8rpx;
-}
-
-/* ---------- 卡片底部元信息 ---------- */
-.card-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx 24rpx;
-  padding-top: 20rpx;
-  border-top: 1rpx solid #f5f5f5;
 }
 
 .meta-item {

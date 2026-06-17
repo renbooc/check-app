@@ -47,11 +47,27 @@
             <text class="qty-unit">{{item.product.unit ? item.product.unit.name : ''}}</text>
           </view>
         </view>
-        <!-- 底部：编号 -->
-        <view class="card-meta">
-          <view class="meta-item">
-            <text class="meta-label">编号</text>
-            <text class="meta-value">{{item.product.code}}</text>
+        <!-- 底部：编号 + 预警 -->
+        <view class="card-footer">
+          <view class="card-meta">
+            <view class="meta-item">
+              <text class="meta-label">编号</text>
+              <text class="meta-value">{{item.product.code}}</text>
+            </view>
+          </view>
+          <view class="card-warnings" wx:if="{{item.hasExpired || item.hasExpiring || item.hasLowStock}}">
+            <view class="warn-item" wx:if="{{item.hasExpired}}">
+              <view class="warn-dot warn-dot-expired"></view>
+              <text class="warn-label">已过期</text>
+            </view>
+            <view class="warn-item" wx:if="{{item.hasExpiring}}">
+              <view class="warn-dot warn-dot-expiring"></view>
+              <text class="warn-label">近效期</text>
+            </view>
+            <view class="warn-item" wx:if="{{item.hasLowStock}}">
+              <view class="warn-dot warn-dot-lowstock"></view>
+              <text class="warn-label">库存偏低</text>
+            </view>
           </view>
         </view>
       </view>
@@ -119,7 +135,11 @@
             </view>
             <!-- 行 -->
             <view class="batch-trow" wx:for="{{detailProduct.batches}}" wx:key="id">
-              <text class="td td-batch">{{item.batchNo}}</text>
+              <view class="td td-batch">
+                <view class="batch-dot batch-dot-expired" wx:if="{{item._expired}}"></view>
+                <view class="batch-dot batch-dot-expiring" wx:elif="{{item._expiring}}"></view>
+                <text class="batch-no-text">{{item.batchNo}}</text>
+              </view>
               <text class="td td-date">{{item.productionDate || '-'}}</text>
               <text class="td td-date">{{item.expiryDate || '-'}}</text>
               <text class="td td-loc">{{item.locationCode || '-'}}</text>

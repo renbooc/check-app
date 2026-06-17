@@ -34,9 +34,9 @@ export class ReportService {
   async getOverview(startDate?: string, endDate?: string) {
     const now = new Date();
     const start = startDate ? new Date(startDate) : new Date(now.getFullYear(), now.getMonth(), 1);
-    const end = endDate ? new Date(endDate + 'T23:59:59') : now;
+    const end = endDate ? new Date(endDate + 'T23:59:59.999') : now;
 
-    const monthlySales = await this.salesRepo
+    const periodSales = await this.salesRepo
       .createQueryBuilder('so')
       .select('SUM(so.totalAmount)', 'total')
       .addSelect('COUNT(*)', 'count')
@@ -44,9 +44,10 @@ export class ReportService {
         statuses: [SalesOrderStatus.APPROVED, SalesOrderStatus.DELIVERED],
       })
       .andWhere('so.createdAt >= :startDate', { startDate: start })
+      .andWhere('so.createdAt <= :endDate', { endDate: end })
       .getRawOne();
 
-    const monthlyPurchase = await this.purchaseRepo
+    const periodPurchase = await this.purchaseRepo
       .createQueryBuilder('po')
       .select('SUM(po.totalAmount)', 'total')
       .addSelect('COUNT(*)', 'count')
@@ -54,6 +55,7 @@ export class ReportService {
         statuses: [PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.RECEIVED],
       })
       .andWhere('po.createdAt >= :startDate', { startDate: start })
+      .andWhere('po.createdAt <= :endDate', { endDate: end })
       .getRawOne();
 
     const totalInventory = await this.inventoryRepo
@@ -61,7 +63,7 @@ export class ReportService {
       .select('SUM(i.quantity)', 'total')
       .getRawOne();
 
-    const monthlyOutbound = await this.salesItemRepo
+    const periodOutbound = await this.salesItemRepo
       .createQueryBuilder('si')
       .innerJoin('si.order', 'so')
       .select('SUM(si.quantity)', 'total')
@@ -69,18 +71,19 @@ export class ReportService {
         statuses: [SalesOrderStatus.APPROVED, SalesOrderStatus.DELIVERED],
       })
       .andWhere('so.createdAt >= :startDate', { startDate: start })
+      .andWhere('so.createdAt <= :endDate', { endDate: end })
       .getRawOne();
 
     const avgInventory = (totalInventory?.total || 0) / 2;
     const turnoverRate = avgInventory > 0
-      ? ((monthlyOutbound?.total || 0) / avgInventory).toFixed(1)
+      ? ((periodOutbound?.total || 0) / avgInventory).toFixed(1)
       : '0';
 
     return {
-      todaySales: monthlySales?.total || 0,
-      todaySalesCount: parseInt(monthlySales?.count || '0'),
-      todayPurchase: monthlyPurchase?.total || 0,
-      todayPurchaseCount: parseInt(monthlyPurchase?.count || '0'),
+      totalSales: periodSales?.total || 0,
+      salesCount: parseInt(periodSales?.count || '0'),
+      totalPurchase: periodPurchase?.total || 0,
+      purchaseCount: parseInt(periodPurchase?.count || '0'),
       turnoverRate,
     };
   }
@@ -128,6 +131,7 @@ export class ReportService {
       .addSelect('p.code', 'productCode')
       .addSelect('p.minQuantity', 'minQuantity')
       .addSelect('SUM(i.quantity)', 'quantity')
+      .where('p.minQuantity > 0')
       .groupBy('p.id')
       .addGroupBy('p.name')
       .addGroupBy('p.code')

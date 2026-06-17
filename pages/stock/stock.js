@@ -45,8 +45,9 @@ Page({
         params.keyword = this.data.searchKeyword
       }
       const res = await api.get('/stock/list', params)
+      const list = (res.list || []).map(item => this.decorateWarnings(item))
       this.setData({
-        stockList: res.list || [],
+        stockList: list,
         total: res.total || 0,
         pageLoading: false
       })
@@ -57,14 +58,65 @@ Page({
     }
   },
 
+  // 计算库存预警标识
+  decorateWarnings(item) {
+    const warnings = { hasLowStock: false, hasExpiring: false, hasExpired: false }
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+    // 库存偏低
+    const minQty = item.product && item.product.minQuantity
+    if (minQty > 0 && item.quantity < minQty) {
+      warnings.hasLowStock = true
+    }
+
+    // 遍历批次检查效期
+    const batches = item.batches || []
+    for (const b of batches) {
+      if (!b.expiryDate) continue
+      const expiry = new Date(b.expiryDate)
+      if (isNaN(expiry.getTime())) continue
+
+      if (expiry < today) {
+        warnings.hasExpired = true
+      } else {
+        const diffDays = Math.ceil((expiry - today) / 86400000)
+        if (diffDays <= 90) {
+          warnings.hasExpiring = true
+        }
+      }
+    }
+
+    return { ...item, ...warnings }
+  },
+
   onItemTap(e) {
     const id = e.currentTarget.dataset.id
     const product = this.data.stockList.find(p => p.id === id)
     if (!product) return
 
+    // 计算批次级预警
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const batches = (product.batches || []).map(b => {
+      const warn = { _expired: false, _expiring: false }
+      if (b.expiryDate) {
+        const expiry = new Date(b.expiryDate)
+        if (!isNaN(expiry.getTime())) {
+          if (expiry < today) {
+            warn._expired = true
+          } else {
+            const diffDays = Math.ceil((expiry - today) / 86400000)
+            if (diffDays <= 90) warn._expiring = true
+          }
+        }
+      }
+      return { ...b, ...warn }
+    })
+
     this.setData({
       showDetail: true,
-      detailProduct: product
+      detailProduct: { ...product, batches }
     })
   },
 

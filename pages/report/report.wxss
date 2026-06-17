@@ -207,6 +207,14 @@
   white-space: nowrap;
 }
 
+.kpi-value.value-positive {
+  color: #00B42A;
+}
+
+.kpi-value.value-negative {
+  color: #e74c3c;
+}
+
 .kpi-sub {
   display: block;
   font-size: 24rpx;
