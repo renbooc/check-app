@@ -160,8 +160,7 @@
         >
           <view class="ps-item-info">
             <text class="ps-item-name">{{item.name}}</text>
-            <text class="ps-item-spec">{{item.spec || '-'}} · {{item.unit ? item.unit.name : '-'}}</text>
-            <text class="ps-item-manufacturer" wx:if="{{item.productManufacturer || item.manufacturer}}">{{item.productManufacturer || item.manufacturer || ''}}</text>
+            <text class="ps-item-spec">{{item.spec || '-'}} · {{item.unit ? item.unit.name : '-'}}<text wx:if="{{item.productManufacturer || item.manufacturer}}"> · {{item.productManufacturer || item.manufacturer}}</text></text>
           </view>
           <view class="ps-item-add">+</view>
         </view>

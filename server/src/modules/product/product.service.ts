@@ -187,8 +187,9 @@ export class ProductService {
     return this.unitRepo.save(dto);
   }
 
-  async getWarehouses() {
-    return this.warehouseRepo.find({ where: { isActive: true } });
+  async getWarehouses(all?: boolean) {
+    const where = all ? {} : { isActive: true };
+    return this.warehouseRepo.find({ where, order: { createdAt: 'DESC' } });
   }
 
   async createWarehouse(dto: Partial<Warehouse>) {

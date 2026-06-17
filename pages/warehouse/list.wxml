@@ -108,12 +108,14 @@
       </view>
       <view class="form-row">
         <text class="form-label">状态</text>
-        <picker mode="selector" range="{{statusNames}}" value="{{statusIndex}}" bindchange="onStatusChange">
-          <view class="form-picker has-value">
-            <text>{{statusNames[statusIndex]}}</text>
-            <view class="picker-arrow"></view>
-          </view>
-        </picker>
+        <view style="flex:1;display:flex;align-items:center;">
+          <picker mode="selector" range="{{statusNames}}" value="{{statusIndex}}" bindchange="onStatusChange" style="width:100%;">
+            <view class="form-picker has-value">
+              <text>{{statusNames[statusIndex]}}</text>
+              <view class="picker-arrow"></view>
+            </view>
+          </picker>
+        </view>
       </view>
     </view>
     <view class="modal-footer">

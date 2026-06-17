@@ -66,35 +66,77 @@
     </view>
 
     <view class="form-item">
-      <text class="form-label">单位</text>
-      <picker
-        mode="selector"
-        range="{{unitNames}}"
-        value="{{unitIndex}}"
-        bindchange="onUnitChange"
-      >
-        <view class="form-picker {{unitIndex >= 0 ? 'has-value' : ''}}">
-          <text wx:if="{{unitIndex >= 0}}">{{unitNames[unitIndex]}}</text>
-          <text wx:else class="placeholder">选择单位</text>
-          <view class="picker-arrow"></view>
-        </view>
-      </picker>
+      <text class="form-label">生产企业</text>
+      <input
+        class="form-input"
+        placeholder="生产企业名称"
+        placeholder-class="placeholder"
+        value="{{form.manufacturer}}"
+        bindinput="onFieldInput"
+        data-field="manufacturer"
+      />
     </view>
 
-    <view class="form-item">
-      <text class="form-label">分类</text>
-      <picker
-        mode="selector"
-        range="{{categoryNames}}"
-        value="{{categoryIndex}}"
-        bindchange="onCategoryChange"
-      >
-        <view class="form-picker {{categoryIndex >= 0 ? 'has-value' : ''}}">
-          <text wx:if="{{categoryIndex >= 0}}">{{categoryNames[categoryIndex]}}</text>
-          <text wx:else class="placeholder">选择分类</text>
-          <view class="picker-arrow"></view>
+    <view class="form-item form-item-with-btn">
+      <text class="form-label">单位</text>
+      <view class="picker-with-btn">
+        <picker
+          mode="selector"
+          range="{{unitNames}}"
+          value="{{unitIndex}}"
+          bindchange="onUnitChange"
+        >
+          <view class="form-picker {{unitIndex >= 0 ? 'has-value' : ''}}">
+            <text wx:if="{{unitIndex >= 0}}">{{unitNames[unitIndex]}}</text>
+            <text wx:else class="placeholder">选择单位</text>
+            <view class="picker-arrow"></view>
+          </view>
+        </picker>
+        <view class="btn-add-inline" bindtap="onToggleUnitInput">
+          <text class="btn-add-inline-icon">+</text>
         </view>
-      </picker>
+      </view>
+    </view>
+    <!-- 内联新增单位 -->
+    <view class="inline-add {{showUnitInput ? 'inline-add-open' : ''}}">
+      <view class="inline-add-inner" wx:if="{{showUnitInput}}">
+        <input class="inline-add-input" placeholder="输入单位名称" placeholder-class="placeholder" value="{{newUnitName}}" bindinput="onNewUnitInput" focus="{{showUnitInput}}" />
+        <view class="inline-add-actions">
+          <view class="inline-add-btn inline-add-cancel" bindtap="onCancelUnit">取消</view>
+          <view class="inline-add-btn inline-add-confirm" bindtap="onConfirmUnit">确定</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-item form-item-with-btn">
+      <text class="form-label">分类</text>
+      <view class="picker-with-btn">
+        <picker
+          mode="selector"
+          range="{{categoryNames}}"
+          value="{{categoryIndex}}"
+          bindchange="onCategoryChange"
+        >
+          <view class="form-picker {{categoryIndex >= 0 ? 'has-value' : ''}}">
+            <text wx:if="{{categoryIndex >= 0}}">{{categoryNames[categoryIndex]}}</text>
+            <text wx:else class="placeholder">选择分类</text>
+            <view class="picker-arrow"></view>
+          </view>
+        </picker>
+        <view class="btn-add-inline" bindtap="onToggleCategoryInput">
+          <text class="btn-add-inline-icon">+</text>
+        </view>
+      </view>
+    </view>
+    <!-- 内联新增分类 -->
+    <view class="inline-add {{showCategoryInput ? 'inline-add-open' : ''}}">
+      <view class="inline-add-inner" wx:if="{{showCategoryInput}}">
+        <input class="inline-add-input" placeholder="输入分类名称" placeholder-class="placeholder" value="{{newCategoryName}}" bindinput="onNewCategoryInput" focus="{{showCategoryInput}}" />
+        <view class="inline-add-actions">
+          <view class="inline-add-btn inline-add-cancel" bindtap="onCancelCategory">取消</view>
+          <view class="inline-add-btn inline-add-confirm" bindtap="onConfirmCategory">确定</view>
+        </view>
+      </view>
     </view>
   </view>
 
@@ -148,17 +190,6 @@
       />
     </view>
 
-    <view class="form-item">
-      <text class="form-label">生产企业</text>
-      <input
-        class="form-input"
-        placeholder="生产企业名称"
-        placeholder-class="placeholder"
-        value="{{form.manufacturer}}"
-        bindinput="onFieldInput"
-        data-field="manufacturer"
-      />
-    </view>
   </view>
 
   <!-- ===== 其他信息卡片 ===== -->

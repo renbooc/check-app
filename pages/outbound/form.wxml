@@ -3,7 +3,7 @@
   <!-- ===== 页面头部 ===== -->
   <view class="page-header">
     <text class="page-header-title">{{id ? '销售出库单详情' : '新增销售出库单'}}</text>
-    <text class="page-header-sub">{{id ? (editing ? '编辑出库信息，确认后提交审核' : '查看出库信息') : '填写以下信息创建出库单'}}</text>
+    <text class="page-header-sub">{{id ? (editing ? '编辑出库信息' : '查看出库信息') : '填写以下信息创建出库单'}}</text>
   </view>
 
   <!-- 状态提示 -->
@@ -18,19 +18,63 @@
         <view class="section-icon section-icon-outbound"></view>
         <text class="section-title">出库单信息</text>
       </view>
+      <view class="change-btn" wx:if="{{selectedCustomer && editing && !fromSalesOrder}}" bindtap="onClearCustomer">
+        <text class="change-btn-text">更换客户</text>
+      </view>
     </view>
 
     <view class="order-form-item order-form-item-column">
       <text class="order-form-label">客户</text>
-      <view class="customer-selected-inline">
+      <view wx:if="{{!selectedCustomer && editing && !fromSalesOrder}}" class="customer-search-wrap">
+        <view class="search-field {{showCustomerResults && filteredCustomers.length > 0 ? 'search-field-active' : ''}}">
+          <view class="search-field-icon">
+            <icon-cmp type="search" size="18" color="#999"></icon-cmp>
+          </view>
+          <input
+            class="search-field-input"
+            placeholder="搜索客户名称"
+            placeholder-class="placeholder"
+            value="{{customerKeyword}}"
+            adjust-position="false"
+            bindinput="onCustomerInput"
+            bindfocus="onCustomerFocus"
+            bindblur="onCustomerBlur"
+            bindkeyboardheight="onKeyboardHeightChange"
+          />
+        </view>
+        <view class="search-results" wx:if="{{showCustomerResults && filteredCustomers.length > 0 && !showFixedDropdown}}">
+          <view class="search-result-item" wx:for="{{filteredCustomers}}" wx:key="id" data-index="{{index}}" bindtap="onCustomerSelect">
+            <view class="result-item-info">
+              <text class="result-item-name">{{item.name}}</text>
+              <text class="result-item-contact" wx:if="{{item.contactPerson}}">{{item.contactPerson}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="search-results-fixed" wx:if="{{showCustomerResults && filteredCustomers.length > 0 && showFixedDropdown}}" style="bottom: {{keyboardHeight + 20}}px;">
+          <view class="search-results-fixed-inner">
+            <view class="search-result-item" wx:for="{{filteredCustomers}}" wx:key="id" data-index="{{index}}" bindtap="onCustomerSelect">
+              <view class="result-item-info">
+                <text class="result-item-name">{{item.name}}</text>
+                <text class="result-item-contact" wx:if="{{item.contactPerson}}">{{item.contactPerson}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="search-empty" wx:elif="{{showCustomerResults && filteredCustomers.length === 0}}">
+          <text class="search-empty-text">未找到匹配的客户</text>
+        </view>
+      </view>
+      <view class="customer-selected-inline" wx:else>
         <view class="customer-avatar-sm">{{customerInitial}}</view>
         <text class="customer-name-inline">{{customerName}}</text>
+        <text class="customer-contact-inline" wx:if="{{selectedCustomer && selectedCustomer.contactPerson}}">· {{selectedCustomer.contactPerson}}</text>
       </view>
     </view>
 
     <view class="order-form-item">
       <text class="order-form-label">出库单号</text>
-      <text class="order-form-value">{{orderNo}}</text>
+      <text wx:if="{{orderNo}}" class="order-form-value">{{orderNo}}</text>
+      <text wx:else class="order-form-value placeholder">保存后自动生成</text>
     </view>
 
     <view class="order-form-item" wx:if="{{salesOrderNo}}">
@@ -40,7 +84,13 @@
 
     <view class="order-form-item">
       <text class="order-form-label">仓库</text>
-      <text class="order-form-value">{{warehouseName || '未指定'}}</text>
+      <picker mode="selector" range="{{warehouseNames}}" value="{{warehouseIndex}}" bindchange="onWarehouseChange" disabled="{{!editing || fromSalesOrder}}">
+        <view class="order-form-picker {{warehouseName ? 'has-value' : ''}}">
+          <text wx:if="{{warehouseName}}">{{warehouseName}}</text>
+          <text wx:else class="placeholder">选择仓库</text>
+          <view class="picker-arrow" wx:if="{{editing && !fromSalesOrder}}"></view>
+        </view>
+      </picker>
     </view>
 
     <view class="order-form-item">
@@ -71,6 +121,46 @@
         <text class="items-count-num">{{items.length}}</text>
         <text class="items-count-label">项</text>
       </view>
+    </view>
+
+    <!-- 商品搜索（编辑模式下） -->
+    <view class="product-search-area" wx:if="{{editing && !fromSalesOrder}}">
+      <view class="ps-field {{showProductResults ? 'ps-field-active' : ''}}">
+        <icon-cmp type="search" size="18" color="#999"></icon-cmp>
+        <input
+          class="ps-input"
+          placeholder="搜索商品名称，点击添加"
+          placeholder-class="placeholder"
+          value="{{productKeyword}}"
+          adjust-position="false"
+          bindinput="onProductSearchInput"
+          bindfocus="onProductSearchFocus"
+          bindblur="onProductSearchBlur"
+          bindkeyboardheight="onKeyboardHeightChange"
+        />
+      </view>
+      <view class="ps-list" wx:if="{{showProductResults && productSearchResults.length > 0 && !showFixedDropdown}}">
+        <view class="ps-item" wx:for="{{productSearchResults}}" wx:key="id" data-pid="{{item.id}}" bindtap="onProductSearchSelect">
+          <view class="ps-item-info">
+            <text class="ps-item-name">{{item.name}}</text>
+            <text class="ps-item-spec">{{item.spec || '-'}} · {{item.unit ? item.unit.name : '-'}}<text wx:if="{{item.manufacturer}}"> · {{item.manufacturer}}</text></text>
+          </view>
+          <view class="ps-item-add">+</view>
+        </view>
+      </view>
+      <view class="ps-list-fixed" wx:if="{{showProductResults && productSearchResults.length > 0 && showFixedDropdown}}" style="bottom: {{keyboardHeight + 20}}px;">
+        <view class="ps-list-fixed-inner">
+          <view class="ps-item" wx:for="{{productSearchResults}}" wx:key="id" data-pid="{{item.id}}" bindtap="onProductSearchSelect">
+            <view class="ps-item-info">
+              <text class="ps-item-name">{{item.name}}</text>
+              <text class="ps-item-spec">{{item.spec || '-'}} · {{item.unit ? item.unit.name : '-'}}</text>
+              <text class="ps-item-manufacturer" wx:if="{{item.manufacturer}}">{{item.manufacturer}}</text>
+            </view>
+            <view class="ps-item-add">+</view>
+          </view>
+        </view>
+      </view>
+      <text class="ps-empty-text" wx:elif="{{showProductResults && productSearchResults.length === 0}}">未找到匹配的商品</text>
     </view>
 
     <view class="items-list" wx:if="{{items.length > 0}}">
@@ -142,7 +232,7 @@
               <view class="item-extra-row">
                 <view class="item-extra-field item-extra-field-half">
                   <text class="item-extra-label">批号</text>
-                  <input class="item-extra-input" type="text" placeholder="必填" placeholder-class="placeholder" value="{{item.batchNo}}" data-index="{{index}}" bindinput="onBatchNoInput" />
+                  <input class="item-extra-input" type="text" placeholder="必填" placeholder-class="placeholder" value="{{item.batchNo}}" data-index="{{index}}" bindinput="onBatchNoInput" disabled="{{fromSalesOrder}}" />
                 </view>
                 <view class="item-extra-field item-extra-field-half">
                   <text class="item-extra-label">货位号</text>
@@ -152,7 +242,7 @@
               <view class="item-extra-row">
                 <view class="item-extra-field item-extra-field-half">
                   <text class="item-extra-label">生产日期</text>
-                  <picker mode="date" value="{{item.productionDate}}" data-index="{{index}}" bindchange="onProductionDateChange">
+                  <picker mode="date" value="{{item.productionDate}}" data-index="{{index}}" bindchange="onProductionDateChange" disabled="{{fromSalesOrder}}">
                     <view class="item-extra-picker {{item.productionDate ? 'has-value' : ''}}">
                       <text wx:if="{{item.productionDate}}">{{item.productionDate}}</text>
                       <text wx:else class="placeholder">必填</text>
@@ -161,13 +251,16 @@
                 </view>
                 <view class="item-extra-field item-extra-field-half">
                   <text class="item-extra-label">有效期</text>
-                  <picker mode="date" value="{{item.expiryDate}}" data-index="{{index}}" bindchange="onExpiryDateChange">
+                  <picker mode="date" value="{{item.expiryDate}}" data-index="{{index}}" bindchange="onExpiryDateChange" disabled="{{fromSalesOrder}}">
                     <view class="item-extra-picker {{item.expiryDate ? 'has-value' : ''}}">
                       <text wx:if="{{item.expiryDate}}">{{item.expiryDate}}</text>
                       <text wx:else class="placeholder">必填</text>
                     </view>
                   </picker>
                 </view>
+              </view>
+              <view class="item-extra-notice" wx:if="{{fromSalesOrder}}">
+                <text class="notice-text">由销售单生成，批号/效期为系统自动分配</text>
               </view>
             </view>
             <!-- 只读：批号/生产日期/有效期/货位号 -->
@@ -199,12 +292,64 @@
     </view>
 
     <view class="items-empty" wx:if="{{items.length === 0}}">
-      <text class="items-empty-text">暂无商品</text>
+      <text class="items-empty-text">暂无商品，请在上方搜索添加</text>
     </view>
   </view>
 
-  <!-- ===== 底部操作栏 ===== -->
-  <view class="bottom-bar" wx:if="{{statusCls === 'pending'}}">
+  <!-- ===== 批次选择弹层 ===== -->
+  <view class="batch-mask" wx:if="{{showBatchPicker}}" bindtap="onCloseBatchPicker"></view>
+  <view class="batch-panel {{showBatchPicker ? 'visible' : ''}}">
+    <view class="batch-panel-head">
+      <text class="batch-panel-title">选择库存批次</text>
+      <view class="batch-panel-close" bindtap="onCloseBatchPicker">✕</view>
+    </view>
+    <view class="batch-panel-product">
+      <view class="batch-panel-product-left">
+        <text class="batch-panel-pname">{{batchProduct && batchProduct.name}}</text>
+        <text class="batch-panel-pspec">{{batchProduct && batchProduct.spec}}</text>
+        <view class="batch-panel-pmanu-row">
+          <text class="batch-panel-pmanu-label">生产厂家</text>
+          <text class="batch-panel-pmanu-value">{{batchProduct && (batchProduct.manufacturer || '-')}}</text>
+        </view>
+      </view>
+      <text class="batch-panel-count">{{batchOptions.length}} 批</text>
+    </view>
+    <view class="batch-panel-body">
+      <view class="batch-card" wx:for="{{batchOptions}}" wx:key="batchCode" data-index="{{index}}" bindtap="onBatchOptionTap">
+        <view class="batch-card-top">
+          <view class="batch-card-batch">
+            <text class="batch-card-label">批号</text>
+            <text class="batch-card-batchno">{{item.batchNo || '-'}}</text>
+          </view>
+          <view class="batch-card-qty">
+            <text class="batch-card-qty-num">{{item.quantity}}</text>
+            <text class="batch-card-qty-unit">{{item._unit}}</text>
+          </view>
+        </view>
+        <view class="batch-card-divider"></view>
+        <view class="batch-card-info">
+          <view class="batch-card-info-item">
+            <text class="batch-card-label">生产日期</text>
+            <text class="batch-card-value">{{item.productionDate || '-'}}</text>
+          </view>
+          <view class="batch-card-info-sep"></view>
+          <view class="batch-card-info-item">
+            <text class="batch-card-label">有效期至</text>
+            <text class="batch-card-value">{{item.expiryDate || '-'}}</text>
+          </view>
+        </view>
+        <view class="batch-card-info">
+          <view class="batch-card-info-item">
+            <text class="batch-card-label">库位</text>
+            <text class="batch-card-value">{{item.locationCode || '未设库位'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 底部操作栏（编辑模式） ===== -->
+  <view class="bottom-bar" wx:if="{{editing}}">
     <view class="bottom-inner">
       <view class="bottom-summary">
         <view class="bottom-summary-left">
@@ -213,17 +358,24 @@
         </view>
         <text class="summary-amount">¥ {{totalAmount || '0.00'}}</text>
       </view>
-      <view class="bottom-inner-actions">
-        <button class="action-btn action-back" bindtap="onBack">返回</button>
-        <button class="action-btn action-edit-toggle" wx:if="{{!editing}}" bindtap="onToggleEdit">编辑</button>
-        <button class="action-btn action-save" wx:if="{{editing}}" bindtap="onSave" disabled="{{submitting}}">{{submitting ? '保存中...' : '保存'}}</button>
-        <button class="action-btn action-approve" bindtap="onApprove" disabled="{{submitting}}">{{submitting ? '处理中...' : '审核通过'}}</button>
+      <view class="bottom-actions">
+        <button class="action-btn action-draft" bindtap="onSave" disabled="{{submitting}}">{{submitting ? '保存中...' : '保存草稿'}}</button>
+        <button class="action-btn action-submit" bindtap="onSubmit" disabled="{{submitting}}">{{submitting ? '提交中...' : '提交审核'}}</button>
       </view>
     </view>
   </view>
 
+  <!-- ===== 底部操作栏（只读模式） ===== -->
   <view class="bottom-bar" wx:else>
-    <view class="bottom-inner bottom-inner-single">
+    <view class="bottom-inner bottom-actions" wx:if="{{!id}}">
+      <button class="action-btn action-back-full" bindtap="onBack">返回列表</button>
+    </view>
+    <view class="bottom-inner bottom-actions" wx:elif="{{statusCls === 'pending'}}">
+      <button class="action-btn action-back" bindtap="onBack">返回</button>
+      <button class="action-btn action-edit-toggle" bindtap="onToggleEdit">编辑</button>
+      <button class="action-btn action-approve" bindtap="onApprove" disabled="{{submitting}}">{{submitting ? '处理中...' : '审核通过'}}</button>
+    </view>
+    <view class="bottom-inner bottom-inner-single" wx:else>
       <button class="action-btn action-back-full" bindtap="onBack">返回列表</button>
     </view>
   </view>

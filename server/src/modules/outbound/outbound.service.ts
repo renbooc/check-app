@@ -223,6 +223,19 @@ export class OutboundService {
   async update(id: string, dto: {
     remark?: string;
     outboundDate?: string;
+    items?: Array<{
+      productId: string;
+      productName: string;
+      productSpec?: string;
+      productUnit?: string;
+      productManufacturer?: string;
+      quantity: number;
+      price: number;
+      batchNo?: string;
+      productionDate?: string;
+      expiryDate?: string;
+      locationCode?: string;
+    }>;
   }) {
     const note = await this.noteRepo.findOne({ where: { id } });
     if (!note) throw new NotFoundException('出库单不存在');
@@ -231,6 +244,40 @@ export class OutboundService {
     if (dto.remark !== undefined) note.remark = dto.remark;
     if (dto.outboundDate !== undefined) note.outboundDate = dto.outboundDate;
     await this.noteRepo.save(note);
+
+    if (dto.items) {
+      await this.itemRepo.delete({ outboundId: id });
+
+      let totalAmount = 0;
+      let totalQuantity = 0;
+      const items = dto.items.map((item) => {
+        const qty = item.quantity;
+        const price = item.price;
+        const amount = qty * price;
+        totalAmount += amount;
+        totalQuantity += qty;
+        return this.itemRepo.create({
+          outboundId: id,
+          productId: item.productId,
+          productName: item.productName,
+          productSpec: item.productSpec || null,
+          productUnit: item.productUnit || null,
+          productManufacturer: item.productManufacturer || null,
+          quantity: qty,
+          price,
+          amount,
+          batchNo: item.batchNo || null,
+          productionDate: item.productionDate || null,
+          expiryDate: item.expiryDate || null,
+          locationCode: item.locationCode || null,
+        } as any);
+      });
+      await this.itemRepo.save(items as any);
+      note.totalAmount = totalAmount;
+      note.totalQuantity = totalQuantity;
+      await this.noteRepo.save(note);
+    }
+
     return this.findOne(id);
   }
 

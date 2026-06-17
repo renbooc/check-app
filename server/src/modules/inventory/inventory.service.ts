@@ -10,6 +10,9 @@ import { PurchaseOrder, PurchaseOrderStatus } from '../../entities/purchase-orde
 import { PurchaseOrderItem } from '../../entities/purchase-order-item.entity';
 import { SalesOrder, SalesOrderStatus } from '../../entities/sales-order.entity';
 import { SalesOrderItem } from '../../entities/sales-order-item.entity';
+import { OutboundNote } from '../../entities/outbound-note.entity';
+import { InboundNote } from '../../entities/inbound-note.entity';
+import { Product } from '../../entities/product.entity';
 import { Location } from '../../entities/location.entity';
 import { Customer } from '../../entities/customer.entity';
 
@@ -24,6 +27,9 @@ export class InventoryService {
     @InjectRepository(PurchaseOrder) private purchaseRepo: Repository<PurchaseOrder>,
     @InjectRepository(SalesOrder) private salesRepo: Repository<SalesOrder>,
     @InjectRepository(SalesOrderItem) private salesItemRepo: Repository<SalesOrderItem>,
+    @InjectRepository(OutboundNote) private outboundRepo: Repository<OutboundNote>,
+    @InjectRepository(InboundNote) private inboundRepo: Repository<InboundNote>,
+    @InjectRepository(Product) private productRepo: Repository<Product>,
     @InjectRepository(Location) private locationRepo: Repository<Location>,
     @InjectRepository(Customer) private customerRepo: Repository<Customer>,
   ) {}
@@ -35,65 +41,58 @@ export class InventoryService {
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const todayEnd = new Date(todayStart.getTime() + 86400000);
 
-    // ===== 今日销售（已审核/已出库） =====
-    const todaySales = await this.salesRepo
-      .createQueryBuilder('so')
-      .select('COALESCE(SUM(so.totalAmount), 0)', 'total')
+    // ===== 今日销售（已审核出库单） =====
+    const todaySales = await this.outboundRepo
+      .createQueryBuilder('o')
+      .select('COALESCE(SUM(o.totalAmount), 0)', 'total')
       .addSelect('COUNT(*)', 'count')
-      .where('so.status IN (:...statuses)', {
-        statuses: [SalesOrderStatus.APPROVED, SalesOrderStatus.DELIVERED],
-      })
-      .andWhere('so.createdAt >= :startDate', { startDate: todayStart })
-      .andWhere('so.createdAt < :endDate', { endDate: todayEnd })
+      .where('o.status = :status', { status: 'approved' })
+      .andWhere('o.createdAt >= :startDate', { startDate: todayStart })
+      .andWhere('o.createdAt < :endDate', { endDate: todayEnd })
       .getRawOne();
 
-    // ===== 今日采购（已审核/已入库） =====
-    const todayPurchase = await this.purchaseRepo
-      .createQueryBuilder('po')
-      .select('COALESCE(SUM(po.totalAmount), 0)', 'total')
+    // ===== 今日采购（已审核入库单） =====
+    const todayPurchase = await this.inboundRepo
+      .createQueryBuilder('i')
+      .select('COALESCE(SUM(i.totalAmount), 0)', 'total')
       .addSelect('COUNT(*)', 'count')
-      .where('po.status IN (:...statuses)', {
-        statuses: [PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.RECEIVED],
-      })
-      .andWhere('po.createdAt >= :startDate', { startDate: todayStart })
-      .andWhere('po.createdAt < :endDate', { endDate: todayEnd })
+      .where('i.status = :status', { status: 'approved' })
+      .andWhere('i.createdAt >= :startDate', { startDate: todayStart })
+      .andWhere('i.createdAt < :endDate', { endDate: todayEnd })
       .getRawOne();
 
-    // ===== 本月销售（用于趋势对比） =====
-    const monthSales = await this.salesRepo
-      .createQueryBuilder('so')
-      .select('COALESCE(SUM(so.totalAmount), 0)', 'total')
+    // ===== 本月销售（已审核出库单） =====
+    const monthSales = await this.outboundRepo
+      .createQueryBuilder('o')
+      .select('COALESCE(SUM(o.totalAmount), 0)', 'total')
       .addSelect('COUNT(*)', 'count')
-      .where('so.status IN (:...statuses)', {
-        statuses: [SalesOrderStatus.APPROVED, SalesOrderStatus.DELIVERED],
-      })
-      .andWhere('so.createdAt >= :startDate', { startDate: startOfMonth })
+      .where('o.status = :status', { status: 'approved' })
+      .andWhere('o.createdAt >= :startDate', { startDate: startOfMonth })
       .getRawOne();
 
-    // 上月销售（用于趋势对比）
+    // 上月销售（出库单，用于趋势对比）
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-    const lastMonthSales = await this.salesRepo
-      .createQueryBuilder('so')
-      .select('COALESCE(SUM(so.totalAmount), 0)', 'total')
-      .where('so.status IN (:...statuses)', {
-        statuses: [SalesOrderStatus.APPROVED, SalesOrderStatus.DELIVERED],
-      })
-      .andWhere('so.createdAt >= :startDate', { startDate: startOfLastMonth })
-      .andWhere('so.createdAt < :endDate', { endDate: startOfMonth })
+    const lastMonthSales = await this.outboundRepo
+      .createQueryBuilder('o')
+      .select('COALESCE(SUM(o.totalAmount), 0)', 'total')
+      .where('o.status = :status', { status: 'approved' })
+      .andWhere('o.createdAt >= :startDate', { startDate: startOfLastMonth })
+      .andWhere('o.createdAt < :endDate', { endDate: startOfMonth })
       .getRawOne();
 
-    // ===== 库存总值（按产品售价估算） =====
+    // ===== 库存总值（按入库成本价计算） =====
     const inventoryValue = await this.inventoryRepo
       .createQueryBuilder('i')
-      .innerJoin('i.product', 'p')
-      .select('COALESCE(SUM(i.quantity * p.price), 0)', 'total')
+      .select('COALESCE(SUM(i.amount), 0)', 'total')
       .getRawOne();
 
-    // ===== 商品种数 =====
-    const productCount = await this.inventoryRepo
-      .createQueryBuilder('i')
-      .select('COUNT(DISTINCT i.productId)', 'count')
+    // ===== 商品种数（从 products 表统计所有商品，含库存为0的） =====
+    const productCount = await this.productRepo
+      .createQueryBuilder('p')
+      .select('COUNT(*)', 'count')
+      .where('p.status != :void', { void: 'void' })
+      .andWhere('p.isActive = true')
       .getRawOne();
 
     // ===== 待盘点数 =====

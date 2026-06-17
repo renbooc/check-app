@@ -27,12 +27,60 @@ Page({
     totalQuantity: 0,
     totalAmount: '0.00',
     submitting: false,
+    fromSalesOrder: false, // 是否由销售订单生成（系统分配批次，不可编辑）
+    // 客户搜索
+    customerKeyword: '',
+    filteredCustomers: [],
+    showCustomerResults: false,
+    selectedCustomer: null,
+    _allCustomers: [],
+    // 仓库
+    warehouses: [],
+    warehouseNames: [],
+    warehouseIndex: -1,
+    // 商品搜索
+    productKeyword: '',
+    productSearchResults: [],
+    showProductResults: false,
+    _allProducts: [],
+    // 键盘
+    keyboardHeight: 0,
+    showFixedDropdown: false,
+    // 批次选择
+    showBatchPicker: false,
+    batchProduct: null,
+    batchOptions: [],
   },
 
   async onLoad(options) {
     if (options.id) {
       this.setData({ id: options.id })
       await this.loadNote(options.id)
+    } else {
+      this.setData({ editing: true, readonly: false })
+      this.loadDependencies()
+    }
+  },
+
+  async loadDependencies() {
+    try {
+      const [customers, products, warehouses] = await Promise.all([
+        api.get('/customers', { page: 1, pageSize: 200 }),
+        api.get('/products', { page: 1, pageSize: 500 }),
+        api.get('/warehouses', { page: 1, pageSize: 200 }),
+      ])
+      const productList = (Array.isArray(products) ? products : (products.list || [])).map(p => ({
+        ...p,
+        _unit: (p.unit && p.unit.name) || p._unit || '',
+      }))
+      this.setData({
+        _allCustomers: Array.isArray(customers) ? customers : (customers.list || []),
+        _allProducts: productList,
+        warehouses: Array.isArray(warehouses) ? warehouses : (warehouses.list || []),
+        warehouseNames: (Array.isArray(warehouses) ? warehouses : (warehouses.list || [])).map(w => w.name),
+      })
+    } catch (err) {
+      console.error('[OutboundForm] loadDependencies error:', err)
     }
   },
 
@@ -62,6 +110,7 @@ Page({
       this.setData({
         orderNo: note.orderNo || '',
         salesOrderNo: note.salesOrderNo || '',
+        fromSalesOrder: !!note.salesOrderId,
         customerName: note.customerName || '',
         customerInitial: (note.customerName && note.customerName.charAt(0)) || '?',
         warehouseName: note.warehouseName || '',
@@ -86,6 +135,174 @@ Page({
 
   onRemarkInput(e) {
     this.setData({ remark: e.detail.value })
+  },
+
+  // ===== 客户搜索 =====
+  onCustomerInput(e) {
+    const keyword = e.detail.value
+    const all = this.data._allCustomers || []
+    const filtered = keyword ? all.filter(c => c.name.includes(keyword)) : []
+    this.setData({
+      customerKeyword: keyword,
+      filteredCustomers: filtered,
+      showCustomerResults: keyword.length > 0,
+    })
+  },
+
+  onCustomerFocus() {
+    if (this.data.customerKeyword.length > 0) {
+      this.onCustomerInput({ detail: { value: this.data.customerKeyword } })
+    }
+  },
+
+  onCustomerBlur() {
+    setTimeout(() => this.setData({ showCustomerResults: false, showFixedDropdown: false }), 200)
+  },
+
+  onCustomerSelect(e) {
+    const index = e.currentTarget.dataset.index
+    const customer = this.data.filteredCustomers[index]
+    this.setData({
+      selectedCustomer: customer,
+      customerName: customer.name,
+      customerInitial: customer.name.charAt(0),
+      customerKeyword: customer.name,
+      showCustomerResults: false,
+      filteredCustomers: [],
+      showFixedDropdown: false,
+    })
+  },
+
+  onClearCustomer() {
+    this.setData({
+      selectedCustomer: null,
+      customerName: '',
+      customerInitial: '',
+      customerKeyword: '',
+    })
+  },
+
+  // ===== 仓库选择 =====
+  onWarehouseChange(e) {
+    const idx = parseInt(e.detail.value)
+    const wh = this.data.warehouses[idx]
+    if (wh) {
+      this.setData({ warehouseIndex: idx, warehouseName: wh.name })
+    }
+  },
+
+  // ===== 商品搜索 =====
+  onProductSearchInput(e) {
+    const keyword = e.detail.value
+    const all = this.data._allProducts || []
+    const filtered = keyword ? all.filter(p => p.name.includes(keyword) || (p.code && p.code.includes(keyword))) : []
+    this.setData({
+      productKeyword: keyword,
+      productSearchResults: filtered,
+      showProductResults: keyword.length > 0,
+    })
+  },
+
+  onProductSearchFocus() {
+    if (this.data.productKeyword.length > 0) {
+      this.onProductSearchInput({ detail: { value: this.data.productKeyword } })
+    }
+  },
+
+  onProductSearchBlur() {
+    setTimeout(() => this.setData({ showProductResults: false, showFixedDropdown: false }), 250)
+  },
+
+  onProductSearchSelect(e) {
+    const pid = e.currentTarget.dataset.pid
+    const product = this.data._allProducts.find(p => p.id === pid)
+    if (!product) return
+    if (this.data.items.some(item => item.productId === product.id)) {
+      wx.showToast({ title: '商品已存在', icon: 'none' })
+      return
+    }
+    this.setData({
+      productKeyword: '',
+      productSearchResults: [],
+      showProductResults: false,
+      showFixedDropdown: false,
+    })
+    // 获取可用批次
+    this.loadBatchesForProduct(product)
+  },
+
+  async loadBatchesForProduct(product) {
+    try {
+      const whName = this.data.warehouseName
+      if (!whName) {
+        wx.showToast({ title: '请先选择仓库', icon: 'none' })
+        return
+      }
+      const whId = this.data.warehouses.find(w => w.name === whName)?.id
+      if (!whId) return
+
+      const res = await api.get('/inventory/product/' + product.id)
+      const batches = (res && res.batches) || []
+      if (batches.length === 0) {
+        wx.showToast({ title: '该商品在所选仓库无可用批次', icon: 'none' })
+        return
+      }
+
+      const unitName = product._unit || (product.unit && product.unit.name) || ''
+      this.setData({
+        batchProduct: product,
+        batchOptions: batches
+          .filter(b => String(b.warehouseId) === whId && b.quantity > 0)
+          .map(b => ({ ...b, _unit: unitName })),
+        showBatchPicker: true,
+      })
+    } catch (err) {
+      console.error('[OutboundForm] loadBatches error:', err)
+      wx.showToast({ title: '获取批次失败', icon: 'none' })
+    }
+  },
+
+  onBatchOptionTap(e) {
+    const idx = e.currentTarget.dataset.index
+    const batch = this.data.batchOptions[idx]
+    const product = this.data.batchProduct
+    if (!batch || !product) return
+
+    const items = [...this.data.items, {
+      productId: product.id,
+      productName: product.name,
+      productSpec: product.spec || '',
+      productUnit: product._unit || (product.unit && product.unit.name) || batch._unit || '',
+      productManufacturer: product.manufacturer || '',
+      quantity: batch.quantity,
+      price: batch.price || '',
+      amount: '0.00',
+      batchNo: batch.batchNo || '',
+      productionDate: batch.productionDate || '',
+      expiryDate: batch.expiryDate || '',
+      locationCode: batch.locationCode || '',
+    }]
+    this.setData({
+      items,
+      batchProduct: null,
+      batchOptions: [],
+      showBatchPicker: false,
+    })
+    this.calcTotal()
+  },
+
+  onCloseBatchPicker() {
+    this.setData({ showBatchPicker: false, batchProduct: null, batchOptions: [] })
+  },
+
+  // ===== 键盘处理 =====
+  onKeyboardHeightChange(e) {
+    const height = e.detail.height || 0
+    const hasResults = this.data.showProductResults || this.data.showCustomerResults
+    this.setData({
+      keyboardHeight: height,
+      showFixedDropdown: height > 0 && hasResults,
+    })
   },
 
   onToggleEdit() {
@@ -185,13 +402,65 @@ Page({
     if (this.data.submitting) return
     this.setData({ submitting: true })
     try {
-      await api.put('/outbound/' + this.data.id, {
-        remark: this.data.remark,
-        outboundDate: this.data.outboundDate || null,
-      })
+      const items = this.data.items.map(item => ({
+        productId: item.productId,
+        productName: item.productName,
+        productSpec: item.productSpec || '',
+        productUnit: item.productUnit || '',
+        productManufacturer: item.productManufacturer || '',
+        quantity: parseFloat(item.quantity) || 0,
+        price: parseFloat(item.price) || 0,
+        batchNo: item.batchNo || '',
+        productionDate: item.productionDate || '',
+        expiryDate: item.expiryDate || '',
+        locationCode: item.locationCode || '',
+      }))
+      if (this.data.id) {
+        await api.put('/outbound/' + this.data.id, { remark: this.data.remark, outboundDate: this.data.outboundDate || null, items })
+      } else {
+        const result = await api.post('/outbound', { items, remark: this.data.remark, outboundDate: this.data.outboundDate || null })
+        this.setData({ id: result.id })
+      }
       showSuccess('保存成功')
       this.setData({ submitting: false, editing: false })
       await this.loadNote(this.data.id)
+    } catch (err) {
+      showError(err.message)
+      this.setData({ submitting: false })
+    }
+  },
+
+  async onSubmit() {
+    if (this.data.submitting) return
+    if (!this.data.selectedCustomer && !this.data.customerName) {
+      wx.showToast({ title: '请选择客户', icon: 'none' })
+      return
+    }
+    if (this.data.items.length === 0) {
+      wx.showToast({ title: '请添加出库商品', icon: 'none' })
+      return
+    }
+    this.setData({ submitting: true })
+    try {
+      const items = this.data.items.map(item => ({
+        productId: item.productId, productName: item.productName, productSpec: item.productSpec || '',
+        productUnit: item.productUnit || '', productManufacturer: item.productManufacturer || '',
+        quantity: parseFloat(item.quantity) || 0, price: parseFloat(item.price) || 0,
+        batchNo: item.batchNo || '', productionDate: item.productionDate || '',
+        expiryDate: item.expiryDate || '', locationCode: item.locationCode || '',
+      }))
+      const payload = { items, remark: this.data.remark, outboundDate: this.data.outboundDate || null }
+      let id = this.data.id
+      if (id) {
+        await api.put('/outbound/' + id, payload)
+      } else {
+        const result = await api.post('/outbound', payload)
+        id = result.id
+      }
+      await api.put('/outbound/' + id + '/status', { status: 'approved' })
+      showSuccess('提交成功')
+      this.setData({ id, submitting: false, editing: false })
+      await this.loadNote(id)
     } catch (err) {
       showError(err.message)
       this.setData({ submitting: false })

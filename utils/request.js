@@ -56,7 +56,7 @@ function request(options) {
         success(res) {
           if (showLoading) wx.hideLoading()
 
-          if (res.statusCode === 200 && res.data.code === 200) {
+          if ((res.statusCode === 200 || res.statusCode === 201) && res.data && res.data.code === 200) {
             pendingRequests.delete(requestKey)
             resolve(res.data.data)
           } else if (res.statusCode === 401 || (res.data && res.data.code === 401)) {

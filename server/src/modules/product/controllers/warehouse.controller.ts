@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -18,8 +19,8 @@ export class WarehouseController {
   constructor(private productService: ProductService) {}
 
   @Get()
-  async findAll() {
-    const data = await this.productService.getWarehouses();
+  async findAll(@Query('all') all?: string) {
+    const data = await this.productService.getWarehouses(all === 'true');
     return { code: 200, data };
   }
 

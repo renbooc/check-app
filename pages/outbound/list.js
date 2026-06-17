@@ -94,6 +94,7 @@ Page({
       ...item,
       statusCls: status,
       statusLabel: STATUS_MAP[status] || status,
+      initial: (item.customerName && item.customerName.trim()) ? item.customerName.trim().charAt(0) : '出',
     }
   },
 

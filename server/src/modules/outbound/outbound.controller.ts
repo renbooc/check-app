@@ -32,7 +32,23 @@ export class OutboundController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() body: { remark?: string; outboundDate?: string }) {
+  async update(@Param('id') id: string, @Body() body: {
+    remark?: string;
+    outboundDate?: string;
+    items?: Array<{
+      productId: string;
+      productName: string;
+      productSpec?: string;
+      productUnit?: string;
+      productManufacturer?: string;
+      quantity: number;
+      price: number;
+      batchNo?: string;
+      productionDate?: string;
+      expiryDate?: string;
+      locationCode?: string;
+    }>;
+  }) {
     const data = await this.outboundService.update(id, body);
     return { code: 200, data };
   }
