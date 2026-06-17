@@ -3,24 +3,29 @@ const app = getApp()
 
 Page({
   data: {
+    loading: true,
     userInfo: {},
     displayName: '未登录',
     avatarUrl: '/images/avatar.png',
+    roleText: '操作员',
     stats: {
       productCount: 0,
       customerCount: 0,
       pendingChecks: 0
     },
-    pendingChecksWarnCls: ''
+    pendingChecks: 0
   },
 
   onShow() {
     const user = app.globalData.userInfo || {}
+    const isAdmin = user.role === 'admin'
+    const displayName = user.name || user.username || '未登录'
     this.setData({
+      loading: false,
       userInfo: user,
-      displayName: user.name || user.username || '未登录',
-      avatarUrl: user.avatar || '/images/avatar.png',
-      roleText: user.role === 'admin' ? '管理员' : '操作员'
+      displayName: displayName,
+      avatarUrl: user.avatar || '/images/icon-user.png',
+      roleText: isAdmin ? '管理员' : '操作员'
     })
     this.loadUserStats()
   },
@@ -35,7 +40,7 @@ Page({
           customerCount: res.customerCount || 0,
           pendingChecks: pendingChecks
         },
-        pendingChecksWarnCls: pendingChecks > 0 ? 'stats-num stats-num-warn' : 'stats-num'
+        pendingChecks: pendingChecks
       })
     } catch (err) {
       console.warn('[Mine] stats load error:', err.message)
@@ -53,11 +58,16 @@ Page({
     }
   },
 
+  onHelp() {
+    wx.showToast({ title: '联系我们：support@rccjoy.com.cn', icon: 'none', duration: 3000 })
+  },
+
   onLogout() {
     wx.showModal({
       title: '退出登录',
       content: '确定要退出当前账号吗？',
       confirmColor: '#F53F3F',
+      confirmText: '退出',
       success: (res) => {
         if (res.confirm) {
           app.logout()

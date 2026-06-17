@@ -1,5 +1,5 @@
 /* ============================================================
-   我的页面 — 企业级 Profile（与首页统一设计语言）
+   我的页面 — 个人中心
    背景 #f5f5f5 / Hero 渐变 / 卡片 #FFFFFF / 主色 #0077C2
    ============================================================ */
 
@@ -9,28 +9,52 @@
   padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
 }
 
+.placeholder { color: #ccc; font-size: 26rpx; }
+
 /* ============================================================
-   用户信息 Hero 卡片（深蓝渐变 — 与首页 Hero 一致风格）
+   Loading（与首页统一）
+   ============================================================ */
+.loading-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 200rpx 0;
+}
+
+.loading-dot {
+  width: 48rpx;
+  height: 48rpx;
+  border: 4rpx solid #f0f0f0;
+  border-top-color: #0077C2;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   用户信息 Hero
    ============================================================ */
 .hero {
-  background: linear-gradient(135deg, #0077C2 0%, #59a5f5 100%);
+  background: linear-gradient(135deg, #0077C2 0%, #4a9fe5 100%);
   margin: 20rpx 20rpx 0;
-  padding: 40rpx 32rpx;
-  border-radius: 12rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  padding: 48rpx 32rpx 36rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 119, 194, 0.2);
   position: relative;
   overflow: hidden;
 }
 
-/* 装饰光晕（右上角，与首页 hero::after 一致） */
-.hero-deco {
+.hero-bg {
   position: absolute;
-  width: 280rpx;
-  height: 280rpx;
+  top: -120rpx;
+  right: -80rpx;
+  width: 400rpx;
+  height: 400rpx;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.04);
-  top: -80rpx;
-  right: -60rpx;
+  background: rgba(255, 255, 255, 0.05);
   pointer-events: none;
 }
 
@@ -42,16 +66,47 @@
 }
 
 .hero-avatar-wrap {
+  position: relative;
   flex-shrink: 0;
   margin-right: 28rpx;
 }
 
-.hero-avatar {
-  width: 100rpx;
-  height: 100rpx;
+.hero-avatar-inner {
+  width: 120rpx;
+  height: 120rpx;
   border-radius: 50%;
-  border: 4rpx solid rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-avatar {
+  width: 100%;
+  height: 100%;
   display: block;
+}
+
+.avatar-gradient {
+  background: linear-gradient(135deg, #0077C2 0%, #4a9fe5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-gradient .hero-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  filter: brightness(0) invert(1);
+}
+
+.hero-avatar-ring {
+  position: absolute;
+  top: -6rpx;
+  left: -6rpx;
+  width: 132rpx;
+  height: 132rpx;
+  border-radius: 50%;
+  border: 4rpx solid rgba(255, 255, 255, 0.3);
 }
 
 .hero-info {
@@ -61,7 +116,7 @@
 
 .hero-name {
   display: block;
-  font-size: 36rpx;
+  font-size: 40rpx;
   font-weight: 800;
   color: #FFFFFF;
   margin-bottom: 14rpx;
@@ -73,7 +128,7 @@
 .hero-role {
   display: inline-flex;
   align-items: center;
-  gap: 10rpx;
+  gap: 8rpx;
   padding: 8rpx 20rpx;
   background: rgba(255, 255, 255, 0.12);
   border-radius: 100rpx;
@@ -83,24 +138,61 @@
   width: 10rpx;
   height: 10rpx;
   border-radius: 50%;
-  background: #00BFFF;
+  background: #00E5A0;
   flex-shrink: 0;
 }
 
 .hero-role-text {
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.85);
 }
 
+.hero-edit {
+  position: absolute;
+  top: -8rpx;
+  right: 0;
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid rgba(255, 255, 255, 0.15);
+}
+
+.hero-edit:active {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.hero-edit-icon {
+  width: 34rpx;
+  height: 34rpx;
+  display: block;
+}
+
+.hero-foot {
+  position: relative;
+  z-index: 1;
+  margin-top: 24rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.12);
+}
+
+.hero-foot-text {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.45);
+}
+
 /* ============================================================
-   统计卡（白卡片 — 与首页 KPI 卡片完全一致）
+   统计卡（与首页 KPI 统一）
    ============================================================ */
 .stats-card {
   background: #FFFFFF;
   margin: 20rpx 20rpx 0;
   padding: 28rpx 0 24rpx;
-  border-radius: 12rpx;
+  border-radius: 16rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
@@ -116,6 +208,7 @@
   align-items: center;
   gap: 10rpx;
   border-right: 1rpx solid #f5f5f5;
+  padding: 4rpx 0;
 }
 
 .stats-cell:last-child {
@@ -123,7 +216,7 @@
 }
 
 .stats-cell:active {
-  background: #f5f5f5;
+  background: #fafafa;
 }
 
 .stats-num {
@@ -135,13 +228,9 @@
 }
 
 .stats-num-warn {
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #00BFFF;
-  line-height: 1;
+  color: #FF7D00;
 }
 
-/* 统计标签行（色点 + 文字）— 与首页 kpi-label-row 一致 */
 .stats-label-row {
   display: flex;
   align-items: center;
@@ -166,24 +255,28 @@
 }
 
 /* ============================================================
-   菜单分组卡片（与首页 entry-card 统一语言）
+   菜单分组
    ============================================================ */
-.menu-card-wrap {
-  margin-top: 24rpx;
+.menu-section {
+  padding: 0 20rpx;
 }
 
-.menu-card-title {
+.menu-group {
+  margin-top: 28rpx;
+}
+
+.menu-group-title {
   display: block;
-  font-size: 24rpx;
-  color: #5c5c5c;
+  font-size: 22rpx;
+  color: #999;
   font-weight: 500;
-  padding: 0 32rpx 12rpx;
+  padding: 0 12rpx 12rpx;
+  letter-spacing: 1rpx;
 }
 
 .menu-card {
   background: #FFFFFF;
-  margin: 0 20rpx;
-  border-radius: 12rpx;
+  border-radius: 16rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
   overflow: hidden;
 }
@@ -192,39 +285,30 @@
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 28rpx 28rpx;
+  padding: 24rpx 24rpx;
   position: relative;
 }
 
 .menu-item:active {
-  background: #f5f5f5;
+  background: #f8f8f8;
 }
 
-/* 分隔线 */
-.menu-item + .menu-item::before {
-  content: '';
-  position: absolute;
-  left: 100rpx;
-  right: 28rpx;
-  top: 0;
-  height: 1rpx;
-  background: #f5f5f5;
+.menu-item + .menu-item {
+  border-top: 1rpx solid #f5f5f5;
 }
 
-/* ---------- 图标容器（与首页 entry-icon 完全一致） ---------- */
+/* ---------- 图标 ---------- */
 .menu-icon {
   width: 56rpx;
   height: 56rpx;
   border-radius: 14rpx;
   margin-right: 20rpx;
   flex-shrink: 0;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* 柔和色底（与首页 icon-bg-* 一致） */
 .icon-bg-blue   { background: #EEF4FF; }
 .icon-bg-green  { background: #ECFDF5; }
 .icon-bg-amber  { background: #FFF8E6; }
@@ -239,7 +323,6 @@
   display: block;
 }
 
-/* ---------- 标签 & 箭头 ---------- */
 .menu-label {
   flex: 1;
   font-size: 28rpx;
@@ -247,57 +330,47 @@
   color: #333333;
 }
 
-.menu-arrow {
-  font-size: 32rpx;
-  color: #cccccc;
-  font-weight: 300;
-  line-height: 1;
-  margin-left: 8rpx;
-}
-
 /* ============================================================
-   退出按钮
+   退出登录
    ============================================================ */
-.logout-section {
-  margin-top: 48rpx;
-  padding: 0 24rpx;
-}
-
 .logout-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10rpx;
   height: 88rpx;
-  border-radius: 8rpx;
+  margin: 48rpx 20rpx 0;
   background: #FFFFFF;
+  border-radius: 16rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
 .logout-btn:active {
-  background: #fff5f5;
+  background: #FFF5F5;
 }
 
-.logout-icon-img {
+.logout-icon {
   width: 28rpx;
   height: 28rpx;
   display: block;
+  opacity: 0.55;
 }
 
 .logout-text {
   font-size: 28rpx;
-  color: #e74c3c;
+  color: #E53E3E;
   font-weight: 500;
 }
 
-/* ---------- 版本号 ---------- */
-.version-footer {
+/* ============================================================
+   版本号
+   ============================================================ */
+.version-bar {
   text-align: center;
   padding: 28rpx 0 20rpx;
 }
 
 .version-text {
-  font-size: 24rpx;
-  color: #cccccc;
-  font-weight: 400;
+  font-size: 22rpx;
+  color: #ccc;
 }

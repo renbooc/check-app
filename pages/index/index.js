@@ -271,6 +271,9 @@ Page({
       case 'inbound':
         wx.navigateTo({ url: '/pages/inbound/list' })
         break
+      case 'outbound':
+        wx.navigateTo({ url: '/pages/outbound/list' })
+        break
     }
   },
 
