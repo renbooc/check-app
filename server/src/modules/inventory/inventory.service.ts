@@ -153,7 +153,29 @@ export class InventoryService {
     }
 
     const list = await qb.orderBy('i.updatedAt', 'DESC').getMany();
-    return { list, total: list.length };
+
+    // 加载每个库存的批次明细
+    const productIds = list.map(item => item.productId);
+    let batches: InventoryDetail[] = [];
+    if (productIds.length > 0) {
+      batches = await this.detailRepo.find({
+        where: { productId: productIds as any },
+        order: { createdAt: 'DESC' },
+      });
+    }
+    const batchMap = new Map<string, InventoryDetail[]>();
+    for (const b of batches) {
+      const key = b.productId;
+      if (!batchMap.has(key)) batchMap.set(key, []);
+      batchMap.get(key)!.push(b);
+    }
+
+    const resultList = list.map(item => ({
+      ...item,
+      batches: batchMap.get(item.productId) || [],
+    }));
+
+    return { list: resultList, total: resultList.length };
   }
 
   async getStockDetail(id: string) {
