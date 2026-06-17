@@ -171,7 +171,16 @@ export class InventoryService {
     }
 
     const resultList = list.map(item => ({
-      ...item,
+      id: item.id,
+      productId: item.productId,
+      product: item.product,
+      warehouseId: item.warehouseId,
+      warehouse: item.warehouse,
+      quantity: item.quantity,
+      avgPrice: item.avgPrice,
+      amount: item.amount,
+      latestSupplier: item.latestSupplier,
+      latestInboundDate: item.latestInboundDate,
       batches: batchMap.get(item.productId) || [],
     }));
 
