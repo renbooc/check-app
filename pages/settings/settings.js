@@ -17,10 +17,16 @@ Page({
   onClearCache() {
     wx.showModal({
       title: '清除缓存',
-      content: '确定要清除本地缓存数据吗？',
+      content: '确定要清除本地缓存吗？登录状态不受影响。',
       success: (res) => {
         if (res.confirm) {
-          wx.clearStorageSync()
+          const prefix = 'erp_app_'
+          const keys = wx.getStorageInfoSync().keys
+          keys.forEach(key => {
+            if (key !== prefix + 'token' && key !== prefix + 'userInfo') {
+              wx.removeStorageSync(key)
+            }
+          })
           showSuccess('缓存已清除')
         }
       }
