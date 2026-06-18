@@ -258,7 +258,7 @@
     </view>
 
     <view class="items-empty" wx:if="{{items.length === 0}}">
-      <text class="items-empty-text">暂无商品</text>
+      <text class="items-empty-text">暂无商品，请在上方搜索添加</text>
     </view>
   </view>
 
