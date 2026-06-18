@@ -481,7 +481,7 @@ Page({
     try {
       await api.put('/inbound/' + this.data.id + '/status', { status: 'cancelled' })
       showSuccess('已取消')
-      await this.loadNote(this.data.id)
+      setTimeout(() => wx.navigateBack(), 1000)
     } catch (err) {
       showError(err.message)
     } finally {
