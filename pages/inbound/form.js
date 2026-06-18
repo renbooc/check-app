@@ -446,9 +446,8 @@ Page({
         const result = await api.post('/inbound', data)
         id = result.id
       }
-      // 草稿→待审核→已审核（后端守卫不允许跳步）
+      // 提交审核：草稿→待审核
       await api.put('/inbound/' + id + '/status', { status: 'pending' })
-      await api.put('/inbound/' + id + '/status', { status: 'approved' })
       showSuccess('提交成功')
       this.setData({ submitting: false, editing: false })
       await this.loadNote(id)
