@@ -413,7 +413,7 @@ Page({
       if (this.data.id) {
         await api.put('/outbound/' + this.data.id, { remark: this.data.remark, outboundDate: this.data.outboundDate || null, items })
       } else {
-        const result = await api.post('/outbound', { items, remark: this.data.remark, outboundDate: this.data.outboundDate || null })
+        const result = await api.post('/outbound', { items, remark: this.data.remark })
         this.setData({ id: result.id })
       }
       showSuccess('保存成功')
@@ -443,12 +443,11 @@ Page({
         quantity: parseFloat(item.quantity) || 0, price: parseFloat(item.price) || 0,
         batchNo: item.batchNo || '', locationCode: item.locationCode || '',
       }))
-      const payload = { items, remark: this.data.remark, outboundDate: this.data.outboundDate || null }
       let id = this.data.id
       if (id) {
-        await api.put('/outbound/' + id, payload)
+        await api.put('/outbound/' + id, { items, remark: this.data.remark, outboundDate: this.data.outboundDate || null })
       } else {
-        const result = await api.post('/outbound', payload)
+        const result = await api.post('/outbound', { items, remark: this.data.remark })
         id = result.id
       }
       await api.put('/outbound/' + id + '/status', { status: 'approved' })
