@@ -241,6 +241,7 @@ export class OutboundService {
       productManufacturer?: string;
       quantity: number;
       price: number;
+      batchCode?: string;
       batchNo?: string;
       productionDate?: string;
       expiryDate?: string;
