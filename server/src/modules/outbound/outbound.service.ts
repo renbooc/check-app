@@ -300,7 +300,7 @@ export class OutboundService {
   private assertValidTransition(currentStatus: string, targetStatus: string) {
     const ALLOWED: Record<string, string[]> = {
       draft: ['pending', 'cancelled'],
-      pending: ['approved', 'cancelled'],
+      pending: ['approved', 'cancelled', 'draft'],
       approved: [],
       cancelled: [],
     };
