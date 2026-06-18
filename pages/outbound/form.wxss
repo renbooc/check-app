@@ -146,10 +146,6 @@
 .search-empty { padding: 20rpx; text-align: center; }
 .search-empty-text { font-size: 24rpx; color: #ccc; }
 
-/* ===== 固定搜索下拉 ===== */
-.search-results-fixed, .ps-list-fixed { position: fixed; left: 20rpx; right: 20rpx; z-index: 999; max-height: 50vh; background: #FFFFFF; border-radius: 12rpx; box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.1), 0 4rpx 20rpx rgba(0,0,0,0.08); overflow: hidden; }
-.search-results-fixed-inner, .ps-list-fixed-inner { max-height: 50vh; overflow-y: auto; }
-
 /* ===== 批次选择弹层 ===== */
 .batch-mask { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 200; }
 .batch-panel { position: fixed; left: 0; right: 0; bottom: 0; background: #f8f9fb; border-radius: 24rpx 24rpx 0 0; z-index: 201; transform: translateY(100%); transition: transform 0.3s ease-out; max-height: 75vh; display: flex; flex-direction: column; }

@@ -47,9 +47,6 @@ Page({
     // Items
     items: [],
 
-    // 键盘高度（解决手机键盘遮挡下拉问题）
-    keyboardHeight: 0,
-    showFixedDropdown: false,
     totalQuantity: 0,
     totalAmount: '0.00',
 
@@ -179,7 +176,6 @@ Page({
       customerKeyword: keyword,
       filteredCustomers: filtered,
       showCustomerResults: keyword.length > 0,
-      showFixedDropdown: this.data.keyboardHeight > 0 && keyword.length > 0,
       selectedCustomer: null,
     })
   },
@@ -192,7 +188,7 @@ Page({
 
   onCustomerBlur() {
     setTimeout(() => {
-      this.setData({ showCustomerResults: false, showFixedDropdown: false })
+      this.setData({ showCustomerResults: false })
     }, 200)
   },
 
@@ -205,7 +201,6 @@ Page({
       customerName: customer.name,
       customerKeyword: customer.name,
       showCustomerResults: false,
-      showFixedDropdown: false,
       filteredCustomers: [],
     })
   },
@@ -215,7 +210,6 @@ Page({
       selectedCustomer: null,
       customerKeyword: '',
       showCustomerResults: false,
-      showFixedDropdown: false,
       filteredCustomers: [],
     })
   },
@@ -255,7 +249,7 @@ Page({
       const filtered = this.data.products.filter(p =>
         p.name.includes(keyword) || (p.spec && p.spec.includes(keyword))
       )
-      this.setData({ productSearchResults: filtered, showProductResults: true, showFixedDropdown: this.data.keyboardHeight > 0 })
+      this.setData({ productSearchResults: filtered, showProductResults: true })
     } else {
       this.setData({ productSearchResults: [], showProductResults: false })
     }
@@ -269,17 +263,8 @@ Page({
 
   onItemProductSearchBlur() {
     setTimeout(() => {
-      this.setData({ showProductResults: false, showFixedDropdown: false })
+      this.setData({ showProductResults: false })
     }, 250)
-  },
-
-  onKeyboardHeightChange(e) {
-    const height = e.detail.height || 0
-    const hasResults = this.data.showProductResults || this.data.showCustomerResults
-    this.setData({
-      keyboardHeight: height,
-      showFixedDropdown: height > 0 && hasResults,
-    })
   },
 
   onItemProductSearchSelect(e) {
@@ -309,7 +294,6 @@ Page({
       productKeyword: '',
       productSearchResults: [],
       showProductResults: false,
-      showFixedDropdown: false,
     })
     this.calcTotal()
   },

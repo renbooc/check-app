@@ -43,9 +43,6 @@ Page({
     productSearchResults: [],
     showProductResults: false,
     _allProducts: [],
-    // 键盘
-    keyboardHeight: 0,
-    showFixedDropdown: false,
     // 批次选择
     showBatchPicker: false,
     batchProduct: null,
@@ -146,7 +143,6 @@ Page({
       customerKeyword: keyword,
       filteredCustomers: filtered,
       showCustomerResults: keyword.length > 0,
-      showFixedDropdown: this.data.keyboardHeight > 0 && keyword.length > 0,
     })
   },
 
@@ -157,7 +153,7 @@ Page({
   },
 
   onCustomerBlur() {
-    setTimeout(() => this.setData({ showCustomerResults: false, showFixedDropdown: false }), 200)
+    setTimeout(() => this.setData({ showCustomerResults: false }), 200)
   },
 
   onCustomerSelect(e) {
@@ -170,7 +166,6 @@ Page({
       customerKeyword: customer.name,
       showCustomerResults: false,
       filteredCustomers: [],
-      showFixedDropdown: false,
     })
   },
 
@@ -201,7 +196,6 @@ Page({
       productKeyword: keyword,
       productSearchResults: filtered,
       showProductResults: keyword.length > 0,
-      showFixedDropdown: this.data.keyboardHeight > 0 && keyword.length > 0,
     })
   },
 
@@ -212,7 +206,7 @@ Page({
   },
 
   onProductSearchBlur() {
-    setTimeout(() => this.setData({ showProductResults: false, showFixedDropdown: false }), 250)
+    setTimeout(() => this.setData({ showProductResults: false }), 250)
   },
 
   onProductSearchSelect(e) {
@@ -227,7 +221,6 @@ Page({
       productKeyword: '',
       productSearchResults: [],
       showProductResults: false,
-      showFixedDropdown: false,
     })
     // 获取可用批次
     this.loadBatchesForProduct(product)
@@ -295,16 +288,6 @@ Page({
 
   onCloseBatchPicker() {
     this.setData({ showBatchPicker: false, batchProduct: null, batchOptions: [] })
-  },
-
-  // ===== 键盘处理 =====
-  onKeyboardHeightChange(e) {
-    const height = e.detail.height || 0
-    const hasResults = this.data.showProductResults || this.data.showCustomerResults
-    this.setData({
-      keyboardHeight: height,
-      showFixedDropdown: height > 0 && hasResults,
-    })
   },
 
   onToggleEdit() {

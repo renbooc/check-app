@@ -43,10 +43,6 @@ Page({
     productSearchResults: [],
     showProductResults: false,
     products: [],
-    // 键盘高度（解决手机键盘遮挡下拉问题）
-    keyboardHeight: 0,
-    showFixedDropdown: false,
-
     // 已添加商品行
     items: [],
 
@@ -176,7 +172,6 @@ Page({
       supplierKeyword: keyword,
       filteredSuppliers: filtered,
       showSupplierResults: keyword.length > 0,
-      showFixedDropdown: this.data.keyboardHeight > 0 && keyword.length > 0,
       selectedSupplier: null,
     });
   },
@@ -189,7 +184,7 @@ Page({
 
   onSupplierBlur() {
     setTimeout(() => {
-      this.setData({ showSupplierResults: false, showFixedDropdown: false });
+      this.setData({ showSupplierResults: false });
     }, 200);
   },
 
@@ -202,7 +197,6 @@ Page({
       supplierName: supplier.name,
       supplierKeyword: supplier.name,
       showSupplierResults: false,
-      showFixedDropdown: false,
       filteredSuppliers: [],
     });
   },
@@ -212,7 +206,6 @@ Page({
       selectedSupplier: null,
       supplierKeyword: "",
       showSupplierResults: false,
-      showFixedDropdown: false,
       filteredSuppliers: [],
     });
   },
@@ -256,7 +249,6 @@ Page({
       this.setData({
         productSearchResults: filtered,
         showProductResults: true,
-        showFixedDropdown: this.data.keyboardHeight > 0,
       });
     } else {
       this.setData({
@@ -276,17 +268,8 @@ Page({
 
   onProductSearchBlur() {
     setTimeout(() => {
-      this.setData({ showProductResults: false, showFixedDropdown: false });
+      this.setData({ showProductResults: false });
     }, 250);
-  },
-
-  onKeyboardHeightChange(e) {
-    const height = e.detail.height || 0;
-    const hasResults = this.data.showProductResults || this.data.showSupplierResults;
-    this.setData({
-      keyboardHeight: height,
-      showFixedDropdown: height > 0 && hasResults,
-    });
   },
 
   onProductSearchSelect(e) {
@@ -323,7 +306,6 @@ Page({
       productKeyword: "",
       productSearchResults: [],
       showProductResults: false,
-      showFixedDropdown: false,
     });
     this.calcTotal();
   },
