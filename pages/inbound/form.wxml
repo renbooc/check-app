@@ -46,7 +46,8 @@
 
     <view class="order-form-item">
       <text class="order-form-label">入库单号</text>
-      <text class="order-form-value">{{orderNo}}</text>
+      <text class="order-form-value" wx:if="{{orderNo}}">{{orderNo}}</text>
+      <text class="order-form-value placeholder" wx:else>保存后自动生成</text>
     </view>
 
     <view class="order-form-item">
