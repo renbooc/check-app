@@ -3,16 +3,8 @@ const { showError, showSuccess, formatDate } = require('../../utils/util')
 
 Page({
   data: {
-    activeTab: 'purchase',
+    activeTab: 'inbound',
     networkError: false,
-    purchaseKeyword: '',
-    purchaseList: [],
-    purchasePage: 1,
-    purchaseTotal: 0,
-    salesKeyword: '',
-    salesList: [],
-    salesPage: 1,
-    salesTotal: 0,
     inventoryKeyword: '',
     inventoryList: [],
     inventoryPage: 1,
@@ -24,7 +16,7 @@ Page({
     outboundKeyword: '',
     outboundList: [],
     outboundPage: 1,
-    outboundTotal: 0
+    outboundTotal: 0,
   },
 
   onShow() {
@@ -43,9 +35,10 @@ Page({
 
   onReachBottom() {
     const tab = this.data.activeTab
+    if (tab === 'purchaseReturn' || tab === 'salesReturn') return
     const listKey = tab + 'List'
     const totalKey = tab + 'Total'
-    if (this.data[listKey].length < this.data[totalKey]) {
+    if (this.data[listKey] && this.data[listKey].length < this.data[totalKey]) {
       const pageKey = tab + 'Page'
       this.setData({ [pageKey]: this.data[pageKey] + 1 })
       this.loadCurrentTab(true)
@@ -61,49 +54,16 @@ Page({
 
   resetCurrentTab() {
     const tab = this.data.activeTab
+    if (tab === 'purchaseReturn' || tab === 'salesReturn') return
     this.setData({ [tab + 'Page']: 1 })
   },
 
   loadCurrentTab(append) {
     const tab = this.data.activeTab
     switch (tab) {
-      case 'purchase': return this.loadPurchase(append)
-      case 'sales': return this.loadSales(append)
       case 'inbound': return this.loadInbound(append)
       case 'outbound': return this.loadOutbound(append)
       case 'inventory': return this.loadInventory(append)
-    }
-  },
-
-  async loadPurchase(append) {
-    try {
-      const params = { page: this.data.purchasePage, pageSize: 20 }
-      if (this.data.purchaseKeyword) params.keyword = this.data.purchaseKeyword
-      const res = await api.get('/purchase', params)
-      const list = (res.list || []).map(i => ({ ...i, createdAt: formatDate(i.createdAt, 'YYYY-MM-DD HH:mm:ss') }))
-      this.setData({
-        purchaseList: append ? [...this.data.purchaseList, ...list] : list,
-        purchaseTotal: res.total || 0
-      })
-    } catch (err) {
-      showError(err.message)
-      this.setData({ networkError: true })
-    }
-  },
-
-  async loadSales(append) {
-    try {
-      const params = { page: this.data.salesPage, pageSize: 20 }
-      if (this.data.salesKeyword) params.keyword = this.data.salesKeyword
-      const res = await api.get('/sales', params)
-      const list = (res.list || []).map(i => ({ ...i, createdAt: formatDate(i.createdAt, 'YYYY-MM-DD HH:mm:ss') }))
-      this.setData({
-        salesList: append ? [...this.data.salesList, ...list] : list,
-        salesTotal: res.total || 0
-      })
-    } catch (err) {
-      showError(err.message)
-      this.setData({ networkError: true })
     }
   },
 
@@ -154,24 +114,6 @@ Page({
     }
   },
 
-  onPurchaseSearchInput(e) {
-    this.setData({ purchaseKeyword: e.detail.value })
-  },
-
-  onPurchaseSearch() {
-    this.setData({ purchasePage: 1 })
-    this.loadPurchase()
-  },
-
-  onSalesSearchInput(e) {
-    this.setData({ salesKeyword: e.detail.value })
-  },
-
-  onSalesSearch() {
-    this.setData({ salesPage: 1 })
-    this.loadSales()
-  },
-
   onInventorySearchInput(e) {
     this.setData({ inventoryKeyword: e.detail.value })
   },
@@ -217,52 +159,12 @@ Page({
     wx.navigateTo({ url: '/pages/outbound/form?id=' + id })
   },
 
-  onAddPurchase() {
-    wx.navigateTo({ url: '/pages/purchase/form' })
-  },
-
-  onAddSales() {
-    wx.navigateTo({ url: '/pages/sales/form' })
-  },
-
   onAddProduct() {
     wx.navigateTo({ url: '/pages/product/form' })
-  },
-
-  onPurchaseTap(e) {
-    const id = e.currentTarget.dataset.id
-    wx.navigateTo({ url: '/pages/purchase/form?id=' + id })
-  },
-
-  onSalesTap(e) {
-    const id = e.currentTarget.dataset.id
-    wx.navigateTo({ url: '/pages/sales/form?id=' + id })
   },
 
   onInventoryTap(e) {
     const id = e.currentTarget.dataset.id
     wx.navigateTo({ url: '/pages/product/detail?id=' + id })
   },
-
-  async onConfirmReceipt(e) {
-    const id = e.currentTarget.dataset.id
-    try {
-      await api.put(`/purchase/${id}/status`, { status: 'received' })
-      showSuccess('已确认入库')
-      this.loadCurrentTab()
-    } catch (err) {
-      showError(err.message)
-    }
-  },
-
-  async onConfirmDelivery(e) {
-    const id = e.currentTarget.dataset.id
-    try {
-      await api.put(`/sales/${id}/status`, { status: 'delivered' })
-      showSuccess('已确认出库')
-      this.loadCurrentTab()
-    } catch (err) {
-      showError(err.message)
-    }
-  }
 })
