@@ -51,7 +51,7 @@
 
     <view class="order-form-item">
       <text class="order-form-label">来源采购单</text>
-      <text class="order-form-value" wx:if="{{purchaseOrderNo}}">{{purchaseOrderNo}}</text>
+      <text class="order-form-value purchase-link" wx:if="{{purchaseOrderNo}}">{{purchaseOrderNo}}</text>
       <text class="order-form-value placeholder" wx:else>—</text>
     </view>
 
