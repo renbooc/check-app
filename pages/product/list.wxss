@@ -1,6 +1,6 @@
 /* ============================================================
    商品列表 — 管理页
-   白色背景 + 蓝色主色 #0077C2
+   白色背景 + 琥珀色主色 #F59E0B
    ============================================================ */
 
 .page {
@@ -103,10 +103,10 @@
 }
 
 .chip-active {
-  background: #0077C2;
+  background: #F59E0B;
   color: #ffffff;
   font-weight: 500;
-  box-shadow: 0 4rpx 12rpx rgba(0, 119, 194, 0.25);
+  box-shadow: 0 4rpx 12rpx rgba(245, 158, 11, 0.25);
 }
 
 /* ============================================================
@@ -255,8 +255,8 @@
 .product-category-tag {
   flex-shrink: 0;
   font-size: 20rpx;
-  color: #0077C2;
-  background: rgba(0, 119, 194, 0.08);
+  color: #F59E0B;
+  background: rgba(245, 158, 11, 0.1);
   padding: 4rpx 14rpx;
   border-radius: 20rpx;
   line-height: 1.4;
@@ -274,8 +274,8 @@
 /* 分类标签（顶部） */
 .category-tag {
   font-size: 18rpx;
-  color: #08979c;
-  background: rgba(8, 151, 156, 0.08);
+  color: #F59E0B;
+  background: rgba(245, 158, 11, 0.1);
   padding: 3rpx 10rpx;
   border-radius: 18rpx;
   flex-shrink: 0;

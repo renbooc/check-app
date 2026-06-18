@@ -76,11 +76,11 @@
 }
 
 .section-icon-price {
-  background: linear-gradient(135deg, #10B981, #34D399);
+  background: linear-gradient(135deg, #F59E0B, #F97316);
 }
 
 .section-icon-other {
-  background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+  background: linear-gradient(135deg, #F59E0B, #F97316);
 }
 
 .section-title {
@@ -150,7 +150,7 @@
   width: 52rpx;
   height: 52rpx;
   border-radius: 50%;
-  background: #EEF4FF;
+  background: #FFFBEB;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -158,12 +158,12 @@
 }
 
 .btn-add-inline:active {
-  background: #D6E4FF;
+  background: #FEF3C7;
 }
 
 .btn-add-inline-icon {
   font-size: 30rpx;
-  color: #0077C2;
+  color: #F59E0B;
   font-weight: 700;
   line-height: 1;
 }
@@ -225,7 +225,7 @@
 }
 
 .inline-add-confirm {
-  background: #0077C2;
+  background: #F59E0B;
   color: #fff;
 }
 
