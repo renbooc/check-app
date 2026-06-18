@@ -79,12 +79,12 @@
             <view class="info-icon-order"></view>
             <text class="card-info-text">{{item.orderNo}}</text>
           </view>
-          <view class="card-info-row" wx:if="{{item.totalQuantity}}" bindtap="onDetail" data-id="{{item.id}}">
-            <view class="info-icon-qty"></view>
-            <text class="card-info-text">{{item.totalQuantity}} 件 · ¥{{item.totalAmount}}</text>
-          </view>
-          <view class="card-action" wx:if="{{item.statusCls === 'approved'}}" catchtap="onQuickDeliver" data-id="{{item.id}}">
-            <text class="card-action-text">确认出库</text>
+          <view class="card-info-row" wx:if="{{item.totalQuantity || item.statusCls === 'approved'}}" bindtap="onDetail" data-id="{{item.id}}">
+            <view class="info-icon-qty" wx:if="{{item.totalQuantity}}"></view>
+            <text class="card-info-text" wx:if="{{item.totalQuantity}}">{{item.totalQuantity}} 件 · ¥{{item.totalAmount}}</text>
+            <view class="card-action" wx:if="{{item.statusCls === 'approved'}}" catchtap="onQuickDeliver" data-id="{{item.id}}">
+              <text class="card-action-text">确认出库</text>
+            </view>
           </view>
         </view>
       </view>

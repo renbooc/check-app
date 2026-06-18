@@ -240,10 +240,10 @@
 }
 
 .card-action {
-  margin-top: 14rpx;
-  align-self: flex-end;
-  padding: 14rpx 24rpx;
-  border-radius: 10rpx;
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 8rpx 20rpx;
+  border-radius: 8rpx;
   background: linear-gradient(135deg, #0D9E6F, #10B981);
 }
 
