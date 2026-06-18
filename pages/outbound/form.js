@@ -281,7 +281,7 @@ Page({
       productManufacturer: product.manufacturer || '',
       quantity: 1,
       price: lastPrice,
-      amount: '0.00',
+      amount: (1 * lastPrice).toFixed(2),
       batchNo: batch.batchNo || '',
       productionDate: batch.productionDate || '',
       expiryDate: batch.expiryDate || '',
@@ -406,8 +406,6 @@ Page({
         quantity: parseFloat(item.quantity) || 0,
         price: parseFloat(item.price) || 0,
         batchNo: item.batchNo || '',
-        productionDate: item.productionDate || '',
-        expiryDate: item.expiryDate || '',
         locationCode: item.locationCode || '',
       }))
       if (this.data.id) {
