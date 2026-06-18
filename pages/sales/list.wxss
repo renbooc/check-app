@@ -239,6 +239,33 @@
   background: #ECFDF5;
 }
 
+.card-inner {
+  display: flex;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+
+.card-action {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  align-self: flex-end;
+  padding: 10rpx 20rpx;
+  border-radius: 8rpx;
+  background: #10B981;
+}
+
+.card-action:active {
+  opacity: 0.8;
+}
+
+.card-action-text {
+  font-size: 24rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 .card-left {
   flex-shrink: 0;
   margin-right: 20rpx;

@@ -110,4 +110,16 @@ Page({
   onCreate() {
     wx.navigateTo({ url: '/pages/sales/form' })
   },
+
+  async onQuickDeliver(e) {
+    const id = e.currentTarget.dataset.id
+    try {
+      await api.put(`/sales/${id}/status`, { status: 'delivered' })
+      wx.showToast({ title: '出库单已生成', icon: 'success' })
+      this.resetList()
+      this.loadPendingCount()
+    } catch (err) {
+      showError(err.message)
+    }
+  },
 })
