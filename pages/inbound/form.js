@@ -108,7 +108,7 @@ Page({
         totalQuantity: note.totalQuantity || 0,
         totalAmount: (parseFloat(note.totalAmount) || 0).toFixed(2),
         readonly,
-        editing: false,
+        editing: status === 'draft',
         statusCls: status,
         statusText: STATUS_MAP[status] || status,
       })
@@ -431,6 +431,31 @@ Page({
       }
     }
     return true
+  },
+
+  async onSubmit() {
+    if (this.data.submitting) return
+    if (!this.validate()) return
+    this.setData({ submitting: true })
+    try {
+      const data = this.buildSubmitData()
+      let id = this.data.id
+      if (id) {
+        await api.put('/inbound/' + id, data)
+      } else {
+        const result = await api.post('/inbound', data)
+        id = result.id
+      }
+      // 草稿→待审核→已审核（后端守卫不允许跳步）
+      await api.put('/inbound/' + id + '/status', { status: 'pending' })
+      await api.put('/inbound/' + id + '/status', { status: 'approved' })
+      showSuccess('提交成功')
+      this.setData({ submitting: false, editing: false })
+      await this.loadNote(id)
+    } catch (err) {
+      showError(err.message)
+      this.setData({ submitting: false })
+    }
   },
 
   async onApprove() {

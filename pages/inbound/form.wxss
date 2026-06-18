@@ -787,3 +787,16 @@
 .action-withdraw:active { background: #f5f5f5; }
 .action-cancel { background: #FFFFFF; color: #999; border: 2rpx solid #ddd; }
 .action-cancel:active { background: #f5f5f5; }
+
+/* ===== 底部操作栏（草稿模式） ===== */
+.bottom-summary { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14rpx; }
+.bottom-summary-left { display: flex; align-items: baseline; gap: 10rpx; }
+.bottom-summary .summary-label { font-size: 24rpx; color: #5c5c5c; }
+.bottom-summary .summary-qty { font-size: 22rpx; color: #5c5c5c; }
+.bottom-summary .summary-amount { font-size: 38rpx; font-weight: 800; color: #F59E0B; }
+.bottom-actions { display: flex; gap: 14rpx; }
+.action-draft { flex: 1; height: 84rpx; line-height: 84rpx; border-radius: 12rpx; text-align: center; border: none; padding: 0; font-size: 28rpx; font-weight: 600; background: #f5f5f5; color: #5c5c5c; }
+.action-draft:active { background: #e8e8e8; }
+.action-submit { flex: 1; height: 84rpx; line-height: 84rpx; border-radius: 12rpx; text-align: center; border: none; padding: 0; font-size: 28rpx; font-weight: 600; background: linear-gradient(135deg, #F59E0B, #F97316); color: #FFFFFF; box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06); }
+.action-submit:active { opacity: 0.9; }
+.action-btn[disabled] { opacity: 0.5; box-shadow: none; }

@@ -262,20 +262,19 @@
     </view>
   </view>
 
-  <!-- ===== 底部操作栏（草稿） ===== -->
+  <!-- ===== 底部操作栏（草稿 = 编辑模式） ===== -->
   <view class="bottom-bar" wx:if="{{statusCls === 'draft'}}">
     <view class="bottom-inner">
-      <view class="bottom-inner-actions">
-        <button class="action-btn action-back" bindtap="onBack">返回</button>
-        <button class="action-btn action-edit-toggle" wx:if="{{!editing}}" bindtap="onToggleEdit" disabled="{{submitting}}">
-          编辑
-        </button>
-        <button class="action-btn action-save" wx:if="{{editing}}" bindtap="onSave" disabled="{{submitting}}">
-          {{submitting ? '保存中...' : '保存'}}
-        </button>
-        <button class="action-btn action-approve" bindtap="onApprove" disabled="{{submitting}}">
-          {{submitting ? '处理中...' : '审核通过'}}
-        </button>
+      <view class="bottom-summary">
+        <view class="bottom-summary-left">
+          <text class="summary-label">合计</text>
+          <text class="summary-qty">{{totalQuantity || 0}} 件</text>
+        </view>
+        <text class="summary-amount">¥ {{totalAmount || '0.00'}}</text>
+      </view>
+      <view class="bottom-actions">
+        <button class="action-btn action-draft" bindtap="onSave" disabled="{{submitting}}">{{submitting ? '保存中...' : '保存草稿'}}</button>
+        <button class="action-btn action-submit" bindtap="onSubmit" disabled="{{submitting}}">{{submitting ? '提交中...' : '提交审核'}}</button>
       </view>
     </view>
   </view>
