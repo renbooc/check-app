@@ -137,8 +137,8 @@ export class InboundService {
 
     const note = this.noteRepo.create({
       orderNo,
-      purchaseOrderId: dto.purchaseOrderId || null,
-      supplierId: dto.supplierId || null,
+      purchaseOrderId: dto.purchaseOrderId || '',
+      supplierId: dto.supplierId || '',
       supplierName: dto.supplierName || '',
       status: 'draft',
       totalAmount: 0,
