@@ -53,6 +53,7 @@ Page({
   async onLoad(options) {
     if (options.id) {
       this.setData({ id: options.id })
+      this.loadDependencies()
       await this.loadNote(options.id)
     } else {
       this.setData({ editing: true, readonly: false })

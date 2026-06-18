@@ -25,7 +25,7 @@
 
     <view class="order-form-item order-form-item-column">
       <text class="order-form-label">客户</text>
-      <view wx:if="{{!selectedCustomer && editing && !fromSalesOrder}}" class="customer-search-wrap">
+      <view wx:if="{{!customerName && editing && !fromSalesOrder}}" class="customer-search-wrap">
         <view class="search-field {{showCustomerResults && filteredCustomers.length > 0 ? 'search-field-active' : ''}}">
           <view class="search-field-icon">
             <icon-cmp type="search" size="18" color="#999"></icon-cmp>
