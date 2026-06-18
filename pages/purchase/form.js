@@ -183,9 +183,7 @@ Page({
   },
 
   onSupplierBlur() {
-    setTimeout(() => {
-      this.setData({ showSupplierResults: false });
-    }, 200);
+    // 离开输入框时不隐藏搜索结果，允许用户滑动页面查看并选择
   },
 
   onSupplierSelect(e) {
@@ -267,9 +265,7 @@ Page({
   },
 
   onProductSearchBlur() {
-    setTimeout(() => {
-      this.setData({ showProductResults: false });
-    }, 250);
+    // 离开输入框时不隐藏搜索结果，允许用户滑动页面查看并选择
   },
 
   onProductSearchSelect(e) {

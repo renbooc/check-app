@@ -153,7 +153,7 @@ Page({
   },
 
   onCustomerBlur() {
-    setTimeout(() => this.setData({ showCustomerResults: false }), 200)
+    // 离开输入框时不隐藏搜索结果，允许用户滑动页面查看并选择
   },
 
   onCustomerSelect(e) {
@@ -206,7 +206,7 @@ Page({
   },
 
   onProductSearchBlur() {
-    setTimeout(() => this.setData({ showProductResults: false }), 250)
+    // 离开输入框时不隐藏搜索结果，允许用户滑动页面查看并选择
   },
 
   onProductSearchSelect(e) {
