@@ -353,7 +353,7 @@ export class OutboundService {
       .innerJoinAndSelect('item.outboundNote', 'note')
       .where('item.productId = :productId', { productId })
       .andWhere('note.customerId = :customerId', { customerId })
-      .orderBy('item.createdAt', 'DESC')
+      .orderBy('note.createdAt', 'DESC')
       .getOne();
     return item ? item.price : 0;
   }
