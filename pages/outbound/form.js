@@ -401,6 +401,10 @@ Page({
 
   async onSave() {
     if (this.data.submitting) return
+    if (this.data.items.length === 0) {
+      wx.showToast({ title: '请添加出库商品', icon: 'none' })
+      return
+    }
     this.setData({ submitting: true })
     try {
       const items = this.data.items.map(item => ({
