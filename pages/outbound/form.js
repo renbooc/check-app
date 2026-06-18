@@ -38,6 +38,7 @@ Page({
     warehouses: [],
     warehouseNames: [],
     warehouseIndex: -1,
+    warehouseId: '',
     // 商品搜索
     productKeyword: '',
     productSearchResults: [],
@@ -183,7 +184,7 @@ Page({
     const idx = parseInt(e.detail.value)
     const wh = this.data.warehouses[idx]
     if (wh) {
-      this.setData({ warehouseIndex: idx, warehouseName: wh.name })
+      this.setData({ warehouseIndex: idx, warehouseId: wh.id, warehouseName: wh.name })
     }
   },
 
@@ -411,7 +412,14 @@ Page({
       if (this.data.id) {
         await api.put('/outbound/' + this.data.id, { remark: this.data.remark, outboundDate: this.data.outboundDate || null, items })
       } else {
-        const result = await api.post('/outbound', { items, remark: this.data.remark })
+        const cust = this.data.selectedCustomer || {}
+        const result = await api.post('/outbound', {
+          items, remark: this.data.remark,
+          customerId: cust.id || null,
+          customerName: cust.name || this.data.customerName || '',
+          warehouseId: this.data.warehouseId || null,
+          warehouseName: this.data.warehouseName || '',
+        })
         this.setData({ id: result.id })
       }
       showSuccess('保存成功')
@@ -445,7 +453,14 @@ Page({
       if (id) {
         await api.put('/outbound/' + id, { items, remark: this.data.remark, outboundDate: this.data.outboundDate || null })
       } else {
-        const result = await api.post('/outbound', { items, remark: this.data.remark })
+        const cust = this.data.selectedCustomer || {}
+        const result = await api.post('/outbound', {
+          items, remark: this.data.remark,
+          customerId: cust.id || null,
+          customerName: cust.name || this.data.customerName || '',
+          warehouseId: this.data.warehouseId || null,
+          warehouseName: this.data.warehouseName || '',
+        })
         id = result.id
       }
       await api.put('/outbound/' + id + '/status', { status: 'approved' })
