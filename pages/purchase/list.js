@@ -110,16 +110,4 @@ Page({
   onCreate() {
     wx.navigateTo({ url: '/pages/purchase/form' })
   },
-
-  async onQuickReceive(e) {
-    const id = e.currentTarget.dataset.id
-    try {
-      await api.put(`/purchase/${id}/status`, { status: 'received' })
-      wx.showToast({ title: '入库单已生成', icon: 'success' })
-      this.resetList()
-      this.loadPendingCount()
-    } catch (err) {
-      showError(err.message)
-    }
-  },
 })

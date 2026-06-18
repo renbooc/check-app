@@ -239,25 +239,6 @@
   background: #ECFDF5;
 }
 
-.card-action {
-  margin-left: auto;
-  flex-shrink: 0;
-  padding: 8rpx 20rpx;
-  border-radius: 8rpx;
-  background: linear-gradient(135deg, #F59E0B, #F97316);
-}
-
-.card-action:active {
-  opacity: 0.85;
-}
-
-.card-action-text {
-  font-size: 24rpx;
-  color: #FFFFFF;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
 .card-left {
   flex-shrink: 0;
   margin-right: 20rpx;
