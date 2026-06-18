@@ -117,6 +117,8 @@
 .action-edit-toggle:active { background: #FFF0F5; }
 .action-save { background: linear-gradient(135deg, #E83E8C, #F06292); color: #fff; }
 .action-save:active { opacity: 0.9; }
+.action-cancel { background: #fff; color: #999; border: 2rpx solid #ddd; }
+.action-cancel:active { background: #f5f5f5; }
 .action-approve { background: linear-gradient(135deg, #E83E8C, #F06292); color: #fff; }
 .action-draft { background: #fff; color: #E83E8C; border: 2rpx solid #E83E8C; }
 .action-submit { background: linear-gradient(135deg, #E83E8C, #F06292); color: #fff; }

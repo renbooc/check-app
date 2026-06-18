@@ -301,6 +301,10 @@ export class OutboundService {
     const note = await this.findOne(id);
     if (!note) throw new NotFoundException('出库单不存在');
 
+    if (status === 'cancelled' && note.status !== 'pending') {
+      throw new NotFoundException('仅待审核出库单可取消');
+    }
+
     await this.noteRepo.update(id, { status });
 
     if (status === 'approved' && note.items) {

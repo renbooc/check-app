@@ -515,6 +515,20 @@ Page({
     }
   },
 
+  async onCancel() {
+    if (this.data.submitting) return
+    this.setData({ submitting: true })
+    try {
+      await api.put('/outbound/' + this.data.id + '/status', { status: 'cancelled' })
+      showSuccess('已取消')
+      this.setData({ submitting: false })
+      await this.loadNote(this.data.id)
+    } catch (err) {
+      showError(err.message)
+      this.setData({ submitting: false })
+    }
+  },
+
   onBack() {
     wx.navigateBack()
   },
