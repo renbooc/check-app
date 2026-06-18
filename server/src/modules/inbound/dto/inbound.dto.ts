@@ -61,6 +61,10 @@ export class CreateInboundDto {
 
   @IsOptional()
   @IsString()
+  inboundDate?: string;
+
+  @IsOptional()
+  @IsString()
   remark?: string;
 
   @IsOptional()

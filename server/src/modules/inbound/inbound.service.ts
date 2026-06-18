@@ -126,6 +126,7 @@ export class InboundService {
     }>;
     operatorId: string;
     operatorName: string;
+    inboundDate?: string;
     remark?: string;
     warehouseId?: string;
     warehouseName?: string;
@@ -142,6 +143,7 @@ export class InboundService {
       status: 'draft',
       totalAmount: 0,
       totalQuantity: 0,
+      inboundDate: dto.inboundDate || null,
       warehouseId: dto.warehouseId || null,
       warehouseName: dto.warehouseName || null,
       operatorId: dto.operatorId,
