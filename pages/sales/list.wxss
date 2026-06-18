@@ -239,30 +239,22 @@
   background: #ECFDF5;
 }
 
-.card-inner {
-  display: flex;
-  align-items: flex-start;
-  flex: 1;
-  min-width: 0;
-}
-
 .card-action {
-  flex-shrink: 0;
-  margin-left: 16rpx;
+  margin-top: 14rpx;
   align-self: flex-end;
-  padding: 10rpx 20rpx;
-  border-radius: 8rpx;
-  background: #10B981;
+  padding: 14rpx 24rpx;
+  border-radius: 10rpx;
+  background: linear-gradient(135deg, #F59E0B, #F97316);
 }
 
 .card-action:active {
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .card-action-text {
   font-size: 24rpx;
   color: #FFFFFF;
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
 }
 

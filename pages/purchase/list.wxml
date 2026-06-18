@@ -67,27 +67,25 @@
     <!-- 列表 -->
     <view class="list-wrap" wx:else>
       <view class="list-card" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}">
-        <view class="card-inner" bindtap="onDetail" data-id="{{item.id}}">
-          <view class="card-left">
-            <view class="card-avatar avatar-purchase">{{item.initial}}</view>
-          </view>
-          <view class="card-body">
-            <view class="card-name-row">
-              <text class="card-name">{{item.supplierName}}</text>
-              <view class="status-tag tag-{{item.statusCls}}">{{item.statusLabel}}</view>
-            </view>
-            <view class="card-info-row" wx:if="{{item.orderNo}}">
-              <view class="info-icon-order"></view>
-              <text class="card-info-text">{{item.orderNo}}</text>
-            </view>
-            <view class="card-info-row" wx:if="{{item.totalQuantity}}">
-              <view class="info-icon-qty"></view>
-              <text class="card-info-text">{{item.totalQuantity}} 件 · ¥{{item.totalAmount}}</text>
-            </view>
-          </view>
+        <view class="card-left" bindtap="onDetail" data-id="{{item.id}}">
+          <view class="card-avatar avatar-purchase">{{item.initial}}</view>
         </view>
-        <view class="card-action" wx:if="{{item.statusCls === 'approved'}}" catchtap="onQuickReceive" data-id="{{item.id}}">
-          <text class="card-action-text">确认入库</text>
+        <view class="card-body">
+          <view class="card-name-row" bindtap="onDetail" data-id="{{item.id}}">
+            <text class="card-name">{{item.supplierName}}</text>
+            <view class="status-tag tag-{{item.statusCls}}">{{item.statusLabel}}</view>
+          </view>
+          <view class="card-info-row" wx:if="{{item.orderNo}}" bindtap="onDetail" data-id="{{item.id}}">
+            <view class="info-icon-order"></view>
+            <text class="card-info-text">{{item.orderNo}}</text>
+          </view>
+          <view class="card-info-row" wx:if="{{item.totalQuantity}}" bindtap="onDetail" data-id="{{item.id}}">
+            <view class="info-icon-qty"></view>
+            <text class="card-info-text">{{item.totalQuantity}} 件 · ¥{{item.totalAmount}}</text>
+          </view>
+          <view class="card-action" wx:if="{{item.statusCls === 'approved'}}" catchtap="onQuickReceive" data-id="{{item.id}}">
+            <text class="card-action-text">确认入库</text>
+          </view>
         </view>
       </view>
 
