@@ -452,6 +452,20 @@ Page({
     }
   },
 
+  async onCancel() {
+    if (this.data.submitting) return
+    this.setData({ submitting: true })
+    try {
+      await api.put('/inbound/' + this.data.id + '/status', { status: 'cancelled' })
+      showSuccess('已取消')
+      await this.loadNote(this.data.id)
+    } catch (err) {
+      showError(err.message)
+    } finally {
+      this.setData({ submitting: false })
+    }
+  },
+
   async onWithdraw() {
     if (this.data.submitting) return
     this.setData({ submitting: true })

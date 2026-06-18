@@ -290,8 +290,11 @@
         <button class="action-btn action-save" wx:if="{{editing}}" bindtap="onSave" disabled="{{submitting}}">
           {{submitting ? '保存中...' : '保存'}}
         </button>
-        <button class="action-btn action-withdraw" bindtap="onWithdraw" disabled="{{submitting}}">
+        <button class="action-btn action-withdraw" wx:if="{{!purchaseOrderNo}}" bindtap="onWithdraw" disabled="{{submitting}}">
           {{submitting ? '处理中...' : '撤回'}}
+        </button>
+        <button class="action-btn action-cancel" bindtap="onCancel" disabled="{{submitting}}">
+          {{submitting ? '处理中...' : '取消'}}
         </button>
         <button class="action-btn action-approve" bindtap="onApprove" disabled="{{submitting}}">
           {{submitting ? '处理中...' : '审核通过'}}
