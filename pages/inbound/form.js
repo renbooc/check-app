@@ -8,7 +8,7 @@ const STATUS_MAP = {
   cancelled: '已取消',
 }
 
-const EDITABLE_STATUSES = ['pending']
+const EDITABLE_STATUSES = ['draft', 'pending']
 
 Page({
   data: {
@@ -22,8 +22,8 @@ Page({
     warehouseName: '',
     inboundDate: '',
     remark: '',
-    statusCls: 'pending',
-    statusText: '待审核',
+    statusCls: 'draft',
+    statusText: '草稿',
     items: [],
     totalQuantity: 0,
     totalAmount: '0.00',
@@ -289,6 +289,10 @@ Page({
     if (!this.validateRequired()) return
     this.setData({ submitting: true })
     try {
+      // 草稿→待审核→已审核（后端守卫不允许跳步）
+      if (this.data.statusCls === 'draft') {
+        await api.put('/inbound/' + this.data.id + '/status', { status: 'pending' })
+      }
       await api.put('/inbound/' + this.data.id + '/status', { status: 'approved' })
       showSuccess('审核通过')
       this.setData({ submitting: false })

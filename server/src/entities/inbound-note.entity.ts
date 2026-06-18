@@ -37,7 +37,7 @@ export class InboundNote {
   @Column({ length: 100 })
   supplierName: string;
 
-  @Column({ length: 20, default: 'pending' })
+  @Column({ length: 20, default: 'draft' })
   status: string;
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })

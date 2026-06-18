@@ -139,7 +139,7 @@ export class InboundService {
       purchaseOrderId: dto.purchaseOrderId,
       supplierId: dto.supplierId,
       supplierName: dto.supplierName,
-      status: 'pending',
+      status: 'draft',
       totalAmount: 0,
       totalQuantity: 0,
       warehouseId: dto.warehouseId || null,
@@ -231,9 +231,23 @@ export class InboundService {
     return this.findOne(id);
   }
 
+  private assertValidTransition(currentStatus: string, targetStatus: string) {
+    const ALLOWED: Record<string, string[]> = {
+      draft: ['pending', 'cancelled'],
+      pending: ['approved', 'cancelled'],
+      approved: [],
+      cancelled: [],
+    };
+    const allowed = ALLOWED[currentStatus] || [];
+    if (!allowed.includes(targetStatus)) {
+      throw new NotFoundException(`不允许从「${currentStatus}」变更为「${targetStatus}」`);
+    }
+  }
+
   async updateStatus(id: string, status: string, operatorId?: string, operatorName?: string) {
     const note = await this.findOne(id);
     if (!note) throw new NotFoundException('入库单不存在');
+    this.assertValidTransition(note.status, status);
 
     await this.noteRepo.update(id, { status });
 

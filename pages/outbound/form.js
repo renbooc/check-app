@@ -2,12 +2,13 @@ const { api } = require('../../utils/request')
 const { showError, showSuccess } = require('../../utils/util')
 
 const STATUS_MAP = {
+  draft: '草稿',
   pending: '待审核',
   approved: '已审核',
   cancelled: '已取消',
 }
 
-const EDITABLE_STATUSES = ['pending']
+const EDITABLE_STATUSES = ['draft', 'pending']
 
 Page({
   data: {
@@ -21,8 +22,8 @@ Page({
     warehouseName: '',
     outboundDate: '',
     remark: '',
-    statusCls: 'pending',
-    statusText: '待审核',
+    statusCls: 'draft',
+    statusText: '草稿',
     items: [],
     totalQuantity: 0,
     totalAmount: '0.00',
@@ -490,6 +491,10 @@ Page({
           warehouseName: this.data.warehouseName || '',
         })
         id = result.id
+      }
+      // 草稿→待审核→已审核（后端守卫不允许跳步）
+      if (this.data.statusCls === 'draft') {
+        await api.put('/outbound/' + id + '/status', { status: 'pending' })
       }
       await api.put('/outbound/' + id + '/status', { status: 'approved' })
       showSuccess('提交成功')

@@ -185,7 +185,7 @@ export class OutboundService {
       salesOrderId: dto.salesOrderId || null,
       customerId: dto.customerId || null,
       customerName: dto.customerName || '',
-      status: 'pending',
+      status: 'draft',
       totalAmount: 0,
       totalQuantity: 0,
       outboundDate: dateStr,
@@ -297,13 +297,23 @@ export class OutboundService {
     return this.findOne(id);
   }
 
+  private assertValidTransition(currentStatus: string, targetStatus: string) {
+    const ALLOWED: Record<string, string[]> = {
+      draft: ['pending', 'cancelled'],
+      pending: ['approved', 'cancelled'],
+      approved: [],
+      cancelled: [],
+    };
+    const allowed = ALLOWED[currentStatus] || [];
+    if (!allowed.includes(targetStatus)) {
+      throw new NotFoundException(`不允许从「${currentStatus}」变更为「${targetStatus}」`);
+    }
+  }
+
   async updateStatus(id: string, status: string, operatorId?: string, operatorName?: string) {
     const note = await this.findOne(id);
     if (!note) throw new NotFoundException('出库单不存在');
-
-    if (status === 'cancelled' && note.status !== 'pending') {
-      throw new NotFoundException('仅待审核出库单可取消');
-    }
+    this.assertValidTransition(note.status, status);
 
     await this.noteRepo.update(id, { status });
 

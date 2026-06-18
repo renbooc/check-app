@@ -345,6 +345,11 @@
     <view class="bottom-inner bottom-actions" wx:if="{{!id}}">
       <button class="action-btn action-back-full" bindtap="onBack">返回列表</button>
     </view>
+    <view class="bottom-inner bottom-actions" wx:elif="{{statusCls === 'draft'}}">
+      <button class="action-btn action-back" bindtap="onBack">返回</button>
+      <button class="action-btn action-edit-toggle" bindtap="onToggleEdit">编辑</button>
+      <button class="action-btn action-cancel" bindtap="onCancel" disabled="{{submitting}}">{{submitting ? '处理中...' : '取消'}}</button>
+    </view>
     <view class="bottom-inner bottom-actions" wx:elif="{{statusCls === 'pending'}}">
       <button class="action-btn action-back" bindtap="onBack">返回</button>
       <button class="action-btn action-edit-toggle" bindtap="onToggleEdit">编辑</button>

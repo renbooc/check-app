@@ -221,8 +221,26 @@
     </view>
   </view>
 
+  <!-- ===== 底部操作栏（草稿） ===== -->
+  <view class="bottom-bar" wx:if="{{statusCls === 'draft'}}">
+    <view class="bottom-inner">
+      <view class="bottom-inner-actions">
+        <button class="action-btn action-back" bindtap="onBack">返回</button>
+        <button class="action-btn action-edit-toggle" wx:if="{{!editing}}" bindtap="onToggleEdit" disabled="{{submitting}}">
+          编辑
+        </button>
+        <button class="action-btn action-save" wx:if="{{editing}}" bindtap="onSave" disabled="{{submitting}}">
+          {{submitting ? '保存中...' : '保存'}}
+        </button>
+        <button class="action-btn action-approve" bindtap="onApprove" disabled="{{submitting}}">
+          {{submitting ? '处理中...' : '审核通过'}}
+        </button>
+      </view>
+    </view>
+  </view>
+
   <!-- ===== 底部操作栏（待审核） ===== -->
-  <view class="bottom-bar" wx:if="{{statusCls === 'pending'}}">
+  <view class="bottom-bar" wx:elif="{{statusCls === 'pending'}}">
     <view class="bottom-inner">
       <view class="bottom-inner-actions">
         <button class="action-btn action-back" bindtap="onBack">返回</button>

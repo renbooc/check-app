@@ -166,12 +166,29 @@ export class PurchaseService {
     return this.findOne(id);
   }
 
+  private assertValidTransition(currentStatus: string, targetStatus: string) {
+    const ALLOWED: Record<string, string[]> = {
+      draft: ['pending', 'cancelled'],
+      pending: ['approved', 'cancelled'],
+      approved: ['received'],
+      received: [],
+      cancelled: [],
+    };
+    const allowed = ALLOWED[currentStatus] || [];
+    if (!allowed.includes(targetStatus)) {
+      throw new NotFoundException(`不允许从「${currentStatus}」变更为「${targetStatus}」`);
+    }
+  }
+
   async updateStatus(id: string, status: string, operatorId?: string, operatorName?: string) {
+    const order = await this.findOne(id);
+    if (!order) throw new NotFoundException('采购订单不存在');
+    this.assertValidTransition(order.status, status);
+
     await this.orderRepo.update(id, { status });
 
     // 确认入库 → 生成入库单（待审核），不再直接改库存
     if (status === 'received') {
-      const order = await this.findOne(id);
       if (order) {
         await this.inboundService.createFromPurchaseOrder(order, operatorId || '', operatorName || '');
       }

@@ -9,6 +9,7 @@ import {
 import { OutboundNoteItem } from './outbound-note-item.entity';
 
 export enum OutboundNoteStatus {
+  DRAFT = 'draft',
   PENDING = 'pending',
   APPROVED = 'approved',
   CANCELLED = 'cancelled',
@@ -34,7 +35,7 @@ export class OutboundNote {
   @Column({ length: 100, nullable: true })
   customerName: string;
 
-  @Column({ length: 20, default: 'pending' })
+  @Column({ length: 20, default: 'draft' })
   status: string;
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })

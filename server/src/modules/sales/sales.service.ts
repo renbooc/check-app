@@ -148,15 +148,30 @@ export class SalesService {
     return this.findOne(id);
   }
 
+  private assertValidTransition(currentStatus: string, targetStatus: string) {
+    const ALLOWED: Record<string, string[]> = {
+      draft: ['pending', 'cancelled'],
+      pending: ['approved', 'cancelled'],
+      approved: ['delivered'],
+      delivered: [],
+      cancelled: [],
+    };
+    const allowed = ALLOWED[currentStatus] || [];
+    if (!allowed.includes(targetStatus)) {
+      throw new NotFoundException(`不允许从「${currentStatus}」变更为「${targetStatus}」`);
+    }
+  }
+
   async updateStatus(id: string, status: string, operatorId?: string, operatorName?: string) {
+    const order = await this.findOne(id);
+    if (!order) throw new NotFoundException('销售订单不存在');
+    this.assertValidTransition(order.status, status);
+
     await this.orderRepo.update(id, { status });
 
     // 确认出库 → 生成出库单（待审核），不再直接扣减库存
     if (status === 'delivered') {
-      const order = await this.findOne(id);
-      if (order) {
-        await this.outboundService.createFromSalesOrder(order, operatorId || '', operatorName || '');
-      }
+      await this.outboundService.createFromSalesOrder(order, operatorId || '', operatorName || '');
     }
     return this.findOne(id);
   }
