@@ -108,7 +108,7 @@ Page({
         totalQuantity: note.totalQuantity || 0,
         totalAmount: (parseFloat(note.totalAmount) || 0).toFixed(2),
         readonly,
-        editing: status === 'draft',
+        editing: false,
         statusCls: status,
         statusText: STATUS_MAP[status] || status,
       })
