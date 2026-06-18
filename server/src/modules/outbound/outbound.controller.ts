@@ -41,6 +41,10 @@ export class OutboundController {
   async update(@Param('id') id: string, @Body() body: {
     remark?: string;
     outboundDate?: string;
+    customerId?: string;
+    customerName?: string;
+    warehouseId?: string;
+    warehouseName?: string;
     items?: Array<{
       productId: string;
       productName: string;

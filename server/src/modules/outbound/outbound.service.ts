@@ -223,6 +223,10 @@ export class OutboundService {
   async update(id: string, dto: {
     remark?: string;
     outboundDate?: string;
+    customerId?: string;
+    customerName?: string;
+    warehouseId?: string;
+    warehouseName?: string;
     items?: Array<{
       productId: string;
       productName: string;
@@ -243,6 +247,10 @@ export class OutboundService {
 
     if (dto.remark !== undefined) note.remark = dto.remark;
     if (dto.outboundDate !== undefined) note.outboundDate = dto.outboundDate;
+    if (dto.customerId !== undefined) note.customerId = dto.customerId;
+    if (dto.customerName !== undefined) note.customerName = dto.customerName;
+    if (dto.warehouseId !== undefined) note.warehouseId = dto.warehouseId;
+    if (dto.warehouseName !== undefined) note.warehouseName = dto.warehouseName;
     await this.noteRepo.save(note);
 
     if (dto.items) {

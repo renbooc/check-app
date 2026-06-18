@@ -110,8 +110,10 @@ Page({
         orderNo: note.orderNo || '',
         salesOrderNo: note.salesOrderNo || '',
         fromSalesOrder: !!note.salesOrderId,
+        customerId: note.customerId || '',
         customerName: note.customerName || '',
         customerInitial: (note.customerName && note.customerName.charAt(0)) || '?',
+        warehouseId: note.warehouseId || '',
         warehouseName: note.warehouseName || '',
         outboundDate: note.outboundDate || '',
         remark: note.remark || '',
@@ -411,7 +413,14 @@ Page({
         locationCode: item.locationCode || '',
       }))
       if (this.data.id) {
-        await api.put('/outbound/' + this.data.id, { remark: this.data.remark, outboundDate: this.data.outboundDate || null, items })
+        const cust = this.data.selectedCustomer || {}
+        await api.put('/outbound/' + this.data.id, {
+          items, remark: this.data.remark, outboundDate: this.data.outboundDate || null,
+          customerId: cust.id || this.data.customerId || null,
+          customerName: cust.name || this.data.customerName || '',
+          warehouseId: this.data.warehouseId || null,
+          warehouseName: this.data.warehouseName || '',
+        })
       } else {
         const cust = this.data.selectedCustomer || {}
         const result = await api.post('/outbound', {
@@ -452,7 +461,14 @@ Page({
       }))
       let id = this.data.id
       if (id) {
-        await api.put('/outbound/' + id, { items, remark: this.data.remark, outboundDate: this.data.outboundDate || null })
+        const cust = this.data.selectedCustomer || {}
+        await api.put('/outbound/' + id, {
+          items, remark: this.data.remark, outboundDate: this.data.outboundDate || null,
+          customerId: cust.id || this.data.customerId || null,
+          customerName: cust.name || this.data.customerName || '',
+          warehouseId: this.data.warehouseId || null,
+          warehouseName: this.data.warehouseName || '',
+        })
       } else {
         const cust = this.data.selectedCustomer || {}
         const result = await api.post('/outbound', {
