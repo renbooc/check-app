@@ -17,6 +17,10 @@ export class OutboundNoteItemDto {
   @IsString()
   productUnit?: string;
 
+  @IsOptional()
+  @IsString()
+  productManufacturer?: string;
+
   @IsNumber()
   quantity: number;
 

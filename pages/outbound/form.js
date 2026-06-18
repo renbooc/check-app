@@ -441,8 +441,7 @@ Page({
         productId: item.productId, productName: item.productName, productSpec: item.productSpec || '',
         productUnit: item.productUnit || '', productManufacturer: item.productManufacturer || '',
         quantity: parseFloat(item.quantity) || 0, price: parseFloat(item.price) || 0,
-        batchNo: item.batchNo || '', productionDate: item.productionDate || '',
-        expiryDate: item.expiryDate || '', locationCode: item.locationCode || '',
+        batchNo: item.batchNo || '', locationCode: item.locationCode || '',
       }))
       const payload = { items, remark: this.data.remark, outboundDate: this.data.outboundDate || null }
       let id = this.data.id
