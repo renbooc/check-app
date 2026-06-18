@@ -84,8 +84,11 @@ Page({
 
   enrichItem(item) {
     const status = item.status || 'draft'
+    const supplierName = item.supplierName || item.supplier?.name || ''
     return {
       ...item,
+      supplierName,
+      initial: supplierName.charAt(0) || '?',
       statusCls: status,
       statusLabel: { draft: '草稿', pending: '待审核', approved: '已审核', cancelled: '已取消' }[status] || status,
     }

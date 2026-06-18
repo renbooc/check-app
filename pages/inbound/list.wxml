@@ -68,7 +68,7 @@
     <view class="list-wrap" wx:else>
       <view class="list-card" wx:for="{{list}}" wx:key="id" bindtap="onView" data-id="{{item.id}}">
         <view class="card-left">
-          <view class="card-avatar avatar-inbound">{{item.orderNo.slice(0, 1)}}</view>
+          <view class="card-avatar avatar-inbound">{{item.initial}}</view>
         </view>
         <view class="card-body">
           <view class="card-name-row">
