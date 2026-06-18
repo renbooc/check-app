@@ -346,4 +346,15 @@ export class OutboundService {
 
     return this.findOne(id);
   }
+
+  async getLastPrice(customerId: string, productId: string): Promise<number> {
+    const item = await this.itemRepo
+      .createQueryBuilder('item')
+      .innerJoinAndSelect('item.outboundNote', 'note')
+      .where('item.productId = :productId', { productId })
+      .andWhere('note.customerId = :customerId', { customerId })
+      .orderBy('item.createdAt', 'DESC')
+      .getOne();
+    return item ? item.price : 0;
+  }
 }

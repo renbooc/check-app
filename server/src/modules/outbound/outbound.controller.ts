@@ -14,6 +14,12 @@ export class OutboundController {
     return { code: 200, data };
   }
 
+  @Get('last-price')
+  async getLastPrice(@Query('customerId') customerId: string, @Query('productId') productId: string) {
+    const data = await this.outboundService.getLastPrice(customerId, productId);
+    return { code: 200, data };
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const data = await this.outboundService.findOne(id);

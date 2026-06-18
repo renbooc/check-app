@@ -257,11 +257,21 @@ Page({
     }
   },
 
-  onBatchOptionTap(e) {
+  async onBatchOptionTap(e) {
     const idx = e.currentTarget.dataset.index
     const batch = this.data.batchOptions[idx]
     const product = this.data.batchProduct
     if (!batch || !product) return
+
+    // 查询当前客户该商品的上次出库单价
+    const customerId = this.data.selectedCustomer?.id
+    let lastPrice = 0
+    if (customerId) {
+      try {
+        const res = await api.get('/outbound/last-price', { customerId, productId: product.id })
+        lastPrice = res ?? 0
+      } catch (_) {}
+    }
 
     const items = [...this.data.items, {
       productId: product.id,
@@ -269,8 +279,8 @@ Page({
       productSpec: product.spec || '',
       productUnit: product._unit || (product.unit && product.unit.name) || batch._unit || '',
       productManufacturer: product.manufacturer || '',
-      quantity: batch.quantity,
-      price: batch.price || '',
+      quantity: 1,
+      price: lastPrice,
       amount: '0.00',
       batchNo: batch.batchNo || '',
       productionDate: batch.productionDate || '',
