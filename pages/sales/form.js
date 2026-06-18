@@ -179,6 +179,7 @@ Page({
       customerKeyword: keyword,
       filteredCustomers: filtered,
       showCustomerResults: keyword.length > 0,
+      showFixedDropdown: this.data.keyboardHeight > 0 && keyword.length > 0,
       selectedCustomer: null,
     })
   },
@@ -254,7 +255,7 @@ Page({
       const filtered = this.data.products.filter(p =>
         p.name.includes(keyword) || (p.spec && p.spec.includes(keyword))
       )
-      this.setData({ productSearchResults: filtered, showProductResults: true })
+      this.setData({ productSearchResults: filtered, showProductResults: true, showFixedDropdown: this.data.keyboardHeight > 0 })
     } else {
       this.setData({ productSearchResults: [], showProductResults: false })
     }

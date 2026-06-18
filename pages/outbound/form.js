@@ -146,6 +146,7 @@ Page({
       customerKeyword: keyword,
       filteredCustomers: filtered,
       showCustomerResults: keyword.length > 0,
+      showFixedDropdown: this.data.keyboardHeight > 0 && keyword.length > 0,
     })
   },
 
@@ -200,6 +201,7 @@ Page({
       productKeyword: keyword,
       productSearchResults: filtered,
       showProductResults: keyword.length > 0,
+      showFixedDropdown: this.data.keyboardHeight > 0 && keyword.length > 0,
     })
   },
 

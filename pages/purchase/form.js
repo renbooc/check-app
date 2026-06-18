@@ -176,6 +176,7 @@ Page({
       supplierKeyword: keyword,
       filteredSuppliers: filtered,
       showSupplierResults: keyword.length > 0,
+      showFixedDropdown: this.data.keyboardHeight > 0 && keyword.length > 0,
       selectedSupplier: null,
     });
   },
@@ -255,6 +256,7 @@ Page({
       this.setData({
         productSearchResults: filtered,
         showProductResults: true,
+        showFixedDropdown: this.data.keyboardHeight > 0,
       });
     } else {
       this.setData({
