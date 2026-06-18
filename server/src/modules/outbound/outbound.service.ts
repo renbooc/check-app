@@ -299,7 +299,7 @@ export class OutboundService {
 
   private assertValidTransition(currentStatus: string, targetStatus: string) {
     const ALLOWED: Record<string, string[]> = {
-      draft: ['pending', 'cancelled'],
+      draft: ['pending'],
       pending: ['approved', 'cancelled'],
       approved: [],
       cancelled: [],
@@ -318,60 +318,62 @@ export class OutboundService {
     await this.noteRepo.update(id, { status });
 
     if (status === 'approved' && note.items) {
-      // FEFO 扣减库存：近效期先出
-      for (const item of note.items) {
-        const needQty = Math.abs(parseFloat(item.quantity as any) || 0);
-        if (needQty <= 0) continue;
+      await this.noteRepo.manager.transaction(async (manager) => {
+        const detailRepo = manager.getRepository(InventoryDetail);
+        const inventoryRepo = manager.getRepository(Inventory);
+        const logRepo = manager.getRepository(InventoryLog);
 
-        const batchWhere: any = { productId: item.productId };
-        if (note.warehouseId) batchWhere.warehouseId = note.warehouseId;
-        const batches = await this.detailRepo.find({
-          where: batchWhere,
-          order: { expiryDate: 'ASC', productionDate: 'ASC', createdAt: 'ASC' },
-        });
+        // FEFO 扣减库存：近效期先出
+        for (const item of note.items) {
+          const needQty = Math.abs(parseFloat(item.quantity as any) || 0);
+          if (needQty <= 0) continue;
 
-        let remaining = needQty;
-        let totalDeducted = 0;
-        let totalAmount = 0;
-
-        for (const batch of batches) {
-          if (remaining <= 0) break;
-          const avail = batch.quantity;
-          if (avail <= 0) continue;
-
-          const deduct = Math.min(avail, remaining);
-          batch.quantity -= deduct;
-          remaining -= deduct;
-          totalDeducted += deduct;
-          totalAmount += deduct * batch.price;
-          await this.detailRepo.save(batch);
-
-          await this.logRepo.save({
-            productId: item.productId,
-            productName: item.productName,
-            type: 'sales_out',
-            changeQuantity: -deduct,
-            beforeQuantity: avail,
-            afterQuantity: batch.quantity,
-            relatedOrderId: id,
-            batchCode: batch.batchCode,
-            batchNo: batch.batchNo,
-            price: batch.price,
-            operatorId,
-            operatorName,
+          const batchWhere: any = { productId: item.productId };
+          if (note.warehouseId) batchWhere.warehouseId = note.warehouseId;
+          const batches = await detailRepo.find({
+            where: batchWhere,
+            order: { expiryDate: 'ASC', productionDate: 'ASC', createdAt: 'ASC' },
           });
-        }
 
-        // Update inventory summary
-        const inv = await this.inventoryRepo.findOne({
-          where: { productId: item.productId },
-        });
-        if (inv) {
-          inv.quantity = Math.max(0, inv.quantity - needQty);
-          if (inv.quantity === 0) { inv.avgPrice = 0; inv.amount = 0; }
-          await this.inventoryRepo.save(inv);
+          let remaining = needQty;
+
+          for (const batch of batches) {
+            if (remaining <= 0) break;
+            const avail = batch.quantity;
+            if (avail <= 0) continue;
+
+            const deduct = Math.min(avail, remaining);
+            batch.quantity -= deduct;
+            remaining -= deduct;
+            await detailRepo.save(batch);
+
+            await logRepo.save({
+              productId: item.productId,
+              productName: item.productName,
+              type: 'sales_out',
+              changeQuantity: -deduct,
+              beforeQuantity: avail,
+              afterQuantity: batch.quantity,
+              relatedOrderId: id,
+              batchCode: batch.batchCode,
+              batchNo: batch.batchNo,
+              price: batch.price,
+              operatorId,
+              operatorName,
+            });
+          }
+
+          // Update inventory summary scoped to warehouse
+          const invWhere: any = { productId: item.productId };
+          if (note.warehouseId) invWhere.warehouseId = note.warehouseId;
+          const inv = await inventoryRepo.findOne({ where: invWhere });
+          if (inv) {
+            inv.quantity = Math.max(0, inv.quantity - needQty);
+            if (inv.quantity === 0) { inv.avgPrice = 0; inv.amount = 0; }
+            await inventoryRepo.save(inv);
+          }
         }
-      }
+      });
     }
 
     return this.findOne(id);

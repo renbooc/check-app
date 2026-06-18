@@ -16,6 +16,9 @@
     <view class="status-tab {{currentStatus === '' ? 'active' : ''}}" bindtap="onStatusFilter" data-status="">
       <text>全部</text>
     </view>
+    <view class="status-tab {{currentStatus === 'draft' ? 'active' : ''}}" bindtap="onStatusFilter" data-status="draft">
+      <text>草稿</text>
+    </view>
     <view class="status-tab {{currentStatus === 'pending' ? 'active' : ''}}" bindtap="onStatusFilter" data-status="pending">
       <text>待审核</text>
     </view>
@@ -100,8 +103,9 @@
         <text class="count-num">{{pendingCount}}</text>
         <text class="count-label">单待审核</text>
       </view>
-      <view class="action-btn action-btn-inbound" bindtap="onRefresh">
-        <text>刷新</text>
+      <view class="action-btn action-btn-inbound" bindtap="onCreate">
+        <view class="btn-plus"></view>
+        <text>新增入库</text>
       </view>
     </view>
   </view>

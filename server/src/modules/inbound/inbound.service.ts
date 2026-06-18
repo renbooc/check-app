@@ -108,9 +108,9 @@ export class InboundService {
   }
 
   async create(dto: {
-    purchaseOrderId: string;
-    supplierId: string;
-    supplierName: string;
+    purchaseOrderId?: string;
+    supplierId?: string;
+    supplierName?: string;
     items: Array<{
       productId: string;
       productName: string;
@@ -136,9 +136,9 @@ export class InboundService {
 
     const note = this.noteRepo.create({
       orderNo,
-      purchaseOrderId: dto.purchaseOrderId,
-      supplierId: dto.supplierId,
-      supplierName: dto.supplierName,
+      purchaseOrderId: dto.purchaseOrderId || null,
+      supplierId: dto.supplierId || null,
+      supplierName: dto.supplierName || '',
       status: 'draft',
       totalAmount: 0,
       totalQuantity: 0,
@@ -233,7 +233,7 @@ export class InboundService {
 
   private assertValidTransition(currentStatus: string, targetStatus: string) {
     const ALLOWED: Record<string, string[]> = {
-      draft: ['pending', 'cancelled'],
+      draft: ['pending'],
       pending: ['approved', 'cancelled'],
       approved: [],
       cancelled: [],
@@ -256,78 +256,83 @@ export class InboundService {
       const today = new Date();
       const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-      // Resolve warehouse: use note's warehouse or fallback to first active warehouse
-      let whId = note.warehouseId || '';
-      if (!whId) {
-        const firstWh = await this.inventoryRepo.query('SELECT id FROM warehouses WHERE "isActive" = true ORDER BY "createdAt" ASC LIMIT 1');
-        whId = (firstWh && firstWh.length > 0) ? firstWh[0].id : '';
-      }
+      await this.noteRepo.manager.transaction(async (manager) => {
+        const detailRepo = manager.getRepository(InventoryDetail);
+        const inventoryRepo = manager.getRepository(Inventory);
+        const logRepo = manager.getRepository(InventoryLog);
 
-      for (let i = 0; i < note.items.length; i++) {
-        const item = note.items[i];
-        const qty = parseFloat(item.quantity as any) || 0;
-        const price = parseFloat(item.price as any) || 0;
-        const lineNo = String(i + 1).padStart(4, '0');
-        const batchCode = `${orderNo}${lineNo}`;
-
-        // 1. Create inventory detail (batch record)
-        const detail = this.detailRepo.create({
-          productId: item.productId,
-          warehouseId: whId,
-          batchCode,
-          batchNo: item.batchNo || '',
-          productionDate: item.productionDate || null,
-          expiryDate: item.expiryDate || null,
-          price,
-          quantity: qty,
-          locationCode: item.locationCode || null,
-        } as any);
-        await this.detailRepo.save(detail as any);
-
-        // 2. Update inventory summary (weighted average)
-        let inv: any = await this.inventoryRepo.findOne({
-          where: { productId: item.productId, warehouseId: whId },
-        });
-        if (!inv) {
-          inv = this.inventoryRepo.create({
-            productId: item.productId,
-            warehouseId: whId,
-            quantity: 0,
-            avgPrice: 0,
-            amount: 0,
-          } as any);
-          inv = await this.inventoryRepo.save(inv as any);
+        // Resolve warehouse
+        let whId = note.warehouseId || '';
+        if (!whId) {
+          const whs = await manager.query('SELECT id FROM warehouses WHERE "isActive" = true ORDER BY "createdAt" ASC LIMIT 1');
+          whId = (whs && whs.length > 0) ? whs[0].id : '';
         }
 
-        const oldQty = inv.quantity;
-        const oldAmount = parseFloat(inv.amount) || 0;
-        const newQty = oldQty + qty;
-        const newAmount = oldAmount + (price * qty);
-        const avgPrice = newQty > 0 ? newAmount / newQty : 0;
+        for (let i = 0; i < note.items.length; i++) {
+          const item = note.items[i];
+          const qty = parseFloat(item.quantity as any) || 0;
+          const price = parseFloat(item.price as any) || 0;
+          const lineNo = String(i + 1).padStart(4, '0');
+          const batchCode = `${orderNo}${lineNo}`;
 
-        inv.quantity = newQty;
-        inv.avgPrice = avgPrice;
-        inv.amount = newAmount;
-        inv.latestSupplier = note.supplierName || null;
-        inv.latestInboundDate = dateStr;
-        await this.inventoryRepo.save(inv);
+          // 1. Create inventory detail (batch record)
+          await detailRepo.save(detailRepo.create({
+            productId: item.productId,
+            warehouseId: whId,
+            batchCode,
+            batchNo: item.batchNo || '',
+            productionDate: item.productionDate || null,
+            expiryDate: item.expiryDate || null,
+            price,
+            quantity: qty,
+            locationCode: item.locationCode || null,
+          } as any));
 
-        // 3. Write inventory log with batch info
-        await this.logRepo.save({
-          productId: item.productId,
-          productName: item.productName,
-          type: 'purchase_in',
-          changeQuantity: qty,
-          beforeQuantity: oldQty,
-          afterQuantity: newQty,
-          relatedOrderId: id,
-          batchCode,
-          batchNo: item.batchNo || '',
-          price,
-          operatorId,
-          operatorName,
-        });
-      }
+          // 2. Update inventory summary (weighted average)
+          let inv: any = await inventoryRepo.findOne({
+            where: { productId: item.productId, warehouseId: whId },
+          });
+          if (!inv) {
+            inv = inventoryRepo.create({
+              productId: item.productId,
+              warehouseId: whId,
+              quantity: 0,
+              avgPrice: 0,
+              amount: 0,
+            } as any);
+            inv = await inventoryRepo.save(inv);
+          }
+
+          const oldQty = inv.quantity;
+          const oldAmount = parseFloat(inv.amount) || 0;
+          const newQty = oldQty + qty;
+          const newAmount = oldAmount + (price * qty);
+          const avgPrice = newQty > 0 ? newAmount / newQty : 0;
+
+          inv.quantity = newQty;
+          inv.avgPrice = avgPrice;
+          inv.amount = newAmount;
+          inv.latestSupplier = note.supplierName || null;
+          inv.latestInboundDate = dateStr;
+          await inventoryRepo.save(inv);
+
+          // 3. Write inventory log
+          await logRepo.save({
+            productId: item.productId,
+            productName: item.productName,
+            type: 'purchase_in',
+            changeQuantity: qty,
+            beforeQuantity: oldQty,
+            afterQuantity: newQty,
+            relatedOrderId: id,
+            batchCode,
+            batchNo: item.batchNo || '',
+            price,
+            operatorId,
+            operatorName,
+          });
+        }
+      });
     }
 
     return this.findOne(id);

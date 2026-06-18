@@ -95,6 +95,10 @@ Page({
     wx.navigateTo({ url: '/pages/inbound/form?id=' + e.currentTarget.dataset.id })
   },
 
+  onCreate() {
+    wx.navigateTo({ url: '/pages/inbound/form' })
+  },
+
   onRefresh() {
     this.resetList()
     this.loadPendingCount()

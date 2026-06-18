@@ -16,6 +16,9 @@
     <view class="status-tab {{currentStatus === '' ? 'active' : ''}}" bindtap="onStatusFilter" data-status="">
       <text>全部</text>
     </view>
+    <view class="status-tab {{currentStatus === 'draft' ? 'active' : ''}}" bindtap="onStatusFilter" data-status="draft">
+      <text>草稿</text>
+    </view>
     <view class="status-tab {{currentStatus === 'pending' ? 'active' : ''}}" bindtap="onStatusFilter" data-status="pending">
       <text>待审核</text>
     </view>

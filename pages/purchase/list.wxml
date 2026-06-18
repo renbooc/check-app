@@ -28,6 +28,9 @@
     <view class="status-tab {{currentStatus === 'received' ? 'active' : ''}}" bindtap="onStatusFilter" data-status="received">
       <text>已入库</text>
     </view>
+    <view class="status-tab {{currentStatus === 'cancelled' ? 'active' : ''}}" bindtap="onStatusFilter" data-status="cancelled">
+      <text>已取消</text>
+    </view>
   </view>
 
   <!-- ========== 内容区域 ========== -->

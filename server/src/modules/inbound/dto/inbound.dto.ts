@@ -17,6 +17,10 @@ export class InboundNoteItemDto {
   @IsString()
   productUnit?: string;
 
+  @IsOptional()
+  @IsString()
+  productManufacturer?: string;
+
   @IsNumber()
   quantity: number;
 
@@ -38,14 +42,17 @@ export class InboundNoteItemDto {
 }
 
 export class CreateInboundDto {
+  @IsOptional()
   @IsString()
-  purchaseOrderId: string;
+  purchaseOrderId?: string;
 
+  @IsOptional()
   @IsString()
-  supplierId: string;
+  supplierId?: string;
 
+  @IsOptional()
   @IsString()
-  supplierName: string;
+  supplierName?: string;
 
   @IsArray()
   @ValidateNested({ each: true })

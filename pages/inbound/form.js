@@ -19,9 +19,22 @@ Page({
     purchaseOrderNo: '',
     supplierName: '',
     supplierInitial: '',
+    supplierKeyword: '',
+    filteredSuppliers: [],
+    showSupplierResults: false,
+    selectedSupplier: null,
+    supplierId: '',
+    _allSuppliers: [],
+    warehouses: [],
+    warehouseIndex: -1,
+    warehouseId: '',
     warehouseName: '',
     inboundDate: '',
     remark: '',
+    productKeyword: '',
+    productSearchResults: [],
+    showProductResults: false,
+    _allProducts: [],
     statusCls: 'draft',
     statusText: '草稿',
     items: [],
@@ -33,7 +46,28 @@ Page({
   async onLoad(options) {
     if (options.id) {
       this.setData({ id: options.id })
+      this.loadDependencies()
       await this.loadNote(options.id)
+    } else {
+      this.setData({ editing: true, readonly: false })
+      this.loadDependencies()
+    }
+  },
+
+  async loadDependencies() {
+    try {
+      const [suppliers, products, warehouses] = await Promise.all([
+        api.get('/suppliers', { page: 1, pageSize: 200 }),
+        api.get('/products', { page: 1, pageSize: 500 }),
+        api.get('/warehouses', { page: 1, pageSize: 200 }),
+      ])
+      this.setData({
+        _allSuppliers: Array.isArray(suppliers) ? suppliers : (suppliers.list || []),
+        _allProducts: Array.isArray(products) ? products : (products.list || []),
+        warehouses: Array.isArray(warehouses) ? warehouses : (warehouses.list || []),
+      })
+    } catch (err) {
+      console.error('[InboundForm] loadDependencies error:', err)
     }
   },
 
@@ -63,8 +97,10 @@ Page({
       this.setData({
         orderNo: note.orderNo || '',
         purchaseOrderNo: note.purchaseOrderNo || '',
+        supplierId: note.supplierId || '',
         supplierName: note.supplierName || '',
         supplierInitial: (note.supplierName && note.supplierName.charAt(0)) || '?',
+        warehouseId: note.warehouseId || '',
         warehouseName: note.warehouseName || '',
         inboundDate: note.inboundDate || '',
         remark: note.remark || '',
@@ -90,6 +126,109 @@ Page({
 
   onRemarkInput(e) {
     this.setData({ remark: e.detail.value })
+  },
+
+  // ============================================================
+  //  供应商搜索
+  // ============================================================
+  onSupplierInput(e) {
+    const keyword = e.detail.value
+    const all = this.data._allSuppliers || []
+    const filtered = keyword ? all.filter(s => s.name.includes(keyword) || (s.contactPerson && s.contactPerson.includes(keyword))) : []
+    this.setData({
+      supplierKeyword: keyword,
+      filteredSuppliers: filtered,
+      showSupplierResults: keyword.length > 0,
+    })
+  },
+
+  onSupplierFocus() {
+    if (this.data.supplierKeyword.length > 0) {
+      this.onSupplierInput({ detail: { value: this.data.supplierKeyword } })
+    }
+  },
+
+  onSupplierBlur() {
+    // 离开时不隐藏搜索结果，允许点击选择
+  },
+
+  onSupplierSelect(e) {
+    const index = e.currentTarget.dataset.index
+    const s = this.data.filteredSuppliers[index]
+    this.setData({
+      selectedSupplier: s,
+      supplierId: s.id,
+      supplierName: s.name,
+      supplierInitial: s.name.charAt(0),
+      supplierKeyword: s.name,
+      showSupplierResults: false,
+      filteredSuppliers: [],
+    })
+  },
+
+  onWarehouseChange(e) {
+    const idx = parseInt(e.detail.value)
+    const wh = this.data.warehouses[idx]
+    if (wh) {
+      this.setData({ warehouseIndex: idx, warehouseName: wh.name })
+    }
+  },
+
+  // ============================================================
+  //  商品搜索
+  // ============================================================
+  onProductSearchInput(e) {
+    const keyword = e.detail.value
+    this.setData({ productKeyword: keyword })
+    if (keyword.length > 0 && this.data._allProducts.length > 0) {
+      const filtered = this.data._allProducts.filter(p =>
+        p.name.includes(keyword) || (p.spec && p.spec.includes(keyword))
+      )
+      this.setData({ productSearchResults: filtered, showProductResults: true })
+    } else {
+      this.setData({ productSearchResults: [], showProductResults: false })
+    }
+  },
+
+  onProductSearchFocus() {
+    if (this.data.productKeyword.length > 0) {
+      this.onProductSearchInput({ detail: { value: this.data.productKeyword } })
+    }
+  },
+
+  onProductSearchBlur() {
+    // 离开时不隐藏搜索结果，允许点击选择
+  },
+
+  onProductSearchSelect(e) {
+    const pid = e.currentTarget.dataset.pid
+    const product = this.data._allProducts.find(p => p.id === pid)
+    if (!product) return
+    if (this.data.items.some(item => item.productId === product.id)) {
+      wx.showToast({ title: '商品已存在', icon: 'none' })
+      return
+    }
+    const items = [...this.data.items, {
+      productId: product.id,
+      productName: product.name,
+      productSpec: product.spec || '',
+      productUnit: product.unit ? product.unit.name : '',
+      productManufacturer: product.manufacturer || '',
+      quantity: '',
+      price: '',
+      amount: '0.00',
+      batchNo: '',
+      productionDate: '',
+      expiryDate: '',
+      locationCode: '',
+    }]
+    this.setData({
+      items,
+      productKeyword: '',
+      productSearchResults: [],
+      showProductResults: false,
+    })
+    this.calcTotal()
   },
 
   // ============================================================
@@ -227,13 +366,18 @@ Page({
 
   buildSubmitData() {
     return {
+      supplierId: this.data.supplierId || null,
+      supplierName: this.data.supplierName || '',
+      warehouseId: this.data.warehouseId || null,
+      warehouseName: this.data.warehouseName || '',
       remark: this.data.remark,
       inboundDate: this.data.inboundDate || null,
       items: this.data.items.map(item => ({
         productId: item.productId,
         productName: item.productName,
-        productSpec: item.productSpec,
-        productUnit: item.productUnit,
+        productSpec: item.productSpec || '',
+        productUnit: item.productUnit || '',
+        productManufacturer: item.productManufacturer || '',
         quantity: parseFloat(item.quantity),
         price: parseFloat(item.price),
         batchNo: item.batchNo || '',
@@ -254,7 +398,12 @@ Page({
     this.setData({ submitting: true })
     try {
       const data = this.buildSubmitData()
-      await api.put('/inbound/' + this.data.id, data)
+      if (this.data.id) {
+        await api.put('/inbound/' + this.data.id, data)
+      } else {
+        const result = await api.post('/inbound', data)
+        this.setData({ id: result.id })
+      }
       showSuccess('保存成功')
       this.setData({ submitting: false, editing: false })
       await this.loadNote(this.data.id)

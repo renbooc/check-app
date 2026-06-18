@@ -168,7 +168,7 @@ export class PurchaseService {
 
   private assertValidTransition(currentStatus: string, targetStatus: string) {
     const ALLOWED: Record<string, string[]> = {
-      draft: ['pending', 'cancelled'],
+      draft: ['pending'],
       pending: ['approved', 'cancelled'],
       approved: ['received'],
       received: [],
