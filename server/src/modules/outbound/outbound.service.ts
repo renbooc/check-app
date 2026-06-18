@@ -161,7 +161,10 @@ export class OutboundService {
       productManufacturer?: string;
       quantity: number;
       price: number;
+      batchCode?: string;
       batchNo?: string;
+      productionDate?: string;
+      expiryDate?: string;
       locationCode?: string;
     }>;
     operatorId: string;
@@ -210,7 +213,10 @@ export class OutboundService {
         quantity: qty,
         price,
         amount,
+        batchCode: item.batchCode || null,
         batchNo: item.batchNo || '',
+        productionDate: item.productionDate || null,
+        expiryDate: item.expiryDate || null,
         locationCode: item.locationCode || null,
       } as any);
     });
@@ -274,6 +280,7 @@ export class OutboundService {
           quantity: qty,
           price,
           amount,
+          batchCode: item.batchCode || null,
           batchNo: item.batchNo || null,
           productionDate: item.productionDate || null,
           expiryDate: item.expiryDate || null,

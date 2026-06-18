@@ -29,7 +29,19 @@ export class OutboundNoteItemDto {
 
   @IsOptional()
   @IsString()
+  batchCode?: string;
+
+  @IsOptional()
+  @IsString()
   batchNo?: string;
+
+  @IsOptional()
+  @IsString()
+  productionDate?: string;
+
+  @IsOptional()
+  @IsString()
+  expiryDate?: string;
 
   @IsOptional()
   @IsString()

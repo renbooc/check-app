@@ -97,6 +97,7 @@ Page({
         quantity: item.quantity,
         price: item.price,
         amount: item.amount,
+        batchCode: item.batchCode || '',
         batchNo: item.batchNo || '',
         productionDate: item.productionDate || '',
         expiryDate: item.expiryDate || '',
@@ -286,6 +287,7 @@ Page({
       quantity: 1,
       price: lastPrice,
       amount: (1 * lastPrice).toFixed(2),
+      batchCode: batch.batchCode || '',
       batchNo: batch.batchNo || '',
       productionDate: batch.productionDate || '',
       expiryDate: batch.expiryDate || '',
@@ -409,7 +411,10 @@ Page({
         productManufacturer: item.productManufacturer || '',
         quantity: parseFloat(item.quantity) || 0,
         price: parseFloat(item.price) || 0,
+        batchCode: item.batchCode || '',
         batchNo: item.batchNo || '',
+        productionDate: item.productionDate || '',
+        expiryDate: item.expiryDate || '',
         locationCode: item.locationCode || '',
       }))
       if (this.data.id) {
@@ -457,7 +462,9 @@ Page({
         productId: item.productId, productName: item.productName, productSpec: item.productSpec || '',
         productUnit: item.productUnit || '', productManufacturer: item.productManufacturer || '',
         quantity: parseFloat(item.quantity) || 0, price: parseFloat(item.price) || 0,
-        batchNo: item.batchNo || '', locationCode: item.locationCode || '',
+        batchCode: item.batchCode || '', batchNo: item.batchNo || '',
+        productionDate: item.productionDate || '', expiryDate: item.expiryDate || '',
+        locationCode: item.locationCode || '',
       }))
       let id = this.data.id
       if (id) {
