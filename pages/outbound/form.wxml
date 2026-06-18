@@ -65,9 +65,10 @@
       <text wx:else class="order-form-value placeholder">保存后自动生成</text>
     </view>
 
-    <view class="order-form-item" wx:if="{{salesOrderNo}}">
+    <view class="order-form-item">
       <text class="order-form-label">来源销售单</text>
-      <text class="order-form-value outbound-link">{{salesOrderNo}}</text>
+      <text class="order-form-value" wx:if="{{salesOrderNo}}">{{salesOrderNo}}</text>
+      <text class="order-form-value placeholder" wx:else>—</text>
     </view>
 
     <view class="order-form-item">
