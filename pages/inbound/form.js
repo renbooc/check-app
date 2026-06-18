@@ -449,8 +449,7 @@ Page({
       // 提交审核：草稿→待审核
       await api.put('/inbound/' + id + '/status', { status: 'pending' })
       showSuccess('提交成功')
-      this.setData({ submitting: false, editing: false })
-      await this.loadNote(id)
+      setTimeout(() => wx.navigateBack(), 1000)
     } catch (err) {
       showError(err.message)
       this.setData({ submitting: false })
@@ -496,7 +495,7 @@ Page({
     try {
       await api.put('/inbound/' + this.data.id + '/status', { status: 'draft' })
       showSuccess('已撤回')
-      await this.loadNote(this.data.id)
+      setTimeout(() => wx.navigateBack(), 1000)
     } catch (err) {
       showError(err.message)
     } finally {
