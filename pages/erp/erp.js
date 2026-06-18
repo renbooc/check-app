@@ -84,7 +84,7 @@ Page({
 
   async loadInbound(append) {
     try {
-      const params = { page: this.data.inboundPage, pageSize: 20 }
+      const params = { page: this.data.inboundPage, pageSize: 20, status: 'approved' }
       if (this.data.inboundKeyword) params.keyword = this.data.inboundKeyword
       const res = await api.get('/inbound', params)
       const list = (res.list || []).map(i => ({ ...i, createdAt: formatDate(i.createdAt, 'YYYY-MM-DD HH:mm:ss') }))
@@ -100,7 +100,7 @@ Page({
 
   async loadOutbound(append) {
     try {
-      const params = { page: this.data.outboundPage, pageSize: 20 }
+      const params = { page: this.data.outboundPage, pageSize: 20, status: 'approved' }
       if (this.data.outboundKeyword) params.keyword = this.data.outboundKeyword
       const res = await api.get('/outbound', params)
       const list = (res.list || []).map(i => ({ ...i, createdAt: formatDate(i.createdAt, 'YYYY-MM-DD HH:mm:ss') }))
