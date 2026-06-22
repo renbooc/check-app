@@ -74,6 +74,41 @@
   margin-bottom: 18rpx;
 }
 
+.record-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.record-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+}
+
+.record-status {
+  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 6rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.record-status.status-pending {
+  color: #FFFFFF;
+  background: #FF7D00;
+}
+
+.record-status.status-approved {
+  color: #00B42A;
+  background: rgba(0, 180, 42, 0.1);
+}
+
+.record-status.status-cancelled {
+  color: #999999;
+  background: rgba(0, 0, 0, 0.05);
+}
+
 .record-type {
   font-size: 22rpx;
   padding: 6rpx 16rpx;

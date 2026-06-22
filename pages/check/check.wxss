@@ -1,6 +1,7 @@
 /* ============================================================
    库存盘点页 — 企业级盘点工作台
    背景 #f5f5f5 / 卡片 #FFFFFF / 主色 #0077C2
+   设计原则：数量调整为视觉主役，其余为支撑信息
    ============================================================ */
 
 .page {
@@ -10,7 +11,7 @@
 }
 
 /* ============================================================
-   顶部标签（两 Tab + 底线指示器）
+   顶部标签
    ============================================================ */
 .tabs {
   background: #FFFFFF;
@@ -51,7 +52,7 @@
 }
 
 /* ============================================================
-   搜索栏（白卡片）
+   搜索栏
    ============================================================ */
 .search-card {
   background: #FFFFFF;
@@ -203,27 +204,225 @@
 }
 
 /* ============================================================
-   商品 Hero 卡（盘点核心信息）
+   搜索栏清除按钮
+   ============================================================ */
+.search-clear {
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 8rpx;
+  background: #e0e0e0;
+  border-radius: 50%;
+}
+
+.search-clear text {
+  font-size: 28rpx;
+  color: #FFFFFF;
+  line-height: 1;
+}
+
+.search-clear:active {
+  opacity: 0.6;
+}
+
+/* ============================================================
+   搜索下拉候选列表（紧贴搜索栏下方）
+   ============================================================ */
+.search-dropdown {
+  margin: 4rpx 24rpx 0;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.search-dropdown-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  padding: 32rpx 0;
+}
+
+.loading-spinner.small {
+  width: 32rpx;
+  height: 32rpx;
+  border-width: 3rpx;
+}
+
+.search-dropdown-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 28rpx 12rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.search-dropdown-title {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #333333;
+}
+
+.search-dropdown-hint {
+  font-size: 22rpx;
+  color: #cccccc;
+}
+
+.search-dropdown-scroll {
+  max-height: 720rpx;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx 28rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:active {
+  background: #fafafa;
+}
+
+.dropdown-item-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 10rpx;
+  background: linear-gradient(135deg, #0077C2, #005a8e);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.dropdown-item-icon text {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1;
+}
+
+.dropdown-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.dropdown-item-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.dropdown-item-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.dropdown-item-spec-tag {
+  font-size: 20rpx;
+  color: #0077C2;
+  background: rgba(0, 119, 194, 0.08);
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  flex-shrink: 0;
+  max-width: 280rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-item-sub {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex-wrap: wrap;
+}
+
+.dropdown-item-manufacturer {
+  font-size: 20rpx;
+  color: #5c5c5c;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 300rpx;
+}
+
+.dropdown-item-approval {
+  font-size: 20rpx;
+  color: #cccccc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-item-stock {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+  flex-shrink: 0;
+  margin-left: 8rpx;
+}
+
+.dropdown-item-count {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #0077C2;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+.dropdown-item-unit {
+  font-size: 20rpx;
+  color: #5c5c5c;
+}
+
+.search-dropdown-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40rpx 0;
+}
+
+.search-dropdown-empty text {
+  font-size: 24rpx;
+  color: #cccccc;
+}
+
+/* ============================================================
+   商品信息卡（紧凑，支撑信息）
    ============================================================ */
 .product-card {
   background: #FFFFFF;
   margin: 20rpx 24rpx 0;
   border-radius: 16rpx;
-  padding: 28rpx;
+  padding: 24rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
-}
-
-.product-top {
   display: flex;
-  gap: 24rpx;
-  margin-bottom: 24rpx;
+  gap: 20rpx;
 }
 
 .product-img {
-  width: 120rpx;
-  height: 120rpx;
+  width: 100rpx;
+  height: 100rpx;
   border-radius: 12rpx;
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #0077C2, #005a8e);
   flex-shrink: 0;
   overflow: hidden;
   display: flex;
@@ -232,8 +431,23 @@
 }
 
 .product-img image {
-  width: 88rpx;
-  height: 88rpx;
+  width: 80rpx;
+  height: 80rpx;
+}
+
+.product-img-initial {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-img-initial text {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1;
 }
 
 .product-info {
@@ -242,7 +456,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8rpx;
+  gap: 6rpx;
 }
 
 .product-name {
@@ -254,116 +468,162 @@
   white-space: nowrap;
 }
 
+.product-manufacturer {
+  font-size: 22rpx;
+  color: #5c5c5c;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-meta {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
 .product-spec {
   font-size: 24rpx;
   color: #5c5c5c;
 }
 
+.product-unit-tag {
+  font-size: 20rpx;
+  color: #0077C2;
+  background: rgba(0, 119, 194, 0.08);
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  flex-shrink: 0;
+}
+
 .product-code {
   font-size: 22rpx;
   color: #cccccc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   数量调整卡（主役，最大视觉权重）
+   ============================================================ */
+.count-card {
+  background: #FFFFFF;
+  margin: 16rpx 24rpx 0;
+  border-radius: 16rpx;
+  padding: 0;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+/* 差异横幅：最醒目的视觉锚点 */
+.count-diff-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 28rpx;
+}
+
+.count-diff-banner.zero {
+  background: #f5f5f5;
+}
+
+.count-diff-banner.positive {
+  background: rgba(0, 180, 42, 0.08);
+}
+
+.count-diff-banner.negative {
+  background: rgba(231, 76, 60, 0.08);
+}
+
+.count-diff-label {
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.count-diff-banner.zero .count-diff-label {
+  color: #5c5c5c;
+}
+
+.count-diff-banner.positive .count-diff-label {
+  color: #00B42A;
+}
+
+.count-diff-banner.negative .count-diff-label {
+  color: #e74c3c;
+}
+
+.count-diff-val {
+  font-size: 32rpx;
+  font-weight: 700;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+.count-diff-banner.positive .count-diff-val {
+  color: #00B42A;
+}
+
+.count-diff-banner.negative .count-diff-val {
+  color: #e74c3c;
 }
 
 /* 库存对比 */
-.stock-compare {
+.count-compare {
   display: flex;
-  background: #f8f9fa;
-  border-radius: 12rpx;
-  padding: 24rpx 0;
+  align-items: center;
+  padding: 32rpx 28rpx 20rpx;
+  gap: 20rpx;
 }
 
-.stock-cell {
+.count-cell {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10rpx;
+  gap: 12rpx;
 }
 
-.stock-label {
+.count-cell-label {
   font-size: 22rpx;
   color: #5c5c5c;
 }
 
-.stock-val {
-  font-size: 44rpx;
+.count-cell-val {
+  font-size: 56rpx;
   font-weight: 700;
   color: #333333;
   line-height: 1;
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
 }
 
-.stock-val.highlight {
+.count-cell.primary .count-cell-val {
   color: #0077C2;
 }
 
-.stock-sep {
-  width: 1rpx;
-  background: #e8e8e8;
-  margin: 8rpx 0;
+.count-arrow {
+  font-size: 36rpx;
+  color: #cccccc;
+  flex-shrink: 0;
+  margin-top: 20rpx;
 }
 
-/* ============================================================
-   调整数量面板
-   ============================================================ */
-.count-card {
-  background: #FFFFFF;
-  margin: 20rpx 24rpx 0;
-  border-radius: 16rpx;
-  padding: 28rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
-}
-
-.count-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24rpx;
-}
-
-.count-title {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #333333;
-}
-
-.count-diff {
-  font-size: 26rpx;
-  font-weight: 700;
-  padding: 6rpx 20rpx;
-  border-radius: 100rpx;
-}
-
-.count-diff.positive {
-  color: #00B42A;
-  background: rgba(0, 180, 42, 0.08);
-}
-
-.count-diff.negative {
-  color: #e74c3c;
-  background: rgba(231, 76, 60, 0.08);
-}
-
-.count-diff.zero {
-  color: #5c5c5c;
-  background: #f5f5f5;
-}
-
+/* 数量调整器 */
 .count-row {
   display: flex;
   align-items: center;
   gap: 16rpx;
+  padding: 0 28rpx 32rpx;
 }
 
 .count-btn {
-  width: 72rpx;
-  height: 72rpx;
+  width: 80rpx;
+  height: 80rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12rpx;
+  border-radius: 16rpx;
   flex-shrink: 0;
-  font-size: 36rpx;
+  font-size: 40rpx;
   font-weight: 600;
 }
 
@@ -383,13 +643,13 @@
 
 .count-input {
   flex: 1;
-  height: 72rpx;
+  height: 80rpx;
   text-align: center;
-  font-size: 36rpx;
+  font-size: 40rpx;
   font-weight: 700;
   color: #333333;
   background: #f8f9fa;
-  border-radius: 12rpx;
+  border-radius: 16rpx;
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
 }
 
@@ -397,15 +657,14 @@
   font-size: 24rpx;
   color: #5c5c5c;
   flex-shrink: 0;
-  margin-left: 4rpx;
 }
 
 /* ============================================================
-   库位/批次折叠卡
+   详情折叠卡（库位 + 批次 + 备注 合并）
    ============================================================ */
 .fold-card {
   background: #FFFFFF;
-  margin: 20rpx 24rpx 0;
+  margin: 16rpx 24rpx 0;
   border-radius: 16rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
   overflow: hidden;
@@ -415,7 +674,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 28rpx;
+  padding: 24rpx 28rpx;
 }
 
 .fold-title {
@@ -436,7 +695,7 @@
 }
 
 .fold-body {
-  padding: 0 28rpx 28rpx;
+  padding: 0 28rpx 24rpx;
 }
 
 .fold-row {
@@ -448,6 +707,10 @@
 
 .fold-row.clickable {
   padding-right: 0;
+}
+
+.fold-row.fold-remark {
+  align-items: flex-start;
 }
 
 .fold-key {
@@ -470,48 +733,19 @@
   margin-left: 8rpx;
 }
 
-/* ============================================================
-   备注
-   ============================================================ */
-.remark-card {
-  background: #FFFFFF;
-  margin: 20rpx 24rpx 0;
-  border-radius: 16rpx;
-  padding: 28rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
-}
-
-.remark-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16rpx;
-}
-
-.remark-title {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #333333;
-}
-
-.remark-count {
-  font-size: 22rpx;
-  color: #cccccc;
-}
-
-.remark-input {
-  width: 100%;
-  height: 120rpx;
+.fold-remark-input {
+  flex: 1;
+  min-height: 60rpx;
   font-size: 26rpx;
   color: #333333;
   background: #f8f9fa;
-  border-radius: 12rpx;
-  padding: 20rpx;
+  border-radius: 10rpx;
+  padding: 12rpx 16rpx;
   box-sizing: border-box;
 }
 
 /* ============================================================
-   操作按钮栏
+   操作按钮（主次分明）
    ============================================================ */
 .action-bar {
   padding: 32rpx 24rpx 0;
@@ -522,16 +756,17 @@
 
 .btn-save {
   width: 100%;
-  height: 88rpx;
+  height: 96rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #0077C2;
   color: #FFFFFF;
-  font-size: 28rpx;
-  font-weight: 600;
+  font-size: 30rpx;
+  font-weight: 700;
   border-radius: 16rpx;
   border: none;
+  box-shadow: 0 4rpx 16rpx rgba(0, 119, 194, 0.25);
 }
 
 .btn-save:active {
@@ -540,16 +775,15 @@
 
 .btn-next {
   width: 100%;
-  height: 88rpx;
+  height: 80rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #FFFFFF;
+  background: transparent;
   color: #0077C2;
-  font-size: 28rpx;
-  font-weight: 600;
+  font-size: 26rpx;
+  font-weight: 500;
   border-radius: 16rpx;
-  border: 2rpx solid rgba(0, 119, 194, 0.2);
 }
 
 .btn-next:active {
@@ -700,7 +934,7 @@
 }
 
 /* ============================================================
-   撤销提示条（底部 Toast）
+   撤销提示条
    ============================================================ */
 .undo-bar {
   position: fixed;
@@ -747,4 +981,267 @@
 
 .undo-btn:active {
   background: rgba(255, 255, 255, 0.25);
+}
+
+/* ============================================================
+   多批次盘点列表
+   ============================================================ */
+.batch-section {
+  padding: 0 24rpx;
+  margin-top: 16rpx;
+}
+
+.batch-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8rpx 4rpx 16rpx;
+}
+
+.batch-section-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #333333;
+}
+
+.batch-card {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  border-left: 6rpx solid transparent;
+}
+
+.batch-card.near-expiry {
+  border-left-color: #FF7D00;
+}
+
+.batch-card.expired {
+  border-left-color: #e74c3c;
+  background: #FFF5F5;
+}
+
+.batch-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.batch-head-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.batch-no {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #333333;
+}
+
+.batch-no-input {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #333333;
+  background: #f8f9fa;
+  border-radius: 8rpx;
+  padding: 8rpx 16rpx;
+  width: 240rpx;
+}
+
+.batch-tags {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  flex-wrap: wrap;
+}
+
+.batch-tag {
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  font-weight: 600;
+}
+
+.batch-tag.warn {
+  color: #FFFFFF;
+  background: #e74c3c;
+}
+
+.batch-tag.near {
+  color: #FFFFFF;
+  background: #FF7D00;
+}
+
+.batch-tag.new {
+  color: #0077C2;
+  background: rgba(0, 119, 194, 0.1);
+}
+
+.batch-remove {
+  font-size: 24rpx;
+  color: #e74c3c;
+  padding: 4rpx 12rpx;
+  flex-shrink: 0;
+}
+
+.batch-remove:active {
+  opacity: 0.6;
+}
+
+.batch-meta {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin-bottom: 20rpx;
+  flex-wrap: wrap;
+}
+
+.batch-meta-item {
+  font-size: 22rpx;
+  color: #5c5c5c;
+}
+
+.batch-meta-item.new-expiry {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.batch-meta-label {
+  font-size: 22rpx;
+  color: #5c5c5c;
+  flex-shrink: 0;
+}
+
+.batch-expiry-input {
+  font-size: 22rpx;
+  color: #333333;
+  background: #f8f9fa;
+  border-radius: 6rpx;
+  padding: 4rpx 12rpx;
+  width: 200rpx;
+}
+
+.batch-count-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 16rpx 0 4rpx;
+  border-top: 1rpx solid #f5f5f5;
+}
+
+.batch-count-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.batch-count-cell.primary {
+  flex: 1.4;
+}
+
+.batch-count-cell.diff {
+  flex: 0.8;
+}
+
+.batch-count-label {
+  font-size: 20rpx;
+  color: #5c5c5c;
+}
+
+.batch-count-val {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #333333;
+  line-height: 1;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+.batch-count-cell.primary .batch-count-val {
+  color: #0077C2;
+}
+
+.batch-count-cell.diff .batch-count-val {
+  color: #5c5c5c;
+}
+
+.batch-count-cell.diff.positive .batch-count-val {
+  color: #00B42A;
+}
+
+.batch-count-cell.diff.negative .batch-count-val {
+  color: #e74c3c;
+}
+
+.batch-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.batch-btn {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10rpx;
+  flex-shrink: 0;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.batch-btn.minus {
+  background: #f5f5f5;
+  color: #5c5c5c;
+}
+
+.batch-btn.plus {
+  background: #0077C2;
+  color: #FFFFFF;
+}
+
+.batch-btn:active {
+  opacity: 0.7;
+}
+
+.batch-input {
+  width: 100rpx;
+  height: 56rpx;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #333333;
+  background: #f8f9fa;
+  border-radius: 10rpx;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+.batch-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  background: rgba(0, 119, 194, 0.04);
+  border-radius: 16rpx;
+  border: 2rpx dashed rgba(0, 119, 194, 0.3);
+}
+
+.batch-add:active {
+  background: rgba(0, 119, 194, 0.08);
+}
+
+.batch-add-text {
+  font-size: 26rpx;
+  color: #0077C2;
+  font-weight: 600;
 }

@@ -99,12 +99,45 @@ Page({
       `${item.productName}：账面${item.stockQuantity} / 实盘${item.checkQuantity} / 差异${item.diffQuantity}`
     ).join('\n')
 
-    wx.showModal({
-      title: `盘点单 ${record.checkNo}`,
-      content: `盘点人：${record.operatorName}\n时间：${record.createdAt}\n品种数：${record.totalProducts}\n已盘：${record.checkedProducts}\n差异：${record.diffProducts}\n${itemList ? '\n明细：\n' + itemList : ''}`,
-      showCancel: false,
-      confirmText: '知道了',
-      confirmColor: '#4080FF'
-    })
+    const statusText = record.status === 'pending' ? '待审核' : record.status === 'approved' ? '已审核' : record.status === 'cancelled' ? '已撤销' : record.status
+
+    // 待审核状态提供审核操作
+    if (record.status === 'pending') {
+      wx.showModal({
+        title: `盘点单 ${record.checkNo}`,
+        content: `状态：${statusText}\n盘点人：${record.operatorName}\n时间：${record.createdAt}\n品种数：${record.totalProducts}\n差异：${record.diffProducts}\n${itemList ? '\n明细：\n' + itemList : ''}`,
+        confirmText: '审核通过',
+        cancelText: '关闭',
+        confirmColor: '#0077C2',
+        success: (res) => {
+          if (res.confirm) {
+            this.approveRecord(id)
+          }
+        }
+      })
+    } else {
+      wx.showModal({
+        title: `盘点单 ${record.checkNo}`,
+        content: `状态：${statusText}\n盘点人：${record.operatorName}\n时间：${record.createdAt}\n品种数：${record.totalProducts}\n差异：${record.diffProducts}\n${itemList ? '\n明细：\n' + itemList : ''}`,
+        showCancel: false,
+        confirmText: '知道了',
+        confirmColor: '#0077C2'
+      })
+    }
+  },
+
+  async approveRecord(id) {
+    wx.showLoading({ title: '审核中...', mask: true })
+    try {
+      await api.post('/check/' + id + '/approve')
+      wx.hideLoading()
+      wx.showToast({ title: '审核成功，库存已修正', icon: 'success' })
+      // 刷新列表
+      this.setData({ page: 1, records: [], hasMore: true })
+      this.loadRecords()
+    } catch (err) {
+      wx.hideLoading()
+      showError(err.message || '审核失败')
+    }
   }
 })

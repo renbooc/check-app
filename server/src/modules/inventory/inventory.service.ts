@@ -148,6 +148,18 @@ export class InventoryService {
     if (params.warehouseId) {
       qb.andWhere('i.warehouseId = :wid', { wid: params.warehouseId });
     }
+    if (params.locationCode) {
+      // 通过批次明细表的 locationCode 反查 productId 列表，再过滤库存总表
+      const details = await this.detailRepo.find({
+        where: { locationCode: params.locationCode },
+        select: ['productId'],
+      });
+      const productIds = [...new Set(details.map((d) => d.productId))];
+      if (productIds.length === 0) {
+        return { list: [], total: 0 };
+      }
+      qb.andWhere('i.productId IN (:...pids)', { pids: productIds });
+    }
 
     const list = await qb.orderBy('i.updatedAt', 'DESC').getMany();
 
@@ -245,9 +257,10 @@ export class InventoryService {
     operatorName: string;
   }) {
     const checkNo = `CK${Date.now()}`;
+    // 保存阶段：仅创建盘点单和明细，状态为 pending，不修改库存
     const check = this.checkRepo.create({
       checkNo,
-      status: 'completed',
+      status: 'pending',
       totalProducts: 1,
       checkedProducts: 1,
       diffProducts: dto.checkCount !== dto.stockCount ? 1 : 0,
@@ -270,34 +283,71 @@ export class InventoryService {
     });
     await this.checkItemRepo.save(item);
 
-    // 同步更新库存总表
-    const inventoryRecord = await this.inventoryRepo.findOne({
-      where: { productId: dto.productId },
-    });
-    if (inventoryRecord) {
-      inventoryRecord.quantity = dto.checkCount;
-      await this.inventoryRepo.save(inventoryRecord);
-    }
-
-    const log = this.logRepo.create({
+    return {
+      id: savedCheck.id,
+      checkNo,
       productId: dto.productId,
       productName: dto.productName,
-      type: 'check',
-      changeQuantity: dto.checkCount - dto.stockCount,
-      beforeQuantity: dto.stockCount,
-      afterQuantity: dto.checkCount,
-      relatedOrderId: savedCheck.id,
+    };
+  }
+
+  /**
+   * 多批次盘点保存：一次提交多个批次的盘点结果
+   * 保存阶段：仅创建盘点单和明细，状态为 pending，不修改库存
+   * 审核通过后由 approveCheck 执行库存修正
+   */
+  async saveCheckBatch(dto: {
+    productId: string;
+    productName: string;
+    remark?: string;
+    items: {
+      detailId?: string;
+      batchNo: string;
+      productionDate?: string;
+      expiryDate?: string;
+      locationCode?: string;
+      stockCount: number;
+      checkCount: number;
+    }[];
+    operatorId: string;
+    operatorName: string;
+  }) {
+    const checkNo = `CK${Date.now()}`;
+    const diffCount = dto.items.filter(i => i.checkCount !== i.stockCount).length;
+    const check = this.checkRepo.create({
+      checkNo,
+      status: 'pending',
+      totalProducts: dto.items.length,
+      checkedProducts: dto.items.length,
+      diffProducts: diffCount,
       operatorId: dto.operatorId,
       operatorName: dto.operatorName,
       remark: dto.remark,
     });
-    await this.logRepo.save(log);
+    const savedCheck = await this.checkRepo.save(check);
+
+    for (const item of dto.items) {
+      // 仅创建盘点明细，不修改 inventory_detail
+      const checkItem = this.checkItemRepo.create({
+        checkId: savedCheck.id,
+        productId: dto.productId,
+        productName: dto.productName,
+        stockQuantity: item.stockCount,
+        checkQuantity: item.checkCount,
+        diffQuantity: item.checkCount - item.stockCount,
+        locationCode: item.locationCode || '',
+        batchNo: item.batchNo,
+        remark: dto.remark,
+      });
+      await this.checkItemRepo.save(checkItem);
+    }
 
     return {
       id: savedCheck.id,
       checkNo,
       productId: dto.productId,
       productName: dto.productName,
+      itemCount: dto.items.length,
     };
   }
 
@@ -323,5 +373,124 @@ export class InventoryService {
       where: { id },
       relations: ['items'],
     });
+  }
+
+  /**
+   * 审核盘点单：审核通过后才修正库存
+   * - 逐条 item 回写 inventory_detail（已有批次更新数量，新增批次创建记录）
+   * - 库存总表由批次明细之和重算
+   * - 每批次写一条 inventory_log
+   * - 状态流转 pending → approved
+   */
+  async approveCheck(id: string, operator: { id: string; name: string }) {
+    const check = await this.checkRepo.findOne({
+      where: { id },
+      relations: ['items'],
+    });
+    if (!check) {
+      throw new Error('盘点单不存在');
+    }
+    if (check.status !== 'pending') {
+      throw new Error('只有待审核状态的盘点单才能审核');
+    }
+
+    // 按 productId 分组处理（多批次可能涉及同一商品）
+    const productMap = new Map<string, typeof check.items>();
+    for (const item of check.items) {
+      if (!productMap.has(item.productId)) productMap.set(item.productId, []);
+      productMap.get(item.productId)!.push(item);
+    }
+
+    for (const [productId, items] of productMap) {
+      for (const item of items) {
+        // 回写批次明细
+        if (item.batchNo) {
+          const detail = await this.detailRepo.findOne({
+            where: { productId: item.productId, batchNo: item.batchNo },
+          });
+          if (detail) {
+            // 已有批次：直接更新为盘点数量
+            detail.quantity = item.checkQuantity;
+            await this.detailRepo.save(detail);
+          } else {
+            // 批次明细不存在（盘到新批次）：创建
+            const newDetail = this.detailRepo.create({
+              productId: item.productId,
+              warehouseId: '',
+              batchCode: '',
+              batchNo: item.batchNo,
+              productionDate: null,
+              expiryDate: null,
+              price: 0,
+              quantity: item.checkQuantity,
+              pendingQuantity: 0,
+              locationCode: item.locationCode || '',
+            });
+            await this.detailRepo.save(newDetail);
+          }
+        }
+
+        // 写库存变动日志
+        const log = this.logRepo.create({
+          productId: item.productId,
+          productName: item.productName,
+          type: 'check',
+          changeQuantity: item.diffQuantity,
+          beforeQuantity: item.stockQuantity,
+          afterQuantity: item.checkQuantity,
+          relatedOrderId: check.id,
+          batchNo: item.batchNo || null,
+          operatorId: operator.id,
+          operatorName: operator.name,
+          remark: check.remark,
+        });
+        await this.logRepo.save(log);
+      }
+
+      // 库存总表由批次明细之和重算
+      const totalQty = await this.detailRepo
+        .createQueryBuilder('d')
+        .select('COALESCE(SUM(d.quantity), 0)', 'total')
+        .where('d.productId = :pid', { pid: productId })
+        .getRawOne();
+      const inventoryRecord = await this.inventoryRepo.findOne({
+        where: { productId },
+      });
+      if (inventoryRecord) {
+        inventoryRecord.quantity = parseInt(totalQty.total) || 0;
+        await this.inventoryRepo.save(inventoryRecord);
+      }
+    }
+
+    // 状态流转
+    check.status = 'approved';
+    await this.checkRepo.save(check);
+
+    return { id, status: 'approved' };
+  }
+
+  /**
+   * 撤销盘点单：仅 pending 状态可撤销（直接作废，未改库存无需回滚）
+   */
+  async undoCheck(id: string) {
+    const check = await this.checkRepo.findOne({
+      where: { id },
+      relations: ['items'],
+    });
+    if (!check) {
+      throw new Error('盘点单不存在');
+    }
+    if (check.status === 'cancelled') {
+      throw new Error('该盘点单已撤销');
+    }
+    if (check.status === 'approved') {
+      throw new Error('已审核的盘点单不可撤销');
+    }
+
+    // pending 状态未修改库存，直接标记为已撤销
+    check.status = 'cancelled';
+    await this.checkRepo.save(check);
+
+    return { id, status: 'cancelled' };
   }
 }

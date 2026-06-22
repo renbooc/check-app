@@ -16,7 +16,10 @@
   <view class="search-card">
     <view class="search-input-wrap">
       <image class="search-icon" src="/images/icon-search.png" mode="aspectFit"></image>
-      <input class="search-input" placeholder="{{activeTab === 'product' ? '搜索药品名称 / 条码' : '搜索库位编号'}}" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearch" />
+      <input class="search-input" placeholder="{{activeTab === 'product' ? '输入药品名称/条码模糊搜索' : '搜索库位编号'}}" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearch" focus="{{!product && activeTab === 'product'}}" />
+      <view class="search-clear" wx:if="{{searchKeyword}}" bindtap="onClearSearch">
+        <text>×</text>
+      </view>
     </view>
     <view class="scan-btn" bindtap="onScanCode">
       <image class="scan-icon" src="/images/icon-scan.png" mode="aspectFit"></image>
@@ -28,8 +31,8 @@
        ============================================================ -->
   <block wx:if="{{activeTab === 'product'}}">
 
-    <!-- 空状态：开始盘点 -->
-    <view class="start-wrap" wx:if="{{!product && !searching}}">
+    <!-- 空状态 -->
+    <view class="start-wrap" wx:if="{{!product && !searching && searchResults.length === 0}}">
       <view class="start-card">
         <image class="start-img" src="/images/icon-quick-check.png" mode="aspectFit"></image>
         <text class="start-title">开始盘点</text>
@@ -41,97 +44,213 @@
     </view>
 
     <!-- 搜索中 -->
-    <view class="loading-wrap" wx:if="{{searching}}">
-      <view class="loading-spinner"></view>
-      <text class="loading-text">搜索中...</text>
+    <view class="search-dropdown" wx:if="{{searching}}">
+      <view class="search-dropdown-loading">
+        <view class="loading-spinner small"></view>
+        <text class="loading-text">搜索中...</text>
+      </view>
+    </view>
+
+    <!-- 搜索下拉候选列表 -->
+    <view class="search-dropdown" wx:if="{{!searching && searchResults.length > 0}}">
+      <view class="search-dropdown-head">
+        <text class="search-dropdown-title">找到 {{searchResults.length}} 个匹配商品</text>
+        <text class="search-dropdown-hint">点击选择盘点</text>
+      </view>
+      <scroll-view scroll-y class="search-dropdown-scroll">
+        <view class="dropdown-item" wx:for="{{searchResults}}" wx:key="id" bindtap="onSelectSearchResult" data-id="{{item.id}}">
+          <view class="dropdown-item-icon">
+            <text>{{item.nameInitial}}</text>
+          </view>
+          <view class="dropdown-item-info">
+            <view class="dropdown-item-name-row">
+              <text class="dropdown-item-name">{{item.name}}</text>
+              <text class="dropdown-item-spec-tag" wx:if="{{item.spec}}">{{item.spec}}</text>
+            </view>
+            <view class="dropdown-item-sub">
+              <text class="dropdown-item-manufacturer" wx:if="{{item.manufacturer}}">{{item.manufacturer}}</text>
+              <text class="dropdown-item-approval" wx:if="{{item.approvalNo}}">批准文号 {{item.approvalNo}}</text>
+            </view>
+          </view>
+          <view class="dropdown-item-stock">
+            <text class="dropdown-item-count">{{item.stockCount}}</text>
+            <text class="dropdown-item-unit">{{item.unitName}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 无匹配结果下拉提示 -->
+    <view class="search-dropdown" wx:if="{{!searching && searchKeyword && searchResults.length === 0 && !product}}">
+      <view class="search-dropdown-empty">
+        <text>未找到匹配商品</text>
+      </view>
     </view>
 
     <!-- 商品盘点面板 -->
-    <block wx:if="{{product && !searching}}">
+    <block wx:if="{{product && !searching && searchResults.length === 0}}">
 
-      <!-- 商品 Hero 卡 -->
+      <!-- 商品信息卡 -->
       <view class="product-card">
-        <view class="product-top">
-          <view class="product-img">
-            <image src="{{product.image}}" mode="aspectFit"></image>
+        <view class="product-img">
+          <view class="product-img-initial">
+            <text>{{product.nameInitial}}</text>
           </view>
-          <view class="product-info">
-            <text class="product-name">{{product.name}}</text>
+        </view>
+        <view class="product-info">
+          <text class="product-name">{{product.name}}</text>
+          <view class="product-meta">
             <text class="product-spec">{{product.spec}}</text>
-            <text class="product-code">{{product.approvalNo}}</text>
+            <text class="product-unit-tag" wx:if="{{product.unitName}}">{{product.unitName}}</text>
           </view>
-        </view>
-        <!-- 库存对比 -->
-        <view class="stock-compare">
-          <view class="stock-cell">
-            <text class="stock-label">系统库存</text>
-            <text class="stock-val">{{product.stockCount}}</text>
-          </view>
-          <view class="stock-sep"></view>
-          <view class="stock-cell">
-            <text class="stock-label">盘点数量</text>
-            <text class="stock-val highlight">{{checkCount}}</text>
-          </view>
+          <text class="product-manufacturer" wx:if="{{product.manufacturer}}">{{product.manufacturer}}</text>
+          <text class="product-code" wx:if="{{product.approvalNo}}">批准文号 {{product.approvalNo}}</text>
         </view>
       </view>
 
-      <!-- 调整数量面板 -->
-      <view class="count-card">
-        <view class="count-head">
-          <text class="count-title">调整数量</text>
-          <text class="count-diff {{checkCount > product.stockCount ? 'positive' : checkCount < product.stockCount ? 'negative' : 'zero'}}" wx:if="{{checkCount !== product.stockCount}}">
-            {{checkCount > product.stockCount ? '+' : ''}}{{checkCount - product.stockCount}}
-          </text>
-          <text class="count-diff zero" wx:else>一致</text>
-        </view>
-        <view class="count-row">
-          <view class="count-btn minus" bindtap="onCountMinus">
-            <text>−</text>
+      <!-- ====== 多批次模式 ====== -->
+      <block wx:if="{{multiBatch}}">
+        <!-- 汇总差异横幅 -->
+        <view class="count-card">
+          <view class="count-diff-banner {{totalDiff > 0 ? 'positive' : totalDiff < 0 ? 'negative' : 'zero'}}">
+            <text class="count-diff-label" wx:if="{{totalDiff !== 0}}">{{totalDiff > 0 ? '盘盈' : '盘亏'}}</text>
+            <text class="count-diff-label" wx:else>账实相符</text>
+            <text class="count-diff-val" wx:if="{{totalDiff !== 0}}">{{totalDiff > 0 ? '+' : ''}}{{totalDiff}} {{product.unitName}}</text>
           </view>
-          <input class="count-input" type="number" value="{{checkCount}}" bindinput="onCountInput" />
-          <view class="count-btn plus" bindtap="onCountPlus">
-            <text>+</text>
+          <view class="count-compare">
+            <view class="count-cell">
+              <text class="count-cell-label">系统总数</text>
+              <text class="count-cell-val">{{totalStock}}</text>
+            </view>
+            <view class="count-arrow">→</view>
+            <view class="count-cell primary">
+              <text class="count-cell-label">盘点总数</text>
+              <text class="count-cell-val">{{totalCheck}}</text>
+            </view>
           </view>
-          <text class="count-unit">{{product.unit}}</text>
         </view>
-      </view>
 
-      <!-- 库位/批次折叠 -->
-      <view class="fold-card">
-        <view class="fold-head" bindtap="onToggleInfoFold">
-          <text class="fold-title">库位 / 批次信息</text>
-          <text class="fold-arrow {{infoFoldOpen ? 'open' : ''}}">›</text>
-        </view>
-        <view class="fold-body" wx:if="{{infoFoldOpen}}">
-          <view class="fold-row clickable" bindtap="onSelectLocation">
-            <text class="fold-key">库位</text>
-            <text class="fold-val">{{location || '点击选择'}}</text>
-            <text class="fold-go">›</text>
+        <!-- 批次明细列表 -->
+        <view class="batch-section">
+          <view class="batch-section-head">
+            <text class="batch-section-title">批次明细（{{batches.length}}）</text>
           </view>
-          <view class="fold-row">
-            <text class="fold-key">批号</text>
-            <text class="fold-val">{{batchNo || '-'}}</text>
-          </view>
-          <view class="fold-row">
-            <text class="fold-key">有效期</text>
-            <text class="fold-val">{{expiryDate || '-'}}</text>
-          </view>
-        </view>
-      </view>
 
-      <!-- 备注 -->
-      <view class="remark-card">
-        <view class="remark-head">
-          <text class="remark-title">备注</text>
-          <text class="remark-count">{{remark.length}}/100</text>
+          <view class="batch-card {{item.isExpired ? 'expired' : item.isNearExpiry ? 'near-expiry' : ''}}" wx:for="{{batches}}" wx:key="index" data-index="{{index}}">
+            <!-- 批次头部信息 -->
+            <view class="batch-head">
+              <view class="batch-head-left">
+                <text class="batch-no" wx:if="{{!item.isNew}}">{{item.batchNo}}</text>
+                <input class="batch-no-input" wx:else placeholder="输入批号" value="{{item.batchNo}}" bindinput="onNewBatchNoInput" data-index="{{index}}" />
+                <view class="batch-tags">
+                  <text class="batch-tag warn" wx:if="{{item.isExpired}}">已过期</text>
+                  <text class="batch-tag near" wx:elif="{{item.isNearExpiry}}">近效期</text>
+                  <text class="batch-tag new" wx:if="{{item.isNew}}">新增</text>
+                </view>
+              </view>
+              <text class="batch-remove" wx:if="{{item.isNew}}" bindtap="onRemoveBatch" data-index="{{index}}">删除</text>
+            </view>
+
+            <!-- 批次有效期/库位 -->
+            <view class="batch-meta">
+              <text class="batch-meta-item" wx:if="{{!item.isNew}}">有效期 {{item.expiryDate || '-'}}</text>
+              <view class="batch-meta-item new-expiry" wx:if="{{item.isNew}}">
+                <text class="batch-meta-label">有效期</text>
+                <input class="batch-expiry-input" placeholder="YYYY-MM-DD" value="{{item.expiryDate}}" bindinput="onNewBatchExpiryInput" data-index="{{index}}" />
+              </view>
+              <text class="batch-meta-item" wx:if="{{item.locationCode}}">库位 {{item.locationCode}}</text>
+            </view>
+
+            <!-- 批次数量调整 -->
+            <view class="batch-count-row">
+              <view class="batch-count-cell">
+                <text class="batch-count-label">系统</text>
+                <text class="batch-count-val">{{item.stockCount}}</text>
+              </view>
+              <view class="batch-count-cell primary">
+                <text class="batch-count-label">盘点</text>
+                <view class="batch-input-group">
+                  <view class="batch-btn minus" bindtap="onBatchMinus" data-index="{{index}}"><text>−</text></view>
+                  <input class="batch-input" type="number" value="{{item.checkCount}}" bindinput="onBatchCountInput" data-index="{{index}}" />
+                  <view class="batch-btn plus" bindtap="onBatchPlus" data-index="{{index}}"><text>+</text></view>
+                </view>
+              </view>
+              <view class="batch-count-cell diff {{item.diff > 0 ? 'positive' : item.diff < 0 ? 'negative' : ''}}">
+                <text class="batch-count-label">差异</text>
+                <text class="batch-count-val">{{item.diff > 0 ? '+' : ''}}{{item.diff}}</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 新增批次按钮 -->
+          <view class="batch-add" bindtap="onAddBatch">
+            <text class="batch-add-text">+ 新增批次</text>
+          </view>
         </view>
-        <textarea class="remark-input" placeholder="选填" maxlength="100" value="{{remark}}" bindinput="onRemarkInput"></textarea>
-      </view>
+      </block>
+
+      <!-- ====== 单批次模式 ====== -->
+      <block wx:else>
+        <view class="count-card">
+          <view class="count-diff-banner {{checkCount > product.stockCount ? 'positive' : checkCount < product.stockCount ? 'negative' : 'zero'}}">
+            <text class="count-diff-label" wx:if="{{checkCount !== product.stockCount}}">{{checkCount > product.stockCount ? '盘盈' : '盘亏'}}</text>
+            <text class="count-diff-label" wx:else>账实相符</text>
+            <text class="count-diff-val" wx:if="{{checkCount !== product.stockCount}}">{{checkCount > product.stockCount ? '+' : ''}}{{checkCount - product.stockCount}} {{product.unitName}}</text>
+          </view>
+          <view class="count-compare">
+            <view class="count-cell">
+              <text class="count-cell-label">系统库存</text>
+              <text class="count-cell-val">{{product.stockCount}}</text>
+            </view>
+            <view class="count-arrow">→</view>
+            <view class="count-cell primary">
+              <text class="count-cell-label">实际盘点</text>
+              <text class="count-cell-val">{{checkCount}}</text>
+            </view>
+          </view>
+          <view class="count-row">
+            <view class="count-btn minus" bindtap="onCountMinus">
+              <text>−</text>
+            </view>
+            <input class="count-input" type="number" value="{{checkCount}}" bindinput="onCountInput" />
+            <view class="count-btn plus" bindtap="onCountPlus">
+              <text>+</text>
+            </view>
+            <text class="count-unit">{{product.unitName}}</text>
+          </view>
+        </view>
+
+        <view class="fold-card">
+          <view class="fold-head" bindtap="onToggleInfoFold">
+            <text class="fold-title">库位 / 批次 / 备注</text>
+            <text class="fold-arrow {{infoFoldOpen ? 'open' : ''}}">›</text>
+          </view>
+          <view class="fold-body" wx:if="{{infoFoldOpen}}">
+            <view class="fold-row clickable" bindtap="onSelectLocation">
+              <text class="fold-key">库位</text>
+              <text class="fold-val">{{location || '点击选择'}}</text>
+              <text class="fold-go">›</text>
+            </view>
+            <view class="fold-row">
+              <text class="fold-key">批号</text>
+              <text class="fold-val">{{batchNo || '-'}}</text>
+            </view>
+            <view class="fold-row">
+              <text class="fold-key">有效期</text>
+              <text class="fold-val">{{expiryDate || '-'}}</text>
+            </view>
+            <view class="fold-row fold-remark">
+              <text class="fold-key">备注</text>
+              <textarea class="fold-remark-input" placeholder="选填" maxlength="100" value="{{remark}}" bindinput="onRemarkInput"></textarea>
+            </view>
+          </view>
+        </view>
+      </block>
 
       <!-- 操作按钮 -->
       <view class="action-bar">
         <button class="btn-save" bindtap="onSave" loading="{{saving}}" disabled="{{saving}}">保存盘点结果</button>
-        <button class="btn-next" bindtap="onContinueScan">继续扫描下一件</button>
+        <view class="btn-next" bindtap="onContinueScan">继续扫描下一件</view>
       </view>
 
     </block>
@@ -147,7 +266,6 @@
       <text class="loading-text">加载库位...</text>
     </view>
 
-    <!-- 库位网格 -->
     <view class="loc-grid" wx:elif="{{locations.length > 0 && !searching}}">
       <view class="loc-item {{selectedLocation === item.code ? 'selected' : ''}}" wx:for="{{locations}}" wx:key="id" bindtap="onLocationTap" data-location="{{item.code}}">
         <image class="loc-icon" src="/images/icon-stock.png" mode="aspectFit"></image>
@@ -160,13 +278,11 @@
       <text class="loading-text">搜索中...</text>
     </view>
 
-    <!-- 库位无商品 -->
     <view class="empty-wrap" wx:if="{{!searching && selectedLocation && locationProducts.length === 0}}">
       <image class="empty-img" src="/images/icon-document.png" mode="aspectFit"></image>
       <text class="empty-text">该库位下暂无商品</text>
     </view>
 
-    <!-- 库位商品列表 -->
     <block wx:if="{{locationProducts.length > 0}}">
       <view class="section-head">
         <text class="section-label">库位 {{selectedLocation}} 的商品</text>

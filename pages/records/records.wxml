@@ -28,7 +28,7 @@
         <view class="record-header">
           <view class="record-title-row">
             <text class="record-title">{{item.checkNo}}</text>
-            <text class="record-status status-{{item.status}}">{{item.status === 'completed' ? '已完成' : item.status === 'pending' ? '进行中' : item.status}}</text>
+            <text class="record-status status-{{item.status}}">{{item.status === 'pending' ? '待审核' : item.status === 'approved' ? '已审核' : item.status === 'cancelled' ? '已撤销' : item.status}}</text>
           </view>
           <text class="record-date">{{item.createdAt}}</text>
         </view>

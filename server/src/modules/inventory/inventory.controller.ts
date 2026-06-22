@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { InventoryService } from './inventory.service';
-import { QueryInventoryDto, SaveCheckDto, QueryCheckRecordDto } from './dto/inventory.dto';
+import { QueryInventoryDto, SaveCheckDto, SaveCheckBatchDto, QueryCheckRecordDto } from './dto/inventory.dto';
 
 @Controller('inventory')
 @UseGuards(AuthGuard('jwt'))
@@ -71,6 +71,18 @@ export class CheckController {
     return { code: 200, message: '保存成功', data };
   }
 
+  @Post('save-batch')
+  @HttpCode(HttpStatus.OK)
+  async saveBatch(@Body() body: SaveCheckBatchDto, @Req() req: any) {
+    const dto = {
+      ...body,
+      operatorId: req.user.id,
+      operatorName: req.user.name,
+    };
+    const data = await this.inventoryService.saveCheckBatch(dto);
+    return { code: 200, message: '保存成功', data };
+  }
+
   @Get('records')
   async getRecords(@Query() query: QueryCheckRecordDto) {
     const data = await this.inventoryService.getCheckRecords(query);
@@ -81,5 +93,21 @@ export class CheckController {
   async getRecordDetail(@Param('id') id: string) {
     const data = await this.inventoryService.getCheckDetail(id);
     return { code: 200, data };
+  }
+
+  @Delete(':id')
+  async undo(@Param('id') id: string) {
+    const data = await this.inventoryService.undoCheck(id);
+    return { code: 200, message: '撤销成功', data };
+  }
+
+  @Post(':id/approve')
+  @HttpCode(HttpStatus.OK)
+  async approve(@Param('id') id: string, @Req() req: any) {
+    const data = await this.inventoryService.approveCheck(id, {
+      id: req.user.id,
+      name: req.user.name,
+    });
+    return { code: 200, message: '审核成功', data };
   }
 }
