@@ -266,6 +266,15 @@
       </view>
     </view>
 
+    <!-- 底部合计（与入库单一致，放在商品卡片内） -->
+    <view class="section-summary" wx:if="{{items.length > 0}}">
+      <view class="section-summary-row">
+        <text class="summary-label">合计</text>
+        <text class="summary-qty">{{totalQuantity || 0}} 件</text>
+        <text class="summary-amount">¥ {{totalAmount || '0.00'}}</text>
+      </view>
+    </view>
+
     <view class="items-empty" wx:if="{{items.length === 0}}">
       <text class="items-empty-text">暂无商品，请在上方搜索添加</text>
     </view>
@@ -323,16 +332,9 @@
     </view>
   </view>
 
-  <!-- ===== 底部操作栏（编辑模式） ===== -->
-  <view class="bottom-bar" wx:if="{{editing}}">
+  <!-- ===== NEW => save draft + submit ===== -->
+  <view class="bottom-bar" wx:if="{{!id}}">
     <view class="bottom-inner">
-      <view class="bottom-summary">
-        <view class="bottom-summary-left">
-          <text class="summary-label">合计</text>
-          <text class="summary-qty">{{totalQuantity || 0}} 件</text>
-        </view>
-        <text class="summary-amount">¥ {{totalAmount || '0.00'}}</text>
-      </view>
       <view class="bottom-actions">
         <button class="action-btn action-draft" bindtap="onSave" disabled="{{submitting}}">{{submitting ? '保存中...' : '保存草稿'}}</button>
         <button class="action-btn action-submit" bindtap="onSubmit" disabled="{{submitting}}">{{submitting ? '提交中...' : '提交审核'}}</button>
@@ -340,24 +342,32 @@
     </view>
   </view>
 
-  <!-- ===== 底部操作栏（只读模式） ===== -->
+  <!-- ===== DRAFT detail => cancel / edit|save / submit ===== -->
+  <view class="bottom-bar" wx:elif="{{statusCls === 'draft' && id}}">
+    <view class="bottom-inner">
+      <view class="bottom-inner-actions">
+        <button class="action-btn action-cancel" bindtap="onCancel" disabled="{{submitting}}">{{submitting ? '处理中...' : '取消'}}</button>
+        <button class="action-btn action-edit-toggle" wx:if="{{!editing}}" bindtap="onToggleEdit" disabled="{{submitting}}">编辑</button>
+        <button class="action-btn action-save" wx:if="{{editing}}" bindtap="onSave" disabled="{{submitting}}">{{submitting ? '保存中...' : '保存草稿'}}</button>
+        <button class="action-btn action-submit" bindtap="onSubmit" disabled="{{submitting}}">{{submitting ? '提交中...' : '提交审核'}}</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== PENDING => back / withdraw / approve ===== -->
+  <view class="bottom-bar" wx:elif="{{statusCls === 'pending'}}">
+    <view class="bottom-inner">
+      <view class="bottom-inner-actions">
+        <button class="action-btn action-back" bindtap="onBack">返回</button>
+        <button class="action-btn action-withdraw" bindtap="onWithdraw" disabled="{{submitting}}">{{submitting ? '处理中...' : '撤回'}}</button>
+        <button class="action-btn action-approve" bindtap="onApprove" disabled="{{submitting}}">{{submitting ? '处理中...' : '审核通过'}}</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== READ-ONLY (approved/cancelled) ===== -->
   <view class="bottom-bar" wx:else>
-    <view class="bottom-inner bottom-actions" wx:if="{{!id}}">
-      <button class="action-btn action-back-full" bindtap="onBack">返回列表</button>
-    </view>
-    <view class="bottom-inner bottom-actions" wx:elif="{{statusCls === 'draft'}}">
-      <button class="action-btn action-back" bindtap="onBack">返回</button>
-      <button class="action-btn action-edit-toggle" bindtap="onToggleEdit">编辑</button>
-      <button class="action-btn action-cancel" bindtap="onCancel" disabled="{{submitting}}">{{submitting ? '处理中...' : '取消'}}</button>
-    </view>
-    <view class="bottom-inner bottom-actions" wx:elif="{{statusCls === 'pending'}}">
-      <button class="action-btn action-back" bindtap="onBack">返回</button>
-      <button class="action-btn action-edit-toggle" bindtap="onToggleEdit">编辑</button>
-      <button class="action-btn action-withdraw" bindtap="onWithdraw" disabled="{{submitting}}">{{submitting ? '处理中...' : '撤回'}}</button>
-      <button class="action-btn action-cancel" bindtap="onCancel" disabled="{{submitting}}">{{submitting ? '处理中...' : '取消出库'}}</button>
-      <button class="action-btn action-approve" bindtap="onApprove" disabled="{{submitting}}">{{submitting ? '处理中...' : '审核通过'}}</button>
-    </view>
-    <view class="bottom-inner bottom-inner-single" wx:else>
+    <view class="bottom-inner bottom-inner-single">
       <button class="action-btn action-back-full" bindtap="onBack">返回列表</button>
     </view>
   </view>

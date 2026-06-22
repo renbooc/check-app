@@ -2,6 +2,7 @@ const { api } = require('../../utils/request')
 const { showError } = require('../../utils/util')
 
 const STATUS_MAP = {
+  draft: '草稿',
   pending: '待审核',
   approved: '已审核',
   cancelled: '已取消',

@@ -51,6 +51,7 @@
 .info-icon-order::after { content: ''; position: absolute; width: 3rpx; height: 8rpx; background: #E83E8C; top: -6rpx; left: 5rpx; border-radius: 1rpx; }
 .info-icon-qty { width: 16rpx; height: 16rpx; border-radius: 2rpx; background: #E83E8C; flex-shrink: 0; }
 .status-tag { font-size: 20rpx; font-weight: 500; padding: 4rpx 12rpx; border-radius: 100rpx; flex-shrink: 0; }
+.tag-draft { background: #f5f5f5; color: #5c5c5c; }
 .tag-pending { background: #FFF0F5; color: #E83E8C; }
 .tag-approved { background: #ECFDF5; color: #00B42A; }
 .tag-cancelled { background: #f5f5f5; color: #999; }

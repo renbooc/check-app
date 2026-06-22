@@ -400,12 +400,64 @@ Page({
     this.setData({ items })
   },
 
+  // ============================================================
+  //  校验
+  // ============================================================
+  validate() {
+    const items = this.data.items
+    if (items.length === 0) {
+      wx.showToast({ title: '请添加出库商品', icon: 'none' })
+      return false
+    }
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]
+      if (!item.quantity || parseFloat(item.quantity) <= 0) {
+        wx.showToast({ title: `第${i + 1}项数量无效`, icon: 'none' })
+        return false
+      }
+      if (!item.price || parseFloat(item.price) <= 0) {
+        wx.showToast({ title: `第${i + 1}项单价无效`, icon: 'none' })
+        return false
+      }
+    }
+    return true
+  },
+
+  validateSubmit() {
+    if (!this.data.warehouseId) {
+      wx.showToast({ title: '请选择仓库', icon: 'none' })
+      return false
+    }
+    if (!this.data.outboundDate) {
+      wx.showToast({ title: '请选择出库日期', icon: 'none' })
+      return false
+    }
+    return this.validateRequired()
+  },
+
+  validateRequired() {
+    const items = this.data.items
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]
+      if (!item.batchNo) {
+        wx.showToast({ title: `第${i + 1}项批号未录入`, icon: 'none', duration: 2000 })
+        return false
+      }
+      if (!item.productionDate) {
+        wx.showToast({ title: `第${i + 1}项生产日期未录入`, icon: 'none', duration: 2000 })
+        return false
+      }
+      if (!item.expiryDate) {
+        wx.showToast({ title: `第${i + 1}项有效期未录入`, icon: 'none', duration: 2000 })
+        return false
+      }
+    }
+    return true
+  },
+
   async onSave() {
     if (this.data.submitting) return
-    if (this.data.items.length === 0) {
-      wx.showToast({ title: '请添加出库商品', icon: 'none' })
-      return
-    }
+    if (!this.validate()) return
     this.setData({ submitting: true })
     try {
       const items = this.data.items.map(item => ({
@@ -457,10 +509,8 @@ Page({
       wx.showToast({ title: '请选择客户', icon: 'none' })
       return
     }
-    if (this.data.items.length === 0) {
-      wx.showToast({ title: '请添加出库商品', icon: 'none' })
-      return
-    }
+    if (!this.validate()) return
+    if (!this.validateSubmit()) return
     this.setData({ submitting: true })
     try {
       const items = this.data.items.map(item => ({
@@ -505,6 +555,7 @@ Page({
 
   async onApprove() {
     if (this.data.submitting) return
+    if (!this.validateRequired()) return
     this.setData({ submitting: true })
     try {
       await api.put('/outbound/' + this.data.id + '/status', { status: 'approved' })

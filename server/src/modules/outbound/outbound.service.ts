@@ -250,7 +250,7 @@ export class OutboundService {
   }) {
     const note = await this.noteRepo.findOne({ where: { id } });
     if (!note) throw new NotFoundException('出库单不存在');
-    if (note.status !== 'pending') throw new NotFoundException('仅待审核出库单可编辑');
+    if (note.status !== 'draft' && note.status !== 'pending') throw new NotFoundException('仅草稿或待审核出库单可编辑');
 
     if (dto.remark !== undefined) note.remark = dto.remark;
     if (dto.outboundDate !== undefined) note.outboundDate = dto.outboundDate;
