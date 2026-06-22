@@ -135,7 +135,7 @@ export class InventoryService {
     };
   }
 
-  async getStockList(params: { keyword?: string; warehouseId?: string; locationId?: string }) {
+  async getStockList(params: { keyword?: string; warehouseId?: string; locationId?: string; locationCode?: string }) {
     const qb = this.inventoryRepo
       .createQueryBuilder('i')
       .leftJoinAndSelect('i.product', 'p')
@@ -419,8 +419,6 @@ export class InventoryService {
               warehouseId: '',
               batchCode: '',
               batchNo: item.batchNo,
-              productionDate: null,
-              expiryDate: null,
               price: 0,
               quantity: item.checkQuantity,
               pendingQuantity: 0,
@@ -439,7 +437,7 @@ export class InventoryService {
           beforeQuantity: item.stockQuantity,
           afterQuantity: item.checkQuantity,
           relatedOrderId: check.id,
-          batchNo: item.batchNo || null,
+          batchNo: item.batchNo || undefined,
           operatorId: operator.id,
           operatorName: operator.name,
           remark: check.remark,
