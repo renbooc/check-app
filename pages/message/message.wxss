@@ -137,7 +137,7 @@
 
 .msg-type-info    { background: #0077C2; }
 .msg-type-warn    { background: #FF7D00; }
-.msg-type-error   { background: #00BFFF; }
+.msg-type-error   { background: #e74c3c; }
 .msg-type-success { background: #00B42A; }
 
 /* ---------- 消息内容区 ---------- */
@@ -196,7 +196,7 @@
   width: 14rpx;
   height: 14rpx;
   border-radius: 50%;
-  background: #00BFFF;
+  background: #e74c3c;
   flex-shrink: 0;
 }
 

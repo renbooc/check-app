@@ -1,6 +1,6 @@
 /* ============================================================
    商品列表 — 管理页
-   白色背景 + 琥珀色主色 #F59E0B
+   白色背景 + 品牌蓝主色 #0077C2（与全项目统一）
    ============================================================ */
 
 .page {
@@ -103,10 +103,10 @@
 }
 
 .chip-active {
-  background: #F59E0B;
+  background: #0077C2;
   color: #ffffff;
   font-weight: 500;
-  box-shadow: 0 4rpx 12rpx rgba(245, 158, 11, 0.25);
+  box-shadow: 0 4rpx 12rpx rgba(0, 119, 194, 0.25);
 }
 
 /* ============================================================
@@ -255,8 +255,8 @@
 .product-category-tag {
   flex-shrink: 0;
   font-size: 20rpx;
-  color: #F59E0B;
-  background: rgba(245, 158, 11, 0.1);
+  color: #0077C2;
+  background: rgba(0, 119, 194, 0.1);
   padding: 4rpx 14rpx;
   border-radius: 20rpx;
   line-height: 1.4;
@@ -274,8 +274,8 @@
 /* 分类标签（顶部） */
 .category-tag {
   font-size: 18rpx;
-  color: #F59E0B;
-  background: rgba(245, 158, 11, 0.1);
+  color: #0077C2;
+  background: rgba(0, 119, 194, 0.1);
   padding: 3rpx 10rpx;
   border-radius: 18rpx;
   flex-shrink: 0;
@@ -360,14 +360,14 @@
 
 .price-sign {
   font-size: 22rpx;
-  color: #ff4d4f;
+  color: #333333;
   font-weight: 600;
 }
 
 .price-num {
   font-size: 32rpx;
   font-weight: 700;
-  color: #ff4d4f;
+  color: #333333;
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
 }
 
@@ -440,7 +440,7 @@
   height: 80rpx;
   padding: 0 36rpx;
   margin-left: auto;
-  background: #F59E0B;
+  background: #0077C2;
   border-radius: 16rpx;
   color: #ffffff;
   font-size: 28rpx;

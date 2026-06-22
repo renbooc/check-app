@@ -138,7 +138,7 @@
   width: 10rpx;
   height: 10rpx;
   border-radius: 50%;
-  background: #00E5A0;
+  background: #5AE880;
   flex-shrink: 0;
 }
 

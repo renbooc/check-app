@@ -33,7 +33,8 @@
       <view class="start-card">
         <image class="start-img" src="/images/icon-quick-check.png" mode="aspectFit"></image>
         <text class="start-title">开始盘点</text>
-        <text class="start-desc">扫描药品条码或搜索名称\n快速完成库存盘点</text>
+        <text class="start-desc">扫描药品条码或搜索名称
+快速完成库存盘点</text>
         <button class="start-btn" bindtap="onScanCode">扫码盘点</button>
         <text class="start-hint">也可在上方搜索框输入药品名称</text>
       </view>

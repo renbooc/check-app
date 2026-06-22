@@ -783,17 +783,17 @@
 }
 
 .status-tag-pending {
-  color: #1890ff;
+  color: #0077C2;
   font-weight: 600;
 }
 
 .status-tag-approved {
-  color: #52c41a;
+  color: #00B42A;
   font-weight: 600;
 }
 
 .status-tag-received {
-  color: #52c41a;
+  color: #00B42A;
   font-weight: 600;
 }
 

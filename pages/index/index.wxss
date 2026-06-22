@@ -111,7 +111,7 @@
   background: linear-gradient(135deg, #0077C2 0%, #59a5f5 100%);
   margin: 20rpx 20rpx 0;
   padding: 32rpx 32rpx 36rpx;
-  border-radius: 12rpx;
+  border-radius: 16rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
   position: relative;
   overflow: hidden;
@@ -236,7 +236,7 @@
   background: #FFFFFF;
   margin: 20rpx 20rpx 0;
   padding: 28rpx 0 24rpx;
-  border-radius: 12rpx;
+  border-radius: 16rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
@@ -271,7 +271,7 @@
 }
 
 .kpi-num-warn {
-  color: #00BFFF;
+  color: #FF7D00;
 }
 
 /* KPI 标签行（色点 + 文字） */
@@ -310,7 +310,7 @@
   background: #FFFFFF;
   margin: 20rpx 20rpx 0;
   padding: 28rpx 12rpx 8rpx;
-  border-radius: 12rpx;
+  border-radius: 16rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
@@ -387,7 +387,7 @@
 .orders-card {
   background: #FFFFFF;
   margin: 20rpx 20rpx 0;
-  border-radius: 12rpx;
+  border-radius: 16rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
   overflow: hidden;
 }

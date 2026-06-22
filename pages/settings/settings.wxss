@@ -9,23 +9,44 @@
   padding: 0 24rpx 60rpx;
 }
 
-/* ===== 页面头部 ===== */
+/* ===== 页面头部（渐变标题卡，与消息页/采购表单统一设计语言） ===== */
 .page-header {
-  padding: 48rpx 4rpx 32rpx;
+  background: linear-gradient(135deg, #0077C2 0%, #59a5f5 100%);
+  padding: 40rpx 32rpx;
+  border-radius: 16rpx;
+  margin: 24rpx 0 32rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  width: 280rpx;
+  height: 280rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  top: -80rpx;
+  right: -60rpx;
+  pointer-events: none;
 }
 
 .page-title {
   display: block;
   font-size: 36rpx;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #FFFFFF;
   margin-bottom: 8rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .page-sub {
   display: block;
   font-size: 24rpx;
-  color: #999;
+  color: rgba(255, 255, 255, 0.75);
+  position: relative;
+  z-index: 1;
 }
 
 /* ===== 卡片 ===== */
@@ -97,7 +118,7 @@
 .setting-desc {
   display: block;
   font-size: 22rpx;
-  color: #bbb;
+  color: #999999;
   margin-top: 4rpx;
 }
 
@@ -122,5 +143,5 @@
   text-align: center;
   padding: 40rpx 0;
   font-size: 22rpx;
-  color: #ccc;
+  color: #999999;
 }
