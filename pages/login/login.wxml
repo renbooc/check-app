@@ -26,7 +26,8 @@
         <input wx:if="{{showPassword}}" class="form-input" placeholder="请输入密码" value="{{password}}" bindinput="onPasswordInput" />
         <input wx:else class="form-input" placeholder="请输入密码" password="{{true}}" value="{{password}}" bindinput="onPasswordInput" />
         <view class="toggle-pwd" bindtap="togglePassword">
-          <text class="toggle-text">{{showPassword ? '隐藏' : '显示'}}</text>
+          <icon-cmp wx:if="{{showPassword}}" type="eye-off" size="18" color="rgba(0,119,194,0.55)" />
+          <icon-cmp wx:else type="eye" size="18" color="rgba(0,119,194,0.55)" />
         </view>
       </view>
     </view>
@@ -36,14 +37,17 @@
     </button>
 
     <!-- 隐私协议 -->
-    <view class="agreement-row">
-      <view class="agreement-checkbox {{agreed ? 'checked' : ''}}" bindtap="onToggleAgreement">
-        <view class="checkbox-icon" wx:if="{{agreed}}">✓</view>
+    <view class="agreement-row" bindtap="onToggleAgreement">
+      <view class="agreement-checkbox {{agreed ? 'checked' : ''}}">
+        <view class="checkbox-inner">
+          <icon-cmp wx:if="{{agreed}}" type="check" size="12" color="#ffffff" />
+        </view>
       </view>
       <text class="agreement-text">
         已阅读并同意
-        <text class="agreement-link" bindtap="onViewPrivacy">《隐私政策》</text>
-        <text class="agreement-link" bindtap="onViewTerms">《用户协议》</text>
+        <text class="agreement-link" catchtap="onViewPrivacy">《隐私政策》</text>
+        <text class="agreement-text-divider">和</text>
+        <text class="agreement-link" catchtap="onViewTerms">《用户协议》</text>
       </text>
     </view>
 

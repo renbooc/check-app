@@ -9,6 +9,9 @@ import { PurchaseOrderItem } from '../../entities/purchase-order-item.entity';
 import { SalesOrder } from '../../entities/sales-order.entity';
 import { SalesOrderItem } from '../../entities/sales-order-item.entity';
 import { Notification } from '../../entities/notification.entity';
+import { InboundNote } from '../../entities/inbound-note.entity';
+import { OutboundNote } from '../../entities/outbound-note.entity';
+import { StockCheck } from '../../entities/stock-check.entity';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import { Notification } from '../../entities/notification.entity';
       SalesOrder,
       SalesOrderItem,
       Notification,
+      InboundNote,
+      OutboundNote,
+      StockCheck,
     ]),
   ],
   controllers: [ReportController],

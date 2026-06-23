@@ -25,7 +25,7 @@
           </view>
         </view>
         <view class="hero-edit" bindtap="onNavigate" data-url="/pages/settings/settings">
-          <image class="hero-edit-icon" src="/images/icon-settings.png" mode="aspectFit"></image>
+          <icon-cmp type="setting" size="17" color="rgba(255,255,255,0.85)" />
         </view>
       </view>
       <view class="hero-foot">
@@ -144,7 +144,7 @@
     </view>
 
     <view class="version-bar">
-      <text class="version-text">药品进销存ERP v2.0.0</text>
+      <text class="version-text">博进ERP v1.2.0</text>
     </view>
 
   </block>

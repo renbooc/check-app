@@ -225,11 +225,17 @@ Page({
   loadUnreadCount() {
     var that = this
     api.get('/report/notifications', { unread: true, pageSize: 1 }).then(function (res) {
-      var total = (res && res.total) || 0
+      var activeCount = (res && (res.activeCount !== undefined ? res.activeCount : res.total)) || 0
       that.setData({
-        unreadDotCls: total > 0 ? 'unread-dot' : 'unread-dot unread-dot-hidden'
+        unreadDotCls: activeCount > 0 ? 'unread-dot' : 'unread-dot unread-dot-hidden'
       })
-    }).catch(function () {})
+    }).catch(function (err) {
+      console.warn('[Index] loadUnreadCount error:', err && err.message)
+      // 请求失败时默认隐藏红点
+      that.setData({
+        unreadDotCls: 'unread-dot unread-dot-hidden'
+      })
+    })
   },
 
   onGoReport() {

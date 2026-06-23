@@ -8,6 +8,9 @@ import { PurchaseOrderItem } from '../../entities/purchase-order-item.entity';
 import { SalesOrder, SalesOrderStatus } from '../../entities/sales-order.entity';
 import { SalesOrderItem } from '../../entities/sales-order-item.entity';
 import { Notification, NotificationStatus } from '../../entities/notification.entity';
+import { InboundNote, InboundNoteStatus } from '../../entities/inbound-note.entity';
+import { OutboundNote, OutboundNoteStatus } from '../../entities/outbound-note.entity';
+import { StockCheck } from '../../entities/stock-check.entity';
 
 @Injectable()
 export class ReportService {
@@ -26,6 +29,12 @@ export class ReportService {
     private salesItemRepo: Repository<SalesOrderItem>,
     @InjectRepository(Notification)
     private notificationRepo: Repository<Notification>,
+    @InjectRepository(InboundNote)
+    private inboundRepo: Repository<InboundNote>,
+    @InjectRepository(OutboundNote)
+    private outboundRepo: Repository<OutboundNote>,
+    @InjectRepository(StockCheck)
+    private checkRepo: Repository<StockCheck>,
   ) {}
 
   /**
@@ -190,10 +199,56 @@ export class ReportService {
       await this.upsertNotification(sourceId, 'sales', 'info', '销售单待审核', content);
     }
 
+    // ---- 待审核入库单 ----
+    const pendingInbound = await this.inboundRepo.find({
+      where: { status: InboundNoteStatus.PENDING },
+      take: 10,
+    });
+    const activeInboundIds = pendingInbound.map((o) => `inbound-${o.id}`);
+
+    for (const note of pendingInbound) {
+      const sourceId = `inbound-${note.id}`;
+      const content = `${note.orderNo} · ¥${note.totalAmount}`;
+      await this.upsertNotification(sourceId, 'inbound', 'info', '入库单待审核', content);
+    }
+
+    // ---- 待审核出库单 ----
+    const pendingOutbound = await this.outboundRepo.find({
+      where: { status: OutboundNoteStatus.PENDING },
+      take: 10,
+    });
+    const activeOutboundIds = pendingOutbound.map((o) => `outbound-${o.id}`);
+
+    for (const note of pendingOutbound) {
+      const sourceId = `outbound-${note.id}`;
+      const content = `${note.orderNo} · ¥${note.totalAmount}`;
+      await this.upsertNotification(sourceId, 'outbound', 'info', '出库单待审核', content);
+    }
+
+    // ---- 待审核盘点单 ----
+    const pendingChecks = await this.checkRepo.find({
+      where: { status: 'pending' },
+      take: 10,
+    });
+    const activeCheckIds = pendingChecks.map((o) => `check-${o.id}`);
+
+    for (const check of pendingChecks) {
+      const sourceId = `check-${check.id}`;
+      const content = `${check.checkNo} · 共 ${check.totalProducts} 种商品`;
+      await this.upsertNotification(sourceId, 'check', 'info', '盘点单待审核', content);
+    }
+
     // ================================================================
     // Phase 2: 自动解决已失效的通知（条件不再满足）
     // ================================================================
-    const allActiveSourceIds = [...activeLowStockIds, ...activePurchaseIds, ...activeSalesIds];
+    const allActiveSourceIds = [
+      ...activeLowStockIds,
+      ...activePurchaseIds,
+      ...activeSalesIds,
+      ...activeInboundIds,
+      ...activeOutboundIds,
+      ...activeCheckIds,
+    ];
 
     // 查找所有 ACTIVE 或 READ 的通知，但当前条件下已经不存在的
     let staleNotifications: any[] = [];
@@ -260,6 +315,32 @@ export class ReportService {
       updateData.readAt = existing.readAt;
     }
     await this.notificationRepo.update(existing.id, updateData);
+  }
+
+  /**
+   * 获取各模块待审核数量（供首页红点使用）
+   */
+  async getPendingCounts() {
+    const [purchaseCount, salesCount, inboundCount, outboundCount, checkCount] =
+      await Promise.all([
+        this.purchaseRepo.count({ where: { status: PurchaseOrderStatus.PENDING } }),
+        this.salesRepo.count({ where: { status: SalesOrderStatus.PENDING } }),
+        this.inboundRepo.count({ where: { status: InboundNoteStatus.PENDING } }),
+        this.outboundRepo.count({ where: { status: OutboundNoteStatus.PENDING } }),
+        this.checkRepo.count({ where: { status: 'pending' } }),
+      ]);
+
+    const total =
+      purchaseCount + salesCount + inboundCount + outboundCount + checkCount;
+
+    return {
+      total,
+      purchase: purchaseCount,
+      sales: salesCount,
+      inbound: inboundCount,
+      outbound: outboundCount,
+      check: checkCount,
+    };
   }
 
   /**

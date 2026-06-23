@@ -104,6 +104,24 @@
   display: none;
 }
 
+/* 未读红点呼吸灯 */
+.unread-dot {
+  animation: breathe 2s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.6);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.15);
+    box-shadow: 0 0 12rpx 6rpx rgba(231, 76, 60, 0.25);
+  }
+}
+
 /* ============================================================
    销售 Hero 卡片（深蓝渐变 — 页面视觉焦点）
    ============================================================ */

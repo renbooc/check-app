@@ -55,6 +55,15 @@ export class ReportController {
   }
 
   /**
+   * 各模块待审核数量（供首页红点使用）
+   */
+  @Get('pending-counts')
+  async getPendingCounts() {
+    const data = await this.reportService.getPendingCounts();
+    return { code: 200, data };
+  }
+
+  /**
    * 标记单条通知已读
    */
   @Put('notifications/:id/read')

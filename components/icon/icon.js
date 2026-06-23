@@ -24,6 +24,9 @@ const SVG_PATHS = {
   'check-circle': '<circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>',
   'list': '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="0.5"/><circle cx="4" cy="12" r="0.5"/><circle cx="4" cy="18" r="0.5"/>',
   'package': '<path d="M16.5 9.4L7.5 4.5m9 10.2l-9-5.1M12 21V12M3.5 8l4.1-2.3M3.5 8v7.5c0 .8.4 1.5 1 1.9l6.5 4c.6.4 1.5.4 2 0l6.5-4c.6-.4 1-1.1 1-1.9V8m-17 0l6.5-4c.6-.4 1.5-.4 2 0l6.5 4"/>',
+  'eye': '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  'eye-off': '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line x1="4" y1="4" x2="20" y2="20"/>',
+  'check': '<polyline points="4 12 9 17 20 6"/>',
 }
 
 function svgDataUri(svgPath, color, size) {
